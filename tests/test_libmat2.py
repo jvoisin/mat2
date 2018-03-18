@@ -31,6 +31,5 @@ class TestCleaning(unittest.TestCase):
         self.assertTrue(ret)
 
         p = pdf.PDFParser('./tests/data/clean.pdf.cleaned')
-        remaining_meta = {'creator': 'cairo 1.14.10 (http://cairographics.org)',
-                'producer': 'cairo 1.14.10 (http://cairographics.org)'}
-        self.assertEqual(p.get_meta(), remaining_meta)
+        expected_meta = {'creation-date': -1, 'format': 'PDF-1.5', 'mod-date': -1}
+        self.assertEqual(p.get_meta(), expected_meta)
