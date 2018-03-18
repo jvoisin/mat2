@@ -11,7 +11,7 @@ import io
 import cairo
 import gi
 gi.require_version('Poppler', '0.18')
-from gi.repository import Poppler
+from gi.repository import Poppler, Gio, GLib
 
 try:
     from PIL import Image
@@ -43,7 +43,8 @@ class PDFParser(abstract.AbstractParser):
         """
         document = Poppler.Document.new_from_file(self.uri, self.password)
 
-        pdf_surface = cairo.PDFSurface(self.output_filename, 128, 128)
+        pdf_out = io.BytesIO()
+        pdf_surface = cairo.PDFSurface(pdf_out, 128, 128)
         pdf_context = cairo.Context(pdf_surface)
 
         for pagenum in range(document.get_n_pages()):
@@ -63,8 +64,6 @@ class PDFParser(abstract.AbstractParser):
             img_surface.finish()
             buf.seek(0)
 
-            #buf = self.__optimize_image_size(buf)
-
             img = cairo.ImageSurface.create_from_png(buf)
             pdf_surface.set_size(page_width*2, page_height*2)
             pdf_context.set_source_surface(img, 0, 0)
@@ -73,11 +72,24 @@ class PDFParser(abstract.AbstractParser):
 
         pdf_surface.finish()
 
-        # This is removing metadata
-        #document = Poppler.Document.new_from_file('file://' + os.path.abspath('OUT.pdf'), self.password)
-        #document.set_producer('totally not MAT2 ;)')
-        #document.set_creator('')
-        #document.save('file://' + os.path.abspath("OUT_clean.pdf"))
+        b = GLib.Bytes(pdf_out.getvalue())
+        input_stream = Gio.MemoryInputStream.new_from_bytes(b)
+        out_document = Poppler.Document.new_from_stream(input_stream, -1, self.password, None)
+        metadata = {}
+        for key in self.meta_list:
+            if out_document.get_property(key):
+                metadata[key] = str(out_document.get_property(key))
+        out_document.set_producer('totally not MAT2 ;)')
+        out_document.set_creator('')
+        print("AFTER")
+        metadata = {}
+        for key in self.meta_list:
+            if out_document.get_property(key):
+                metadata[key] = str(out_document.get_property(key))
+        print("LOL")
+        out_document.save('file://' + os.path.abspath("olol.pdf"))
+
+        print(metadata)
 
         return True
 
@@ -89,5 +101,5 @@ class PDFParser(abstract.AbstractParser):
         metadata = {}
         for key in self.meta_list:
             if document.get_property(key):
-                metadata[key] = document.get_property(key)
+                metadata[key] = str(document.get_property(key))
         return metadata
