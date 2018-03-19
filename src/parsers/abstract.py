@@ -3,6 +3,7 @@ class AbstractParser(object):
         self.filename = filename
         self.output_filename = filename + '.cleaned'
         self.meta_list = set()
+        self.mimetypes = set()
 
     def get_meta(self):
         raise NotImplementedError

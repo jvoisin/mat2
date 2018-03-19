@@ -20,13 +20,14 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 class PDFParser(abstract.AbstractParser):
+    mimetypes = {'application/pdf', }
+    meta_list = {'author', 'creation-date', 'creator', 'format', 'keywords',
+            'metadata', 'mod-date', 'producer', 'subject', 'title',
+            'viewer-preferences'}
+
     def __init__(self, filename):
         super().__init__(filename)
-        self.meta_list = {'author', 'creation-date', 'creator', 'format', 'keywords',
-                'metadata', 'mod-date', 'producer', 'subject', 'title',
-                'viewer-preferences'}
         self.uri = 'file://' + os.path.abspath(self.filename)
-        self.password = None
 
     def remove_all(self):
         """
@@ -35,7 +36,7 @@ class PDFParser(abstract.AbstractParser):
             PDF are removed via Poppler, because there is no way to tell
             cairo to not add "created by cairo" during rendering.
         """
-        document = Poppler.Document.new_from_file(self.uri, self.password)
+        document = Poppler.Document.new_from_file(self.uri, None)
         pages_count = document.get_n_pages()
 
         _, tmp_path = tempfile.mkstemp()
@@ -80,7 +81,7 @@ class PDFParser(abstract.AbstractParser):
         """ Return a dict with all the meta of the file
         """
         print("URI: %s", self.uri)
-        document = Poppler.Document.new_from_file(self.uri, self.password)
+        document = Poppler.Document.new_from_file(self.uri, None)
         metadata = {}
         for key in self.meta_list:
             if document.get_property(key):
