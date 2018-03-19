@@ -28,6 +28,7 @@ class PDFParser(abstract.AbstractParser):
     def __init__(self, filename):
         super().__init__(filename)
         self.uri = 'file://' + os.path.abspath(self.filename)
+        self.__scale = 2
 
     def remove_all(self):
         """
@@ -48,10 +49,10 @@ class PDFParser(abstract.AbstractParser):
             page_width, page_height = page.get_size()
             logging.info("Rendering page %d/%d", pagenum + 1, pages_count)
 
-            img_surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, int(page_width)*2, int(page_height)*2)
+            img_surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, int(page_width) * self.__scale, int(page_height) * self.__scale)
             img_context = cairo.Context(img_surface)
 
-            img_context.scale(2, 2)
+            img_context.scale(self.__scale, self.__scale)
             page.render_for_printing(img_context)
             img_context.show_page()
 
