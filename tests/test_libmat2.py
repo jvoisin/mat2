@@ -5,7 +5,7 @@ import shutil
 import os
 
 from src import parsers
-from src.parsers import pdf
+from src.parsers import pdf, png
 
 class TestGetMeta(unittest.TestCase):
     def test_pdf(self):
@@ -14,14 +14,15 @@ class TestGetMeta(unittest.TestCase):
         self.assertEqual(meta['producer'], 'pdfTeX-1.40.14')
         self.assertEqual(meta['creator'], "'Certified by IEEE PDFeXpress at 03/19/2016 2:56:07 AM'")
 
+    def test_png(self):
+        p = png.PNGParser('./tests/data/dirty.png')
+        meta = p.get_meta()
+        self.assertEqual(meta['Comment'], 'This is a comment, be careful!')
+        self.assertEqual(meta['ModifyDate'], "2018:03:20 21:59:25")
+
 class TestCleaning(unittest.TestCase):
-    def setUp(self):
-        shutil.copy('./tests/data/dirty.pdf', './tests/data/clean.pdf')
-
-    def tearDown(self):
-        os.remove('./tests/data/clean.pdf')
-
     def test_pdf(self):
+        shutil.copy('./tests/data/dirty.pdf', './tests/data/clean.pdf')
         p = pdf.PDFParser('./tests/data/clean.pdf')
 
         meta = p.get_meta()
@@ -33,3 +34,20 @@ class TestCleaning(unittest.TestCase):
         p = pdf.PDFParser('./tests/data/clean.pdf.cleaned')
         expected_meta = {'creation-date': -1, 'format': 'PDF-1.5', 'mod-date': -1}
         self.assertEqual(p.get_meta(), expected_meta)
+
+        os.remove('./tests/data/clean.pdf')
+
+    def test_png(self):
+        shutil.copy('./tests/data/dirty.png', './tests/data/clean.png')
+        p = png.PNGParser('./tests/data/clean.png')
+
+        meta = p.get_meta()
+        self.assertEqual(meta['Comment'], 'This is a comment, be careful!')
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = png.PNGParser('./tests/data/clean.png.cleaned')
+        self.assertEqual(p.get_meta(), {})
+
+        os.remove('./tests/data/clean.png')
