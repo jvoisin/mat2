@@ -2,7 +2,6 @@ import sys
 from shutil import copyfile
 import argparse
 
-from src.parsers import pdf
 from src import parser_factory
 
 
@@ -20,7 +19,7 @@ def create_arg_parser():
     return parser
 
 def show_meta(file_name:str):
-    p = parser_factory(file_name)
+    p = parser_factory.get_parser(file_name)
     for k,v in p.get_meta().items():
         print("%s: %s" % (k, v))
 
@@ -32,14 +31,10 @@ def main():
         for f in args.files:
             show_meta(f)
         return 0
-    elif not args.files:
-        return argparser.show_help()
 
-    #p = pdf.PDFParser(sys.argv[1])
-    p = parser_factory.get_parser(sys.argv[1])
-    p.remove_all()
-    p = pdf.PDFParser('OUT_clean.pdf')
-    print("ok")
+    for f in args.files:
+        p = parser_factory.get_parser(sys.argv[1])
+        p.remove_all()
 
 
 if __name__ == '__main__':
