@@ -81,7 +81,6 @@ class PDFParser(abstract.AbstractParser):
     def get_meta(self):
         """ Return a dict with all the meta of the file
         """
-        print("URI: %s", self.uri)
         document = Poppler.Document.new_from_file(self.uri, None)
         metadata = {}
         for key in self.meta_list:
