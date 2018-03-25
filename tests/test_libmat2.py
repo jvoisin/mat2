@@ -5,7 +5,7 @@ import shutil
 import os
 
 from src import parsers
-from src.parsers import pdf, png, jpg
+from src.parsers import pdf, png, jpg, audio
 
 class TestGetMeta(unittest.TestCase):
     def test_pdf(self):
@@ -24,6 +24,17 @@ class TestGetMeta(unittest.TestCase):
         p = jpg.JPGParser('./tests/data/dirty.jpg')
         meta = p.get_meta()
         self.assertEqual(meta['Comment'], 'Created with GIMP')
+
+    def test_mp3(self):
+        p = audio.MP3Parser('./tests/data/dirty.mp3')
+        meta = p.get_meta()
+        self.assertEqual(meta['TXXX:I am a '], ['various comment'])
+
+    def test_ogg(self):
+        p = audio.OGGParser('./tests/data/dirty.ogg')
+        meta = p.get_meta()
+        self.assertEqual(meta['TITLE'], ['I am so'])
+
 
 class TestCleaning(unittest.TestCase):
     def test_pdf(self):
@@ -57,7 +68,6 @@ class TestCleaning(unittest.TestCase):
 
         os.remove('./tests/data/clean.png')
 
-
     def test_jpg(self):
         shutil.copy('./tests/data/dirty.jpg', './tests/data/clean.jpg')
         p = jpg.JPGParser('./tests/data/clean.jpg')
@@ -72,3 +82,33 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.jpg')
+
+    def test_mp3(self):
+        shutil.copy('./tests/data/dirty.mp3', './tests/data/clean.mp3')
+        p = audio.MP3Parser('./tests/data/clean.mp3')
+
+        meta = p.get_meta()
+        self.assertEqual(meta['TXXX:I am a '], ['various comment'])
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = audio.MP3Parser('./tests/data/clean.mp3.cleaned')
+        self.assertEqual(p.get_meta(), {})
+
+        os.remove('./tests/data/clean.mp3')
+
+    def test_ogg(self):
+        shutil.copy('./tests/data/dirty.ogg', './tests/data/clean.ogg')
+        p = audio.OGGParser('./tests/data/clean.ogg')
+
+        meta = p.get_meta()
+        self.assertEqual(meta['TITLE'], ['I am so'])
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = audio.OGGParser('./tests/data/clean.ogg.cleaned')
+        self.assertEqual(p.get_meta(), {})
+
+        os.remove('./tests/data/clean.ogg')
