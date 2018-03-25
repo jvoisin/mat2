@@ -16,7 +16,7 @@ class PNGParser(abstract.AbstractParser):
 
     def get_meta(self):
         out = subprocess.check_output(['exiftool', '-json', self.filename])
-        meta = json.loads(out)[0]
+        meta = json.loads(out.decode('utf-8'))[0]
         for key in self.meta_whitelist:
             meta.pop(key, None)
         return meta
