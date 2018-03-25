@@ -5,7 +5,7 @@ import shutil
 import os
 
 from src import parsers
-from src.parsers import pdf, png
+from src.parsers import pdf, png, jpg
 
 class TestGetMeta(unittest.TestCase):
     def test_pdf(self):
@@ -19,6 +19,11 @@ class TestGetMeta(unittest.TestCase):
         meta = p.get_meta()
         self.assertEqual(meta['Comment'], 'This is a comment, be careful!')
         self.assertEqual(meta['ModifyDate'], "2018:03:20 21:59:25")
+
+    def test_jpg(self):
+        p = jpg.JPGParser('./tests/data/dirty.jpg')
+        meta = p.get_meta()
+        self.assertEqual(meta['Comment'], 'Created with GIMP')
 
 class TestCleaning(unittest.TestCase):
     def test_pdf(self):
@@ -51,3 +56,19 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.png')
+
+
+    def test_jpg(self):
+        shutil.copy('./tests/data/dirty.jpg', './tests/data/clean.jpg')
+        p = jpg.JPGParser('./tests/data/clean.jpg')
+
+        meta = p.get_meta()
+        self.assertEqual(meta['Comment'], 'Created with GIMP')
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = jpg.JPGParser('./tests/data/clean.jpg.cleaned')
+        self.assertEqual(p.get_meta(), {})
+
+        os.remove('./tests/data/clean.jpg')
