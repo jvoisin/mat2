@@ -24,11 +24,10 @@ class MP3Parser(MutagenParser):
     mimetypes = {'audio/mpeg', }
 
     def get_meta(self):
+        meta = super().get_meta()
         metadata = {}
-        f = mutagen.File(self.filename)
-        if f.tags:
-            for key in f.tags:
-                metadata[key] = f.tags[key].text
+        for key in meta:
+            metadata[key] = meta[key].text
         return metadata
 
 class OGGParser(MutagenParser):
