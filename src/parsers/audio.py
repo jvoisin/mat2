@@ -33,3 +33,6 @@ class MP3Parser(MutagenParser):
 
 class OGGParser(MutagenParser):
     mimetypes = {'audio/ogg', }
+
+class FLACParser(MutagenParser):
+    mimetypes = {'audio/flac', }

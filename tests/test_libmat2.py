@@ -35,6 +35,11 @@ class TestGetMeta(unittest.TestCase):
         meta = p.get_meta()
         self.assertEqual(meta['TITLE'], ['I am so'])
 
+    def test_flac(self):
+        p = audio.FLACParser('./tests/data/dirty.flac')
+        meta = p.get_meta()
+        self.assertEqual(meta['TITLE'], ['I am so'])
+
 
 class TestCleaning(unittest.TestCase):
     def test_pdf(self):
@@ -112,3 +117,18 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.ogg')
+
+    def test_flac(self):
+        shutil.copy('./tests/data/dirty.flac', './tests/data/clean.flac')
+        p = audio.FLACParser('./tests/data/clean.flac')
+
+        meta = p.get_meta()
+        self.assertEqual(meta['TITLE'], ['I am so'])
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = audio.FLACParser('./tests/data/clean.flac.cleaned')
+        self.assertEqual(p.get_meta(), {})
+
+        os.remove('./tests/data/clean.flac')
