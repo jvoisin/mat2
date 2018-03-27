@@ -6,6 +6,10 @@
                        
 ```
 
+[![pipeline status](https://0xacab.org/jvoisin/mat2/badges/master/pipeline.svg)](https://0xacab.org/jvoisin/mat2/commits/master)
+[![coverage report](https://0xacab.org/jvoisin/mat2/badges/master/coverage.svg)](https://0xacab.org/jvoisin/mat2/commits/master)
+
+
 
 # Run the testsuite
 
