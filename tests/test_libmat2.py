@@ -6,7 +6,7 @@ import os
 import zipfile
 import tempfile
 
-from src import pdf, png, jpg, audio, office, libreoffice, parser_factory
+from src import pdf, png, images_pixbuf, audio, office, libreoffice, parser_factory
 
 class TestGetMeta(unittest.TestCase):
     def test_pdf(self):
@@ -22,9 +22,16 @@ class TestGetMeta(unittest.TestCase):
         self.assertEqual(meta['ModifyDate'], "2018:03:20 21:59:25")
 
     def test_jpg(self):
-        p = jpg.JPGParser('./tests/data/dirty.jpg')
+        p = images_pixbuf.JPGParser('./tests/data/dirty.jpg')
         meta = p.get_meta()
         self.assertEqual(meta['Comment'], 'Created with GIMP')
+
+    def test_tiff(self):
+        p = images_pixbuf.JPGParser('./tests/data/dirty.tiff')
+        meta = p.get_meta()
+        self.assertEqual(meta['Make'], 'OLYMPUS IMAGING CORP.')
+        self.assertEqual(meta['Model'], 'C7070WZ')
+        self.assertEqual(meta['ModifyDate'], '2005:12:26 17:09:35')
 
     def test_mp3(self):
         p = audio.MP3Parser('./tests/data/dirty.mp3')
@@ -152,7 +159,7 @@ class TestCleaning(unittest.TestCase):
 
     def test_jpg(self):
         shutil.copy('./tests/data/dirty.jpg', './tests/data/clean.jpg')
-        p = jpg.JPGParser('./tests/data/clean.jpg')
+        p = images_pixbuf.JPGParser('./tests/data/clean.jpg')
 
         meta = p.get_meta()
         self.assertEqual(meta['Comment'], 'Created with GIMP')
@@ -160,7 +167,7 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = jpg.JPGParser('./tests/data/clean.jpg.cleaned')
+        p = images_pixbuf.JPGParser('./tests/data/clean.jpg.cleaned')
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.jpg')
@@ -240,3 +247,18 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.odt')
+
+    def test_tiff(self):
+        shutil.copy('./tests/data/dirty.tiff', './tests/data/clean.tiff')
+        p = images_pixbuf.TiffParser('./tests/data/clean.tiff')
+
+        meta = p.get_meta()
+        self.assertEqual(meta['Model'], 'C7070WZ')
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = images_pixbuf.TiffParser('./tests/data/clean.tiff.cleaned')
+        self.assertEqual(p.get_meta(), {})
+
+        os.remove('./tests/data/clean.tiff')
