@@ -3,8 +3,10 @@
 import unittest
 import shutil
 import os
+import zipfile
+import tempfile
 
-from src import pdf, png, jpg, audio, office, libreoffice
+from src import pdf, png, jpg, audio, office, libreoffice, parser_factory
 
 class TestGetMeta(unittest.TestCase):
     def test_pdf(self):
@@ -54,6 +56,56 @@ class TestGetMeta(unittest.TestCase):
         self.assertEqual(meta['meta:generator'], 'LibreOffice/3.3$Unix LibreOffice_project/330m19$Build-202')
 
 
+class TestDeepCleaning(unittest.TestCase):
+    def __check_zip_clean(self, p):
+        tempdir = tempfile.mkdtemp()
+        zipin = zipfile.ZipFile(p.filename)
+        zipin.extractall(tempdir)
+
+        for subdir, dirs, files in os.walk(tempdir):
+            for f in files:
+                complete_path = os.path.join(subdir, f)
+                inside_p = parser_factory.get_parser(complete_path)
+                if inside_p is None:
+                    continue
+                print('[+] %s is clean inside %s' %(complete_path, p.filename))
+                self.assertEqual(inside_p.get_meta(), {})
+        shutil.rmtree(tempdir)
+
+    def test_office(self):
+        shutil.copy('./tests/data/dirty.docx', './tests/data/clean.docx')
+        p = office.OfficeParser('./tests/data/clean.docx')
+
+        meta = p.get_meta()
+        self.assertIsNotNone(meta)
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = office.OfficeParser('./tests/data/clean.docx.cleaned')
+        self.assertEqual(p.get_meta(), {})
+
+        self.__check_zip_clean(p)
+
+        os.remove('./tests/data/clean.docx')
+
+
+    def test_libreoffice(self):
+        shutil.copy('./tests/data/dirty.odt', './tests/data/clean.odt')
+        p = libreoffice.LibreOfficeParser('./tests/data/clean.odt')
+
+        meta = p.get_meta()
+        self.assertIsNotNone(meta)
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = libreoffice.LibreOfficeParser('./tests/data/clean.odt.cleaned')
+        self.assertEqual(p.get_meta(), {})
+
+        self.__check_zip_clean(p)
+
+        os.remove('./tests/data/clean.odt')
 
 class TestCleaning(unittest.TestCase):
     def test_pdf(self):
