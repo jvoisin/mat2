@@ -57,7 +57,7 @@ class TestGetMeta(unittest.TestCase):
 
 
 class TestDeepCleaning(unittest.TestCase):
-    def __check_zip_clean(self, p):
+    def __check_deep_meta(self, p):
         tempdir = tempfile.mkdtemp()
         zipin = zipfile.ZipFile(p.filename)
         zipin.extractall(tempdir)
@@ -72,6 +72,15 @@ class TestDeepCleaning(unittest.TestCase):
                 self.assertEqual(inside_p.get_meta(), {})
         shutil.rmtree(tempdir)
 
+
+    def __check_zip_meta(self, p):
+        zipin = zipfile.ZipFile(p.filename)
+        for item in zipin.infolist():
+            self.assertEqual(item.comment, b'')
+            self.assertEqual(item.date_time, (1980, 1, 1, 0, 0, 0))
+            self.assertEqual(item.create_system, 3)  # 3 is UNIX
+
+
     def test_office(self):
         shutil.copy('./tests/data/dirty.docx', './tests/data/clean.docx')
         p = office.OfficeParser('./tests/data/clean.docx')
@@ -85,7 +94,8 @@ class TestDeepCleaning(unittest.TestCase):
         p = office.OfficeParser('./tests/data/clean.docx.cleaned')
         self.assertEqual(p.get_meta(), {})
 
-        self.__check_zip_clean(p)
+        self.__check_zip_meta(p)
+        self.__check_deep_meta(p)
 
         os.remove('./tests/data/clean.docx')
 
@@ -103,7 +113,8 @@ class TestDeepCleaning(unittest.TestCase):
         p = libreoffice.LibreOfficeParser('./tests/data/clean.odt.cleaned')
         self.assertEqual(p.get_meta(), {})
 
-        self.__check_zip_clean(p)
+        self.__check_zip_meta(p)
+        self.__check_deep_meta(p)
 
         os.remove('./tests/data/clean.odt')
 

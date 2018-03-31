@@ -34,6 +34,13 @@ class LibreOfficeParser(abstract.AbstractParser):
         zipin.close()
         return metadata
 
+    def __clean_zipinfo(self, zipinfo:zipfile.ZipInfo) -> zipfile.ZipInfo:
+        zipinfo.compress_type = zipfile.ZIP_DEFLATED
+        zipinfo.create_system = 3  # Linux
+        zipinfo.comment = b''
+        zipinfo.date_time = (1980, 1, 1, 0, 0, 0)
+        return zipinfo
+
     def remove_all(self):
         zin = zipfile.ZipFile(self.filename, 'r')
         zout = zipfile.ZipFile(self.output_filename, 'w')
@@ -51,7 +58,10 @@ class LibreOfficeParser(abstract.AbstractParser):
                 print("%s isn't supported" % item.filename)
                 continue
             tmp_parser.remove_all()
-            zout.write(tmp_parser.output_filename, item.filename)
+            zinfo = zipfile.ZipInfo(item.filename)
+            item = self.__clean_zipinfo(item)
+            with open(tmp_parser.output_filename, 'rb') as f:
+                zout.writestr(zinfo, f.read())
         shutil.rmtree(temp_folder)
         zout.close()
         zin.close()
