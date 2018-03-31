@@ -4,8 +4,7 @@ import unittest
 import shutil
 import os
 
-from src import parsers
-from src.parsers import pdf, png, jpg, audio
+from src import pdf, png, jpg, audio, office
 
 class TestGetMeta(unittest.TestCase):
     def test_pdf(self):

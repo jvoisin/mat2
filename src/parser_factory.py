@@ -2,12 +2,12 @@ import mimetypes
 import importlib
 import pkgutil
 
-from .parsers import abstract
+from . import abstract
 
-for module_loader, name, ispkg in pkgutil.walk_packages('.src.parsers'):
-    if not name.startswith('src.parsers.'):
+for module_loader, name, ispkg in pkgutil.walk_packages('.src'):
+    if not name.startswith('src.'):
         continue
-    elif name == 'src.parsers.abstract':
+    elif name == 'src.abstract':
         continue
     importlib.import_module(name)
 
@@ -16,4 +16,5 @@ def get_parser(filename: str):
     for c in abstract.AbstractParser.__subclasses__():
         if mtype in c.mimetypes:
             return c(filename)
-    print('Nope')
+    print('factory: %s is not supported' % mtype)
+    return None
