@@ -1,3 +1,4 @@
+import re
 import subprocess
 import json
 import zipfile
@@ -16,11 +17,19 @@ class OfficeParser(abstract.AbstractParser):
     files_to_keep = {'_rels/.rels', 'word/_rels/document.xml.rels'}
 
     def get_meta(self):
+        """
+        Yes, I know that parsing xml with regexp ain't pretty,
+        be my guest and fix it if you want.
+        """
         metadata = {}
         zipin = zipfile.ZipFile(self.filename)
         for item in zipin.namelist():
-            if item.startswith('docProps/'):
-                metadata[item] = 'harmful content'
+            if item.startswith('docProps/') and item.endswith('.xml'):
+                content = zipin.read(item).decode('utf-8')
+                for (key, value) in re.findall(r"<(.+)>(.+)</\1>", content, re.I):
+                    metadata[key] = value
+                if not metadata:  # better safe than sorry
+                    metadata[item] = 'harmful content'
         zipin.close()
         return metadata
 
