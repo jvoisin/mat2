@@ -1,7 +1,7 @@
 from . import abstract
 
 class HarmlessParser(abstract.AbstractParser):
-    mimetypes = {'application/xml', 'text/plain'}
+    mimetypes = {'application/xml', 'text/plain', 'application/rdf+xml'}
 
     def __init__(self, filename: str):
         self.filename = filename
