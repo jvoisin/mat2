@@ -11,6 +11,10 @@ from . import abstract, parser_factory
 class LibreOfficeParser(abstract.AbstractParser):
     mimetypes = {
             'application/vnd.oasis.opendocument.text',
+            'application/vnd.oasis.opendocument.spreadsheet',
+            'application/vnd.oasis.opendocument.presentation',
+            'application/vnd.oasis.opendocument.graphics',
+            'application/vnd.oasis.opendocument.chart'
     }
 
     def get_meta(self):
@@ -39,7 +43,7 @@ class LibreOfficeParser(abstract.AbstractParser):
             if item.filename[-1] == '/':
                 continue  # `is_dir` is added in Python3.6
             elif item.filename == 'meta.xml':
-                    continue  # don't keep metadata files
+                continue  # don't keep metadata files
 
             zin.extract(member=item, path=temp_folder)
             tmp_parser = parser_factory.get_parser(os.path.join(temp_folder, item.filename))
