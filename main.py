@@ -20,6 +20,9 @@ def create_arg_parser():
 
 def show_meta(file_name:str):
     p = parser_factory.get_parser(file_name)
+    if p is None:
+        print("[-] %s's format (%s) is not supported" % (file_name, p))
+        return
     for k,v in p.get_meta().items():
         print("%s: %s" % (k, v))
 
