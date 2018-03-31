@@ -30,8 +30,8 @@ class OfficeParser(abstract.AbstractParser):
         temp_folder = tempfile.mkdtemp()
 
         for item in zin.infolist():
-            if item.is_dir():
-                continue
+            if item.filename[-1] == '/':
+                continue  # `is_dir` is added in Python3.6
             elif item.filename.startswith('docProps/'):
                 if not item.filename.endswith('.rels'):
                     continue  # don't keep metadata files
