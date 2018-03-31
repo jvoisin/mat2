@@ -6,8 +6,8 @@ class AbstractParser(object):
         self.filename = filename
         self.output_filename = filename + '.cleaned'
 
-    def get_meta(self):
+    def get_meta(self) -> dict:
         raise NotImplementedError
 
-    def remove_all(self):
+    def remove_all(self) -> bool:
         raise NotImplementedError

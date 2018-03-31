@@ -6,7 +6,7 @@ import os
 import zipfile
 import tempfile
 
-from src import pdf, png, images_pixbuf, audio, office, libreoffice, parser_factory
+from src import pdf, png, images_pixbuf, audio, office, parser_factory
 
 class TestGetMeta(unittest.TestCase):
     def test_pdf(self):
@@ -49,14 +49,14 @@ class TestGetMeta(unittest.TestCase):
         self.assertEqual(meta['TITLE'], ['I am so'])
 
     def test_docx(self):
-        p = office.OfficeParser('./tests/data/dirty.docx')
+        p = office.MSOfficeParser('./tests/data/dirty.docx')
         meta = p.get_meta()
         self.assertEqual(meta['cp:lastModifiedBy'], 'Julien Voisin')
         self.assertEqual(meta['dc:creator'], 'julien voisin')
         self.assertEqual(meta['Application'], 'LibreOffice/5.4.5.1$Linux_X86_64 LibreOffice_project/40m0$Build-1')
 
     def test_libreoffice(self):
-        p = libreoffice.LibreOfficeParser('./tests/data/dirty.odt')
+        p = office.LibreOfficeParser('./tests/data/dirty.odt')
         meta = p.get_meta()
         self.assertEqual(meta['meta:initial-creator'], 'jvoisin ')
         self.assertEqual(meta['meta:creation-date'], '2011-07-26T03:27:48')
@@ -90,7 +90,7 @@ class TestDeepCleaning(unittest.TestCase):
 
     def test_office(self):
         shutil.copy('./tests/data/dirty.docx', './tests/data/clean.docx')
-        p = office.OfficeParser('./tests/data/clean.docx')
+        p = office.MSOfficeParser('./tests/data/clean.docx')
 
         meta = p.get_meta()
         self.assertIsNotNone(meta)
@@ -98,7 +98,7 @@ class TestDeepCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = office.OfficeParser('./tests/data/clean.docx.cleaned')
+        p = office.MSOfficeParser('./tests/data/clean.docx.cleaned')
         self.assertEqual(p.get_meta(), {})
 
         self.__check_zip_meta(p)
@@ -109,7 +109,7 @@ class TestDeepCleaning(unittest.TestCase):
 
     def test_libreoffice(self):
         shutil.copy('./tests/data/dirty.odt', './tests/data/clean.odt')
-        p = libreoffice.LibreOfficeParser('./tests/data/clean.odt')
+        p = office.LibreOfficeParser('./tests/data/clean.odt')
 
         meta = p.get_meta()
         self.assertIsNotNone(meta)
@@ -117,7 +117,7 @@ class TestDeepCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = libreoffice.LibreOfficeParser('./tests/data/clean.odt.cleaned')
+        p = office.LibreOfficeParser('./tests/data/clean.odt.cleaned')
         self.assertEqual(p.get_meta(), {})
 
         self.__check_zip_meta(p)
@@ -219,7 +219,7 @@ class TestCleaning(unittest.TestCase):
 
     def test_office(self):
         shutil.copy('./tests/data/dirty.docx', './tests/data/clean.docx')
-        p = office.OfficeParser('./tests/data/clean.docx')
+        p = office.MSOfficeParser('./tests/data/clean.docx')
 
         meta = p.get_meta()
         self.assertIsNotNone(meta)
@@ -227,7 +227,7 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = office.OfficeParser('./tests/data/clean.docx.cleaned')
+        p = office.MSOfficeParser('./tests/data/clean.docx.cleaned')
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.docx')
@@ -235,7 +235,7 @@ class TestCleaning(unittest.TestCase):
 
     def test_libreoffice(self):
         shutil.copy('./tests/data/dirty.odt', './tests/data/clean.odt')
-        p = libreoffice.LibreOfficeParser('./tests/data/clean.odt')
+        p = office.LibreOfficeParser('./tests/data/clean.odt')
 
         meta = p.get_meta()
         self.assertIsNotNone(meta)
@@ -243,7 +243,7 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = libreoffice.LibreOfficeParser('./tests/data/clean.odt.cleaned')
+        p = office.LibreOfficeParser('./tests/data/clean.odt.cleaned')
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.odt')
