@@ -4,7 +4,7 @@ import unittest
 import shutil
 import os
 
-from src import pdf, png, jpg, audio, office
+from src import pdf, png, jpg, audio, office, libreoffice
 
 class TestGetMeta(unittest.TestCase):
     def test_pdf(self):
@@ -45,6 +45,14 @@ class TestGetMeta(unittest.TestCase):
         self.assertEqual(meta['cp:lastModifiedBy'], 'Julien Voisin')
         self.assertEqual(meta['dc:creator'], 'julien voisin')
         self.assertEqual(meta['Application'], 'LibreOffice/5.4.5.1$Linux_X86_64 LibreOffice_project/40m0$Build-1')
+
+    def test_libreoffice(self):
+        p = libreoffice.LibreOfficeParser('./tests/data/dirty.odt')
+        meta = p.get_meta()
+        self.assertEqual(meta['meta:initial-creator'], 'jvoisin ')
+        self.assertEqual(meta['meta:creation-date'], '2011-07-26T03:27:48')
+        self.assertEqual(meta['meta:generator'], 'LibreOffice/3.3$Unix LibreOffice_project/330m19$Build-202')
+
 
 
 class TestCleaning(unittest.TestCase):
@@ -153,3 +161,19 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.docx')
+
+
+    def test_libreoffice(self):
+        shutil.copy('./tests/data/dirty.odt', './tests/data/clean.odt')
+        p = libreoffice.LibreOfficeParser('./tests/data/clean.odt')
+
+        meta = p.get_meta()
+        self.assertIsNotNone(meta)
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = libreoffice.LibreOfficeParser('./tests/data/clean.odt.cleaned')
+        self.assertEqual(p.get_meta(), {})
+
+        os.remove('./tests/data/clean.odt')
