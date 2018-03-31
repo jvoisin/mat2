@@ -39,6 +39,11 @@ class TestGetMeta(unittest.TestCase):
         meta = p.get_meta()
         self.assertEqual(meta['TITLE'], ['I am so'])
 
+    def test_docx(self):
+        p = office.OfficeParser('./tests/data/dirty.docx')
+        meta = p.get_meta()
+        print(meta)
+
 
 class TestCleaning(unittest.TestCase):
     def test_pdf(self):
@@ -131,3 +136,18 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.flac')
+
+    def test_office(self):
+        shutil.copy('./tests/data/dirty.docx', './tests/data/clean.docx')
+        p = office.OfficeParser('./tests/data/clean.docx')
+
+        meta = p.get_meta()
+        self.assertIsNotNone(meta)
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = office.OfficeParser('./tests/data/clean.docx.cleaned')
+        self.assertEqual(p.get_meta(), {})
+
+        os.remove('./tests/data/clean.docx')
