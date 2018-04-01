@@ -1,4 +1,5 @@
 import sys
+import mimetypes
 from shutil import copyfile
 import argparse
 
@@ -18,10 +19,11 @@ def create_arg_parser():
                       help='list all the harmful metadata of a file without removing them')
     return parser
 
-def show_meta(file_name:str):
-    p = parser_factory.get_parser(file_name)
+def show_meta(filename:str):
+    p = parser_factory.get_parser(filename)
     if p is None:
-        print("[-] %s's format (%s) is not supported" % (file_name, p))
+        mtype, _ = mimetypes.guess_type(filename)
+        print("[-] %s's format (%s) is not supported" % (filename, mtype))
         return
     for k,v in p.get_meta().items():
         print("%s: %s" % (k, v))
@@ -36,7 +38,10 @@ def main():
         return 0
 
     for f in args.files:
-        p = parser_factory.get_parser(sys.argv[1])
+        p = parser_factory.get_parser(f)
+        if p is None:
+            print("[-] %s's format (%s) is not supported" % (f, "meh"))
+            continue
         p.remove_all()
 
 
