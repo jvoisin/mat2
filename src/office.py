@@ -4,6 +4,7 @@ import re
 import shutil
 import subprocess
 import tempfile
+import datetime
 import zipfile
 
 from . import abstract, parser_factory
@@ -15,6 +16,25 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
         zipinfo.comment = b''
         zipinfo.date_time = (1980, 1, 1, 0, 0, 0)
         return zipinfo
+
+    def _get_zipinfo_meta(self, zipinfo:zipfile.ZipInfo) -> dict:
+        metadata = {}
+        if zipinfo.create_system == 3:
+            #metadata['create_system'] = 'Linux'
+            pass
+        elif zipinfo.create_system == 2:
+            metadata['create_system'] = 'Windows'
+        else:
+            metadata['create_system'] = 'Weird'
+
+        if zipinfo.comment:
+            metadata['comment'] = zipinfo.comment
+
+        if zipinfo.date_time != (1980, 1, 1, 0, 0, 0):
+            metadata['comment'] = datetime.datetime(*zipinfo.date_time)
+
+        return metadata
+
 
     def _clean_internal_file(self, item:zipfile.ZipInfo, temp_folder:str, zin:zipfile.ZipFile, zout:zipfile.ZipFile):
         zin.extract(member=item, path=temp_folder)
@@ -43,13 +63,15 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
         """
         metadata = {}
         zipin = zipfile.ZipFile(self.filename)
-        for item in zipin.namelist():
-            if item.startswith('docProps/') and item.endswith('.xml'):
+        for item in zipin.infolist():
+            if item.filename.startswith('docProps/') and item.filename.endswith('.xml'):
                 content = zipin.read(item).decode('utf-8')
                 for (key, value) in re.findall(r"<(.+)>(.+)</\1>", content, re.I):
                     metadata[key] = value
                 if not metadata:  # better safe than sorry
                     metadata[item] = 'harmful content'
+
+            metadata = {**metadata, **self._get_zipinfo_meta(item)}
         zipin.close()
         return metadata
 
@@ -95,13 +117,14 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
         """
         metadata = {}
         zipin = zipfile.ZipFile(self.filename)
-        for item in zipin.namelist():
-            if item == 'meta.xml':
+        for item in zipin.infolist():
+            if item.filename == 'meta.xml':
                 content = zipin.read(item).decode('utf-8')
                 for (key, value) in re.findall(r"<((?:meta|dc|cp).+?)>(.+)</\1>", content, re.I):
                     metadata[key] = value
                 if not metadata:  # better safe than sorry
                     metadata[item] = 'harmful content'
+            metadata = {**metadata, **self._get_zipinfo_meta(item)}
         zipin.close()
         return metadata
 
