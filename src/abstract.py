@@ -1,4 +1,6 @@
-class AbstractParser(object):
+import abc
+
+class AbstractParser(abc.ABC):
     meta_list = set()
     mimetypes = set()
 
@@ -6,8 +8,10 @@ class AbstractParser(object):
         self.filename = filename
         self.output_filename = filename + '.cleaned'
 
+    @abc.abstractmethod
     def get_meta(self) -> dict:
-        raise NotImplementedError
+        pass
 
+    @abc.abstractmethod
     def remove_all(self) -> bool:
-        raise NotImplementedError
+        pass
