@@ -6,7 +6,7 @@ import os
 import zipfile
 import tempfile
 
-from src import pdf, png, images_pixbuf, audio, office, parser_factory
+from src import pdf, images, audio, office, parser_factory
 
 class TestGetMeta(unittest.TestCase):
     def test_pdf(self):
@@ -16,18 +16,18 @@ class TestGetMeta(unittest.TestCase):
         self.assertEqual(meta['creator'], "'Certified by IEEE PDFeXpress at 03/19/2016 2:56:07 AM'")
 
     def test_png(self):
-        p = png.PNGParser('./tests/data/dirty.png')
+        p = images.PNGParser('./tests/data/dirty.png')
         meta = p.get_meta()
         self.assertEqual(meta['Comment'], 'This is a comment, be careful!')
         self.assertEqual(meta['ModifyDate'], "2018:03:20 21:59:25")
 
     def test_jpg(self):
-        p = images_pixbuf.JPGParser('./tests/data/dirty.jpg')
+        p = images.JPGParser('./tests/data/dirty.jpg')
         meta = p.get_meta()
         self.assertEqual(meta['Comment'], 'Created with GIMP')
 
     def test_tiff(self):
-        p = images_pixbuf.JPGParser('./tests/data/dirty.tiff')
+        p = images.JPGParser('./tests/data/dirty.tiff')
         meta = p.get_meta()
         self.assertEqual(meta['Make'], 'OLYMPUS IMAGING CORP.')
         self.assertEqual(meta['Model'], 'C7070WZ')
@@ -144,7 +144,7 @@ class TestCleaning(unittest.TestCase):
 
     def test_png(self):
         shutil.copy('./tests/data/dirty.png', './tests/data/clean.png')
-        p = png.PNGParser('./tests/data/clean.png')
+        p = images.PNGParser('./tests/data/clean.png')
 
         meta = p.get_meta()
         self.assertEqual(meta['Comment'], 'This is a comment, be careful!')
@@ -152,14 +152,14 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = png.PNGParser('./tests/data/clean.png.cleaned')
+        p = images.PNGParser('./tests/data/clean.png.cleaned')
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.png')
 
     def test_jpg(self):
         shutil.copy('./tests/data/dirty.jpg', './tests/data/clean.jpg')
-        p = images_pixbuf.JPGParser('./tests/data/clean.jpg')
+        p = images.JPGParser('./tests/data/clean.jpg')
 
         meta = p.get_meta()
         self.assertEqual(meta['Comment'], 'Created with GIMP')
@@ -167,7 +167,7 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = images_pixbuf.JPGParser('./tests/data/clean.jpg.cleaned')
+        p = images.JPGParser('./tests/data/clean.jpg.cleaned')
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.jpg')
@@ -250,7 +250,7 @@ class TestCleaning(unittest.TestCase):
 
     def test_tiff(self):
         shutil.copy('./tests/data/dirty.tiff', './tests/data/clean.tiff')
-        p = images_pixbuf.TiffParser('./tests/data/clean.tiff')
+        p = images.TiffParser('./tests/data/clean.tiff')
 
         meta = p.get_meta()
         self.assertEqual(meta['Model'], 'C7070WZ')
@@ -258,7 +258,7 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = images_pixbuf.TiffParser('./tests/data/clean.tiff.cleaned')
+        p = images.TiffParser('./tests/data/clean.tiff.cleaned')
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.tiff')
