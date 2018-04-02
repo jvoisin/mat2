@@ -8,6 +8,7 @@ from typing import Type, TypeVar
 
 T = TypeVar('T', bound='abstract.AbstractParser')
 
+# This loads every parser in a dynamic way
 for module_loader, name, ispkg in pkgutil.walk_packages('.src'):
     if not name.startswith('src.'):
         continue

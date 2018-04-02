@@ -32,6 +32,9 @@ class PNGParser(abstract.AbstractParser):
         return True
 
 class GdkPixbufAbstractParser(abstract.AbstractParser):
+    """ GdkPixbuf can handle a lot of surfaces, so we're rending images on it,
+        this has the side-effect of removing metadata completely.
+    """
     def get_meta(self):
         out = subprocess.check_output(['exiftool', '-json', self.filename])
         meta = json.loads(out.decode('utf-8'))[0]
