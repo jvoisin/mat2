@@ -1,3 +1,4 @@
+import os
 import sys
 import mimetypes
 from shutil import copyfile
@@ -5,6 +6,14 @@ import argparse
 
 from src import parser_factory
 
+def __check_file(filename:str, mode=os.R_OK) -> bool:
+    if not os.path.isfile(filename):
+        print("[-] %s is not a regular file." % filename)
+        return False
+    elif not os.access(filename, mode):
+        print("[-] %s is not readable and writeable." % filename)
+        return False
+    return True
 
 def create_arg_parser():
     parser = argparse.ArgumentParser(description='Metadata anonymisation toolkit 2')
@@ -20,30 +29,38 @@ def create_arg_parser():
     return parser
 
 def show_meta(filename:str):
+    if not __check_file(filename):
+        return
+
     p, mtype = parser_factory.get_parser(filename)
     if p is None:
         print("[-] %s's format (%s) is not supported" % (filename, mtype))
         return
+    print("[+] Metadata for %s:" % filename)
     for k,v in p.get_meta().items():
-        print("%s: %s" % (k, v))
+        print("  %s: %s" % (k, v))
+
+def clean_meta(filename:str):
+    if not __check_file(filename, os.R_OK|os.W_OK):
+        return
+
+    p, mtype = parser_factory.get_parser(f)
+    if p is None:
+        print("[-] %s's format (%s) is not supported" % (filename, mtype))
+        return
+    p.remove_all()
 
 def main():
-    argparser = create_arg_parser()
-    args = argparser.parse_args()
+    args = create_arg_parser().parse_args()
+
 
     if args.show:
         for f in args.files:
             show_meta(f)
-        return 0
-
-    for f in args.files:
-        p, mtype = parser_factory.get_parser(f)
-        if p is None:
-            print("[-] %s's format (%s) is not supported" % (f, mtype))
-            continue
-        p.remove_all()
+    else:
+        for f in args.files:
+            clean_meta(f)
 
 
 if __name__ == '__main__':
-
     main()
