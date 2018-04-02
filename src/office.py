@@ -38,9 +38,9 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
     def _clean_internal_file(self, item:zipfile.ZipInfo, temp_folder:str, zin:zipfile.ZipFile, zout:zipfile.ZipFile):
         zin.extract(member=item, path=temp_folder)
-        tmp_parser = parser_factory.get_parser(os.path.join(temp_folder, item.filename))
+        tmp_parser, mtype = parser_factory.get_parser(os.path.join(temp_folder, item.filename))
         if tmp_parser is None:
-            print("%s isn't supported" % item.filename)
+            print("%s's format (%s) isn't supported" % (item.filename, mtype))
             return
         tmp_parser.remove_all()
         zinfo = zipfile.ZipInfo(item.filename)

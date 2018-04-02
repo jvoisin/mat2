@@ -20,9 +20,8 @@ def create_arg_parser():
     return parser
 
 def show_meta(filename:str):
-    p = parser_factory.get_parser(filename)
+    p, mtype = parser_factory.get_parser(filename)
     if p is None:
-        mtype, _ = mimetypes.guess_type(filename)
         print("[-] %s's format (%s) is not supported" % (filename, mtype))
         return
     for k,v in p.get_meta().items():
@@ -38,9 +37,9 @@ def main():
         return 0
 
     for f in args.files:
-        p = parser_factory.get_parser(f)
+        p, mtype = parser_factory.get_parser(f)
         if p is None:
-            print("[-] %s's format (%s) is not supported" % (f, "meh"))
+            print("[-] %s's format (%s) is not supported" % (f, mtype))
             continue
         p.remove_all()
 

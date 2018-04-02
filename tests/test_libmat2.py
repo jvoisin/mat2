@@ -72,7 +72,7 @@ class TestDeepCleaning(unittest.TestCase):
         for subdir, dirs, files in os.walk(tempdir):
             for f in files:
                 complete_path = os.path.join(subdir, f)
-                inside_p = parser_factory.get_parser(complete_path)
+                inside_p, _ = parser_factory.get_parser(complete_path)
                 if inside_p is None:
                     continue
                 print('[+] %s is clean inside %s' %(complete_path, p.filename))
