@@ -18,7 +18,10 @@ for module_loader, name, ispkg in pkgutil.walk_packages('.src'):
 
 def get_parser(filename: str) -> (T, str):
     mtype, _ = mimetypes.guess_type(filename)
-    for c in abstract.AbstractParser.__subclasses__():
+    def get_subclasses(cls):
+        return cls.__subclasses__() + \
+               [g for s in cls.__subclasses__() for g in get_subclasses(s)]
+    for c in get_subclasses(abstract.AbstractParser):
         if mtype in c.mimetypes:
             return c(filename), mtype
     return None, mtype
