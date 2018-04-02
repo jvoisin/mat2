@@ -28,7 +28,7 @@ class PDFParser(abstract.AbstractParser):
     def __init__(self, filename):
         super().__init__(filename)
         self.uri = 'file://' + os.path.abspath(self.filename)
-        self.__scale = 2
+        self.__scale = 2  # how much precision do we want for the render
 
     def remove_all(self):
         """
@@ -62,14 +62,14 @@ class PDFParser(abstract.AbstractParser):
             buf.seek(0)
 
             img = cairo.ImageSurface.create_from_png(buf)
-            pdf_surface.set_size(page_width*2, page_height*2)
+            pdf_surface.set_size(page_width*self.__scale, page_height*self.__scale)
             pdf_context.set_source_surface(img, 0, 0)
             pdf_context.paint()
             pdf_context.show_page()
 
         pdf_surface.finish()
 
-        # This is removing metadata added by Poppler
+        # Removes metadata added by Poppler
         document = Poppler.Document.new_from_file('file://' + tmp_path)
         document.set_producer('')
         document.set_creator('')
