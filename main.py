@@ -6,7 +6,7 @@ import argparse
 
 from src import parser_factory
 
-def __check_file(filename:str, mode=os.R_OK) -> bool:
+def __check_file(filename:str, mode:int = os.R_OK) -> bool:
     if not os.path.isfile(filename):
         print("[-] %s is not a regular file." % filename)
         return False
@@ -52,7 +52,6 @@ def clean_meta(filename:str):
 
 def main():
     args = create_arg_parser().parse_args()
-
 
     if args.show:
         for f in args.files:
