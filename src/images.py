@@ -52,7 +52,7 @@ class GdkPixbufAbstractParser(abstract.AbstractParser):
 
 
 class JPGParser(GdkPixbufAbstractParser):
-    mimetypes = {'image/jpg'}
+    mimetypes = {'image/jpeg'}
     meta_whitelist = {'SourceFile', 'ExifToolVersion', 'FileName',
             'Directory', 'FileSize', 'FileModifyDate', 'FileAccessDate',
             "FileInodeChangeDate", 'FilePermissions', 'FileType',
