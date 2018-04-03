@@ -8,6 +8,13 @@ import tempfile
 
 from src import pdf, images, audio, office, parser_factory
 
+class TestParserFactory(unittest.TestCase):
+    def test_subsubcalss(self):
+        """ Test that our module auto-detection is handling sub-sub-classes """
+        parser, mimetype = parser_factory.get_parser('./tests/data/dirty.mp3')
+        self.assertEqual(mimetype, 'audio/mpeg')
+        self.assertEqual(parser.__class__, audio.MP3Parser)
+
 class TestGetMeta(unittest.TestCase):
     def test_pdf(self):
         p = pdf.PDFParser('./tests/data/dirty.pdf')
