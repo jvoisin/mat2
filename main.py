@@ -39,7 +39,10 @@ def show_meta(filename:str):
         return
     print("[+] Metadata for %s:" % filename)
     for k,v in p.get_meta().items():
-        print("  %s: %s" % (k, v))
+        try:  # FIXME this is ugly.
+            print("  %s: %s" % (k, v))
+        except UnicodeEncodeError:
+            print("  %s: harmful content" % k)
 
 def clean_meta(filename:str):
     if not __check_file(filename, os.R_OK|os.W_OK):
