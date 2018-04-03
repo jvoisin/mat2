@@ -25,6 +25,10 @@ handle PDF. But apparently, people are ok with [pdf redact
 tools](https://github.com/firstlookmedia/pdf-redact-tools), that simply
 transform the PDF into images. So this is what's MAT2 is doing too.
 
+Of course, it would be possible to detect images in PDf file, and process them
+with MAT2, but since a PDF can contain a lot of things, like images, videos,
+javascript, pdf, blobs, … this is the easiest and safest way to clean them.
+
 Images handling
 ---------------
 
