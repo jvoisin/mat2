@@ -24,3 +24,12 @@ Please note that MAT2 runs on Python3.
 ```bash
 $ python3 -m unittest discover -v
 ```
+
+# Related softwares
+
+- The first iteration of [MAT](http://mat.boum.org)
+- [Exiftool](https://sno.phy.queensu.ca/~phil/exiftool/mat)
+- [pdf-redact-tools](https://github.com/firstlookmedia/pdf-redact-tools), that
+	try to deal with *printer dots* too.
+- [pdfparanoia](https://github.com/kanzure/pdfparanoia), that removes
+	watermarks from PDF.
