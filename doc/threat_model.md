@@ -11,13 +11,15 @@ Warnings
 
 Mat only removes standard metadata from your files, it does _not_:
 
-  - anonymise their content
+  - anonymise their content (the substance and the form)
   - handle watermarking
   - handle steganography
+  - handle stylometry
   - handle any non-standard metadata field/system
 
 If you really want to be anonymous format that does not contain any
-metadata, or better : use plain-text. And as usual, think before clicking.
+metadata, or better : use plain-text ASCII without trailing spaces.
+And as usual, think before clicking.
 
 
 Adversary
