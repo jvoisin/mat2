@@ -31,7 +31,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
             metadata['comment'] = zipinfo.comment
 
         if zipinfo.date_time != (1980, 1, 1, 0, 0, 0):
-            metadata['comment'] = datetime.datetime(*zipinfo.date_time)
+            metadata['date_time'] = datetime.datetime(*zipinfo.date_time)
 
         return metadata
 
