@@ -44,21 +44,30 @@ def clean_meta(filename:str):
     if not __check_file(filename, os.R_OK|os.W_OK):
         return
 
-    p, mtype = parser_factory.get_parser(f)
+    p, mtype = parser_factory.get_parser(filename)
     if p is None:
         print("[-] %s's format (%s) is not supported" % (filename, mtype))
         return
     p.remove_all()
 
 def main():
-    args = create_arg_parser().parse_args()
+    arg_parser = create_arg_parser()
+    args = arg_parser.parse_args()
 
     if args.show:
         for f in args.files:
             show_meta(f)
-    else:
+    elif args.list:
+        print('[+] Supported formats:')
+        for parser in parser_factory._get_parsers():
+            for mtype in parser.mimetypes:
+                extensions = ', '.join(mimetypes.guess_all_extensions(mtype))
+                print('  - %s (%s)' % (mtype, extensions))
+    elif args.files:
         for f in args.files:
             clean_meta(f)
+    else:
+        arg_parser.print_help()
 
 
 if __name__ == '__main__':
