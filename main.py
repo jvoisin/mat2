@@ -1,12 +1,11 @@
 #!/usr/bin/python3
 
 import os
-import sys
 import mimetypes
-from shutil import copyfile
 import argparse
 
 from src import parser_factory
+
 
 def __check_file(filename:str, mode:int = os.R_OK) -> bool:
     if not os.path.isfile(filename):
@@ -83,10 +82,10 @@ def main():
         return
 
     if args.show:
-        for f in get_files_recursively(args.files):
+        for f in __get_files_recursively(args.files):
             show_meta(f)
     else:
-        for f in get_files_recursively(args.files):
+        for f in __get_files_recursively(args.files):
             clean_meta(f)
 
 
