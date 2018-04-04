@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+
 import os
 import sys
 import mimetypes
@@ -54,24 +55,39 @@ def clean_meta(filename:str):
         return
     p.remove_all()
 
+def show_parsers():
+    print('[+] Supported formats:')
+    for parser in parser_factory._get_parsers():
+        for mtype in parser.mimetypes:
+            extensions = ', '.join(mimetypes.guess_all_extensions(mtype))
+            print('  - %s (%s)' % (mtype, extensions))
+
+def __get_files_recursively(files):
+    for f in files:
+        if os.path.isfile(f):
+            yield f
+        else:
+            for path, _, _files in os.walk(f):
+                for _f in _files:
+                    yield os.path.join(path, _f)
+
+
 def main():
     arg_parser = create_arg_parser()
     args = arg_parser.parse_args()
 
+    if not args.files:
+        if not args.list:
+            return arg_parser.print_help()
+        show_parsers()
+        return
+
     if args.show:
-        for f in args.files:
+        for f in get_files_recursively(args.files):
             show_meta(f)
-    elif args.list:
-        print('[+] Supported formats:')
-        for parser in parser_factory._get_parsers():
-            for mtype in parser.mimetypes:
-                extensions = ', '.join(mimetypes.guess_all_extensions(mtype))
-                print('  - %s (%s)' % (mtype, extensions))
-    elif args.files:
-        for f in args.files:
-            clean_meta(f)
     else:
-        arg_parser.print_help()
+        for f in get_files_recursively(args.files):
+            clean_meta(f)
 
 
 if __name__ == '__main__':
