@@ -9,6 +9,11 @@ class TestHelp(unittest.TestCase):
         stdout, _ = proc.communicate()
         self.assertIn(b'usage: main.py [-h] [-c] [-l] [-s] [files [files ...]]', stdout)
 
+    def test_no_arg(self):
+        proc = subprocess.Popen(['./main.py'], stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+        self.assertIn(b'usage: main.py [-h] [-c] [-l] [-s] [files [files ...]]', stdout)
+
 class TestGetMeta(unittest.TestCase):
     def test_pdf(self):
         proc = subprocess.Popen(['./main.py', '--show', './tests/data/dirty.pdf'],
