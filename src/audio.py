@@ -10,7 +10,7 @@ class MutagenParser(abstract.AbstractParser):
     def get_meta(self):
         f = mutagen.File(self.filename)
         if f.tags:
-            return f.tags
+            return {k:', '.join(v) for k,v in f.tags.items()}
         return {}
 
     def remove_all(self):
@@ -24,10 +24,10 @@ class MP3Parser(MutagenParser):
     mimetypes = {'audio/mpeg', }
 
     def get_meta(self):
-        meta = super().get_meta()
         metadata = {}
+        meta = mutagen.File(self.filename).tags
         for key in meta:
-            metadata[key] = meta[key].text
+            metadata[key.rstrip(' \t\r\n\0')] = ', '.join(map(str, meta[key].text))
         return metadata
 
 class OGGParser(MutagenParser):

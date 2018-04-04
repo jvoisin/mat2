@@ -43,17 +43,17 @@ class TestGetMeta(unittest.TestCase):
     def test_mp3(self):
         p = audio.MP3Parser('./tests/data/dirty.mp3')
         meta = p.get_meta()
-        self.assertEqual(meta['TXXX:I am a '], ['various comment'])
+        self.assertEqual(meta['TXXX:I am a'], 'various comment')
 
     def test_ogg(self):
         p = audio.OGGParser('./tests/data/dirty.ogg')
         meta = p.get_meta()
-        self.assertEqual(meta['TITLE'], ['I am so'])
+        self.assertEqual(meta['title'], 'I am so')
 
     def test_flac(self):
         p = audio.FLACParser('./tests/data/dirty.flac')
         meta = p.get_meta()
-        self.assertEqual(meta['TITLE'], ['I am so'])
+        self.assertEqual(meta['title'], 'I am so')
 
     def test_docx(self):
         p = office.MSOfficeParser('./tests/data/dirty.docx')
@@ -184,7 +184,7 @@ class TestCleaning(unittest.TestCase):
         p = audio.MP3Parser('./tests/data/clean.mp3')
 
         meta = p.get_meta()
-        self.assertEqual(meta['TXXX:I am a '], ['various comment'])
+        self.assertEqual(meta['TXXX:I am a'], 'various comment')
 
         ret = p.remove_all()
         self.assertTrue(ret)
@@ -199,7 +199,7 @@ class TestCleaning(unittest.TestCase):
         p = audio.OGGParser('./tests/data/clean.ogg')
 
         meta = p.get_meta()
-        self.assertEqual(meta['TITLE'], ['I am so'])
+        self.assertEqual(meta['title'], 'I am so')
 
         ret = p.remove_all()
         self.assertTrue(ret)
@@ -214,7 +214,7 @@ class TestCleaning(unittest.TestCase):
         p = audio.FLACParser('./tests/data/clean.flac')
 
         meta = p.get_meta()
-        self.assertEqual(meta['TITLE'], ['I am so'])
+        self.assertEqual(meta['title'], 'I am so')
 
         ret = p.remove_all()
         self.assertTrue(ret)

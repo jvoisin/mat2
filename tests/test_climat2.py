@@ -43,3 +43,27 @@ class TestGetMeta(unittest.TestCase):
         self.assertIn(b'generator: LibreOffice/3.3$Unix', stdout)
         self.assertIn(b'creator: jvoisin', stdout)
         self.assertIn(b'date_time: 2011-07-26 02:40:16', stdout)
+
+    def test_mp3(self):
+        proc = subprocess.Popen(['./main.py', '--show', './tests/data/dirty.mp3'],
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+        self.assertIn(b'TALB: harmfull', stdout)
+        self.assertIn(b'COMM::: Thank you for using MAT !', stdout)
+
+    def test_flac(self):
+        proc = subprocess.Popen(['./main.py', '--show', './tests/data/dirty.flac'],
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+        self.assertIn(b'comments: Thank you for using MAT !', stdout)
+        self.assertIn(b'genre: Python', stdout)
+        self.assertIn(b'title: I am so', stdout)
+
+    def test_ogg(self):
+        proc = subprocess.Popen(['./main.py', '--show', './tests/data/dirty.ogg'],
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+        self.assertIn(b'comments: Thank you for using MAT !', stdout)
+        self.assertIn(b'genre: Python', stdout)
+        self.assertIn(b'i am a : various comment', stdout)
+        self.assertIn(b'artist: jvoisin', stdout)
