@@ -1,5 +1,6 @@
 from . import abstract
 
+
 class HarmlessParser(abstract.AbstractParser):
     """ This is the parser for filetypes that do not contain metadata. """
     mimetypes = {'application/xml', 'text/plain', 'application/rdf+xml'}

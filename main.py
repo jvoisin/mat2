@@ -16,6 +16,7 @@ def __check_file(filename:str, mode:int = os.R_OK) -> bool:
         return False
     return True
 
+
 def create_arg_parser():
     parser = argparse.ArgumentParser(description='Metadata anonymisation toolkit 2')
     parser.add_argument('files', nargs='*')
@@ -28,6 +29,7 @@ def create_arg_parser():
     info.add_argument('-s', '--show', action='store_true',
                       help='list all the harmful metadata of a file without removing them')
     return parser
+
 
 def show_meta(filename:str):
     if not __check_file(filename):
@@ -44,6 +46,7 @@ def show_meta(filename:str):
         except UnicodeEncodeError:
             print("  %s: harmful content" % k)
 
+
 def clean_meta(filename:str):
     if not __check_file(filename, os.R_OK|os.W_OK):
         return
@@ -54,12 +57,14 @@ def clean_meta(filename:str):
         return
     p.remove_all()
 
+
 def show_parsers():
     print('[+] Supported formats:')
     for parser in parser_factory._get_parsers():
         for mtype in parser.mimetypes:
             extensions = ', '.join(mimetypes.guess_all_extensions(mtype))
             print('  - %s (%s)' % (mtype, extensions))
+
 
 def __get_files_recursively(files):
     for f in files:

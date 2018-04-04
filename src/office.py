@@ -7,6 +7,7 @@ import zipfile
 
 from . import abstract, parser_factory
 
+
 class ArchiveBasedAbstractParser(abstract.AbstractParser):
     def _clean_zipinfo(self, zipinfo:zipfile.ZipInfo) -> zipfile.ZipInfo:
         zipinfo.compress_type = zipfile.ZIP_DEFLATED
@@ -45,6 +46,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
         clean_zinfo = self._clean_zipinfo(zinfo)
         with open(tmp_parser.output_filename, 'rb') as f:
             zout.writestr(clean_zinfo, f.read())
+
 
 class MSOfficeParser(ArchiveBasedAbstractParser):
     mimetypes = {

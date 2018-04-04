@@ -1,5 +1,6 @@
 import abc
 
+
 class AbstractParser(abc.ABC):
     meta_list = set()
     mimetypes = set()

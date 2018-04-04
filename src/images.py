@@ -10,6 +10,7 @@ from gi.repository import GdkPixbuf
 
 from . import abstract
 
+
 class PNGParser(abstract.AbstractParser):
     mimetypes = {'image/png', }
     meta_whitelist = {'SourceFile', 'ExifToolVersion', 'FileName',
@@ -30,6 +31,7 @@ class PNGParser(abstract.AbstractParser):
         surface = cairo.ImageSurface.create_from_png(self.filename)
         surface.write_to_png(self.output_filename)
         return True
+
 
 class GdkPixbufAbstractParser(abstract.AbstractParser):
     """ GdkPixbuf can handle a lot of surfaces, so we're rending images on it,

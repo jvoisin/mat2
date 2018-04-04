@@ -4,6 +4,7 @@ import mutagen
 
 from . import abstract
 
+
 class MutagenParser(abstract.AbstractParser):
     def get_meta(self):
         f = mutagen.File(self.filename)
@@ -18,6 +19,7 @@ class MutagenParser(abstract.AbstractParser):
         f.save()
         return True
 
+
 class MP3Parser(MutagenParser):
     mimetypes = {'audio/mpeg', }
 
@@ -28,8 +30,10 @@ class MP3Parser(MutagenParser):
             metadata[key.rstrip(' \t\r\n\0')] = ', '.join(map(str, meta[key].text))
         return metadata
 
+
 class OGGParser(MutagenParser):
     mimetypes = {'audio/ogg', }
+
 
 class FLACParser(MutagenParser):
     mimetypes = {'audio/flac', }
