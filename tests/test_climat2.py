@@ -1,6 +1,5 @@
 import unittest
 import subprocess
-import os
 
 
 class TestHelp(unittest.TestCase):

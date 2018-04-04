@@ -5,9 +5,7 @@
 import os
 import logging
 import tempfile
-import shutil
 import io
-import tempfile
 
 import cairo
 import gi
