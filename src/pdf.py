@@ -3,6 +3,7 @@
 """
 
 import os
+import re
 import logging
 import tempfile
 import io
@@ -76,6 +77,13 @@ class PDFParser(abstract.AbstractParser):
 
         return True
 
+
+    def __parse_metadata_field(self, data:str) -> dict:
+        metadata = {}
+        for (_, key, value) in re.findall(r"<(xmp|pdfx|pdf|xmpMM):(.+)>(.+)</\1:\2>", data, re.I):
+            metadata[key] = value
+        return metadata
+
     def get_meta(self):
         """ Return a dict with all the meta of the file
         """
@@ -84,4 +92,7 @@ class PDFParser(abstract.AbstractParser):
         for key in self.meta_list:
             if document.get_property(key):
                 metadata[key] = document.get_property(key)
+        if 'metadata' in metadata:
+            parsed_meta =  self.__parse_metadata_field(metadata['metadata'])
+            return {**metadata, **parsed_meta}
         return metadata

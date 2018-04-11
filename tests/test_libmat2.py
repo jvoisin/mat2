@@ -23,6 +23,10 @@ class TestGetMeta(unittest.TestCase):
         meta = p.get_meta()
         self.assertEqual(meta['producer'], 'pdfTeX-1.40.14')
         self.assertEqual(meta['creator'], "'Certified by IEEE PDFeXpress at 03/19/2016 2:56:07 AM'")
+        self.assertEqual(meta['DocumentID'], "uuid:4a1a79c8-404e-4d38-9580-5bc081036e61")
+        self.assertEqual(meta['PTEX.Fullbanner'], "This is pdfTeX, Version " \
+                "3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) kpathsea " \
+                "version 6.1.1")
 
     def test_png(self):
         p = images.PNGParser('./tests/data/dirty.png')
