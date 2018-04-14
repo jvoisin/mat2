@@ -17,7 +17,8 @@
 - `gir1.2-gdkpixbuf-2.0` for images support
 - `libimage-exiftool-perl` for everything else
 
-Please note that MAT2 runs on Python3.
+Please note that MAT2 requires at least Python3.5, meaning that it
+doesn't run on [Debian Jessie](Stretc://packages.debian.org/jessie/python3),
 
 # Run the testsuite
 
