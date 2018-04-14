@@ -3,6 +3,9 @@
 import os
 import mimetypes
 import argparse
+from threading import Thread
+import multiprocessing
+from queue import Queue
 
 from src import parser_factory
 
@@ -75,6 +78,14 @@ def __get_files_recursively(files):
                 for _f in _files:
                     yield os.path.join(path, _f)
 
+def __do_clean_async(q):
+    while True:
+        f = q.get()
+        if f is None:  # nothing more to process
+            return
+        clean_meta(f)
+        q.task_done()
+
 
 def main():
     arg_parser = create_arg_parser()
@@ -86,12 +97,27 @@ def main():
         show_parsers()
         return
 
-    if args.show:
+    elif args.show:
         for f in __get_files_recursively(args.files):
             show_meta(f)
-    else:
+        return
+
+    else:  # Thread the cleaning
+        q = Queue(maxsize=0)
+        threads = list()
         for f in __get_files_recursively(args.files):
-            clean_meta(f)
+            q.put(f)
+
+        for _ in range(multiprocessing.cpu_count()):
+            worker = Thread(target=__do_clean_async, args=(q, ))
+            worker.start()
+            threads.append(worker)
+
+        for _ in range(multiprocessing.cpu_count()):
+            q.put(None)  # stop the threads
+
+        for worker in threads:
+            worker.join()
 
 
 if __name__ == '__main__':
