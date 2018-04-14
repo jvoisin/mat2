@@ -6,12 +6,12 @@ class TestHelp(unittest.TestCase):
     def test_help(self):
         proc = subprocess.Popen(['./main.py', '--help'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'usage: main.py [-h] [-c] [-l] [-s] [files [files ...]]', stdout)
+        self.assertIn(b'usage: main.py [-h] [-c] [-l] [-s] [-L] [files [files ...]]', stdout)
 
     def test_no_arg(self):
         proc = subprocess.Popen(['./main.py'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'usage: main.py [-h] [-c] [-l] [-s] [files [files ...]]', stdout)
+        self.assertIn(b'usage: main.py [-h] [-c] [-l] [-s] [-L] [files [files ...]]', stdout)
 
 
 class TestGetMeta(unittest.TestCase):

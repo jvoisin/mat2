@@ -31,6 +31,8 @@ def create_arg_parser():
                       help='list all supported fileformats')
     info.add_argument('-s', '--show', action='store_true',
                       help='list all the harmful metadata of a file without removing them')
+    info.add_argument('-L', '--lightweight', action='store_true',
+                      help='remove SOME metadata')
     return parser
 
 
@@ -50,7 +52,7 @@ def show_meta(filename:str):
             print("  %s: harmful content" % k)
 
 
-def clean_meta(filename:str):
+def clean_meta(filename:str, is_lightweigth:bool):
     if not __check_file(filename, os.R_OK|os.W_OK):
         return
 
@@ -58,7 +60,10 @@ def clean_meta(filename:str):
     if p is None:
         print("[-] %s's format (%s) is not supported" % (filename, mtype))
         return
-    p.remove_all()
+    if is_lightweigth:
+        p.remove_all_lightweight()
+    else:
+        p.remove_all()
 
 
 def show_parsers():
@@ -78,12 +83,12 @@ def __get_files_recursively(files):
                 for _f in _files:
                     yield os.path.join(path, _f)
 
-def __do_clean_async(q):
+def __do_clean_async(is_lightweigth, q):
     while True:
         f = q.get()
         if f is None:  # nothing more to process
             return
-        clean_meta(f)
+        clean_meta(is_lightweigth, f)
         q.task_done()
 
 
@@ -109,7 +114,7 @@ def main():
             q.put(f)
 
         for _ in range(multiprocessing.cpu_count()):
-            worker = Thread(target=__do_clean_async, args=(q, ))
+            worker = Thread(target=__do_clean_async, args=(mode, q))
             worker.start()
             threads.append(worker)
 

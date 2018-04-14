@@ -138,6 +138,37 @@ class TestDeepCleaning(unittest.TestCase):
 
         os.remove('./tests/data/clean.odt')
 
+class TestLightWeightCleaning(unittest.TestCase):
+    def test_pdf(self):
+        shutil.copy('./tests/data/dirty.pdf', './tests/data/clean.pdf')
+        p = pdf.PDFParser('./tests/data/clean.pdf')
+
+        meta = p.get_meta()
+        self.assertEqual(meta['producer'], 'pdfTeX-1.40.14')
+
+        ret = p.remove_all_lightweight()
+        self.assertTrue(ret)
+
+        p = pdf.PDFParser('./tests/data/clean.pdf.cleaned')
+        expected_meta = {'creation-date': -1, 'format': 'PDF-1.5', 'mod-date': -1}
+        self.assertEqual(p.get_meta(), expected_meta)
+
+        os.remove('./tests/data/clean.pdf')
+
+    def test_png(self):
+        shutil.copy('./tests/data/dirty.png', './tests/data/clean.png')
+        p = images.PNGParser('./tests/data/clean.png')
+
+        meta = p.get_meta()
+        self.assertEqual(meta['Comment'], 'This is a comment, be careful!')
+
+        ret = p.remove_all_lightweight()
+        self.assertTrue(ret)
+
+        p = images.PNGParser('./tests/data/clean.png.cleaned')
+        self.assertEqual(p.get_meta(), {})
+
+        os.remove('./tests/data/clean.png')
 
 class TestCleaning(unittest.TestCase):
     def test_pdf(self):

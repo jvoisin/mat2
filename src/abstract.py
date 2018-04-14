@@ -16,3 +16,7 @@ class AbstractParser(abc.ABC):
     @abc.abstractmethod
     def remove_all(self) -> bool:
         pass
+
+    def remove_all_lightweight(self) -> bool:
+        """ Remove _SOME_ metadata. """
+        return self.remove_all()

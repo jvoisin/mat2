@@ -29,18 +29,43 @@ class PDFParser(abstract.AbstractParser):
         self.uri = 'file://' + os.path.abspath(self.filename)
         self.__scale = 2  # how much precision do we want for the render
 
+    def remove_all_lightweight(self):
+        """
+            Load the document into Poppler, render pages on a new PDFSurface.
+        """
+        document = Poppler.Document.new_from_file(self.uri, None)
+        pages_count = document.get_n_pages()
+
+        tmp_path = tempfile.mkstemp()[1]
+        pdf_surface = cairo.PDFSurface(tmp_path, 10, 10)
+        pdf_context = cairo.Context(pdf_surface)  # context draws on the surface
+
+        for pagenum in range(pages_count):
+            logging.info("Rendering page %d/%d", pagenum + 1, pages_count)
+            page = document.get_page(pagenum)
+            page_width, page_height = page.get_size()
+            pdf_surface.set_size(page_width, page_height)
+            pdf_context.save()
+            page.render_for_printing(pdf_context)
+            pdf_context.restore()
+            pdf_context.show_page()  # draw pdf_context on pdf_surface
+        pdf_surface.finish()
+
+        self.__remove_superficial_meta(tmp_path, self.output_filename)
+        os.remove(tmp_path)
+
+        return True
+
     def remove_all(self):
         """
             Load the document into Poppler, render pages on PNG,
-            and shove those PNG into a new PDF. Metadata from the new
-            PDF are removed via Poppler, because there is no way to tell
-            cairo to not add "created by cairo" during rendering.
+            and shove those PNG into a new PDF.
         """
         document = Poppler.Document.new_from_file(self.uri, None)
         pages_count = document.get_n_pages()
 
         _, tmp_path = tempfile.mkstemp()
-        pdf_surface = cairo.PDFSurface(tmp_path, 128, 128)
+        pdf_surface = cairo.PDFSurface(tmp_path, 32, 32)  # resized later anyway
         pdf_context = cairo.Context(pdf_surface)
 
         for pagenum in range(pages_count):
@@ -69,12 +94,16 @@ class PDFParser(abstract.AbstractParser):
         pdf_surface.finish()
 
         # Removes metadata added by Poppler
-        document = Poppler.Document.new_from_file('file://' + tmp_path)
-        document.set_producer('')
-        document.set_creator('')
-        document.save('file://' + os.path.abspath(self.output_filename))
+        self.__remove_superficial_meta(tmp_path, self.output_filename)
         os.remove(tmp_path)
 
+        return True
+
+    def __remove_superficial_meta(self, in_file:str, out_file: str) -> bool:
+        document = Poppler.Document.new_from_file('file://' + in_file)
+        document.set_producer('')
+        document.set_creator('')
+        document.save('file://' + os.path.abspath(out_file))
         return True
 
 
