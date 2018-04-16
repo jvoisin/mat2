@@ -75,3 +75,17 @@ class TiffParser(GdkPixbufAbstractParser):
             'FileTypeExtension', 'ImageHeight', 'ImageSize', 'ImageWidth',
             'MIMEType', 'Megapixels', 'SourceFile'}
 
+
+class BMPParser(GdkPixbufAbstractParser):
+    mimetypes = {'image/bmp', 'image/x-ms-bmp'}
+    meta_whitelist = {'SourceFile', 'ExifToolVersion', 'FileName', 'Directory',
+            'FileSize', 'FileModifyDate', 'FileAccessDate',
+            'FileInodeChangeDate', 'FilePermissions', 'FileType',
+            'FileTypeExtension', 'MIMEType', 'BMPVersion', 'ImageWidth',
+            'ImageHeight', 'Planes', 'BitDepth', 'Compression', 'ImageLength',
+            'PixelsPerMeterX', 'PixelsPerMeterY', 'NumColors',
+            'NumImportantColors', 'RedMask', 'GreenMask', 'BlueMask',
+            'AlphaMask', 'ColorSpace', 'RedEndpoint', 'GreenEndpoint',
+            'BlueEndpoint', 'GammaRed', 'GammaGreen', 'GammaBlue', 'ImageSize',
+            'Megapixels'}
+
