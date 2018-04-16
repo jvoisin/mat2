@@ -49,7 +49,7 @@ class GdkPixbufAbstractParser(abstract.AbstractParser):
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.filename)
         if extension == '.jpg':
             extension = '.jpeg'
-        pixbuf.savev(self.output_filename, extension[1:], ["quality"], ["100"])
+        pixbuf.savev(self.output_filename, extension[1:], [], [])
         return True
 
 
