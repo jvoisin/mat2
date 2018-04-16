@@ -88,7 +88,7 @@ def __do_clean_async(is_lightweigth, q):
         f = q.get()
         if f is None:  # nothing more to process
             return
-        clean_meta(is_lightweigth, f)
+        clean_meta(f, is_lightweigth)
         q.task_done()
 
 
@@ -108,6 +108,7 @@ def main():
         return
 
     else:  # Thread the cleaning
+        mode = (args.lightweight is True)
         q = Queue(maxsize=0)
         threads = list()
         for f in __get_files_recursively(args.files):
