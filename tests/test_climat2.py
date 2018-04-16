@@ -1,5 +1,7 @@
-import unittest
+import os
+import shutil
 import subprocess
+import unittest
 
 
 class TestHelp(unittest.TestCase):
@@ -12,6 +14,27 @@ class TestHelp(unittest.TestCase):
         proc = subprocess.Popen(['./main.py'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
         self.assertIn(b'usage: main.py [-h] [-c] [-l] [-s] [-L] [files [files ...]]', stdout)
+
+
+class TestCleanMeta(unittest.TestCase):
+    def test_jpg(self):
+        shutil.copy('./tests/data/dirty.jpg', './tests/data/clean.jpg')
+
+        proc = subprocess.Popen(['./main.py', '--show', './tests/data/clean.jpg'],
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+        self.assertIn(b'Comment: Created with GIMP', stdout)
+
+        proc = subprocess.Popen(['./main.py', './tests/data/clean.jpg'],
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+
+        proc = subprocess.Popen(['./main.py', '--show', './tests/data/clean.jpg.cleaned'],
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+        self.assertNotIn(b'Comment: Created with GIMP', stdout)
+
+        os.remove('./tests/data/clean.jpg')
 
 
 class TestGetMeta(unittest.TestCase):
