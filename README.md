@@ -9,6 +9,9 @@
 [![pipeline status](https://0xacab.org/jvoisin/mat2/badges/master/pipeline.svg)](https://0xacab.org/jvoisin/mat2/commits/master)
 [![coverage report](https://0xacab.org/jvoisin/mat2/badges/master/coverage.svg)](https://0xacab.org/jvoisin/mat2/commits/master)
 
+This software is currently in **beta**, please don't use it for anything
+critical.
+
 
 # Requirements
 
@@ -20,7 +23,7 @@
 Please note that MAT2 requires at least Python3.5, meaning that it
 doesn't run on [Debian Jessie](Stretc://packages.debian.org/jessie/python3),
 
-# Run the testsuite
+# Running the testsuite
 
 ```bash
 $ python3 -m unittest discover -v
@@ -31,6 +34,6 @@ $ python3 -m unittest discover -v
 - The first iteration of [MAT](http://mat.boum.org)
 - [Exiftool](https://sno.phy.queensu.ca/~phil/exiftool/mat)
 - [pdf-redact-tools](https://github.com/firstlookmedia/pdf-redact-tools), that
-	try to deal with *printer dots* too.
+	tries to deal with *printer dots* too.
 - [pdfparanoia](https://github.com/kanzure/pdfparanoia), that removes
 	watermarks from PDF.
