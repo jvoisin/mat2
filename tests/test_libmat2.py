@@ -6,7 +6,7 @@ import os
 import zipfile
 import tempfile
 
-from src import pdf, images, audio, office, parser_factory
+from src import pdf, images, audio, office, parser_factory, torrent
 
 
 class TestParserFactory(unittest.TestCase):
@@ -27,6 +27,11 @@ class TestGetMeta(unittest.TestCase):
         self.assertEqual(meta['PTEX.Fullbanner'], "This is pdfTeX, Version " \
                 "3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) kpathsea " \
                 "version 6.1.1")
+
+    def test_torrent(self):
+        p = torrent.TorrentParser('./tests/data/dirty.torrent')
+        meta = p.get_meta()
+        self.assertEqual(meta['created by'], b'mktorrent 1.0')
 
     def test_png(self):
         p = images.PNGParser('./tests/data/dirty.png')
@@ -322,3 +327,19 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.bmp')
+
+
+    def test_torrent(self):
+        shutil.copy('./tests/data/dirty.torrent', './tests/data/clean.torrent')
+        p = torrent.TorrentParser('./tests/data/clean.torrent')
+
+        meta = p.get_meta()
+        self.assertEqual(meta, {'created by': b'mktorrent 1.0', 'creation date': 1522397702})
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = torrent.TorrentParser('./tests/data/clean.torrent.cleaned')
+        self.assertEqual(p.get_meta(), {})
+
+        os.remove('./tests/data/clean.torrent')
