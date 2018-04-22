@@ -52,7 +52,7 @@ def show_meta(filename:str):
             print("  %s: harmful content" % k)
 
 
-def clean_meta(filename:str, is_lightweigth:bool):
+def clean_meta(filename:str, is_lightweigth:bool) -> bool:
     if not __check_file(filename, os.R_OK|os.W_OK):
         return
 
@@ -61,9 +61,8 @@ def clean_meta(filename:str, is_lightweigth:bool):
         print("[-] %s's format (%s) is not supported" % (filename, mtype))
         return
     if is_lightweigth:
-        p.remove_all_lightweight()
-    else:
-        p.remove_all()
+        return p.remove_all_lightweight()
+    return p.remove_all()
 
 
 def show_parsers():
