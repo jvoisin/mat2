@@ -357,3 +357,19 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.odf')
+
+
+    def test_odg(self):
+        shutil.copy('./tests/data/dirty.odg', './tests/data/clean.odg')
+        p = office.LibreOfficeParser('./tests/data/clean.odg')
+
+        meta = p.get_meta()
+        self.assertEqual(meta['dc:date'], '2018-04-23T00:26:59.385838550')
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = office.LibreOfficeParser('./tests/data/clean.odg.cleaned')
+        self.assertEqual(p.get_meta(), {})
+
+        os.remove('./tests/data/clean.odg')
