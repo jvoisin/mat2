@@ -107,7 +107,8 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
             'application/vnd.oasis.opendocument.spreadsheet',
             'application/vnd.oasis.opendocument.presentation',
             'application/vnd.oasis.opendocument.graphics',
-            'application/vnd.oasis.opendocument.chart'
+            'application/vnd.oasis.opendocument.chart',
+            'application/vnd.oasis.opendocument.formula',
     }
 
     def get_meta(self):

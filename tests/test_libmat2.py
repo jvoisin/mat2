@@ -328,7 +328,6 @@ class TestCleaning(unittest.TestCase):
 
         os.remove('./tests/data/clean.bmp')
 
-
     def test_torrent(self):
         shutil.copy('./tests/data/dirty.torrent', './tests/data/clean.torrent')
         p = torrent.TorrentParser('./tests/data/clean.torrent')
@@ -343,3 +342,18 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.torrent')
+
+    def test_odf(self):
+        shutil.copy('./tests/data/dirty.odf', './tests/data/clean.odf')
+        p = office.LibreOfficeParser('./tests/data/clean.odf')
+
+        meta = p.get_meta()
+        self.assertEqual(meta['meta:creation-date'], '2018-04-23T00:18:59.438231281')
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = office.LibreOfficeParser('./tests/data/clean.odf.cleaned')
+        self.assertEqual(p.get_meta(), {})
+
+        os.remove('./tests/data/clean.odf')
