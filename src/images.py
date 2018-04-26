@@ -77,7 +77,7 @@ class TiffParser(GdkPixbufAbstractParser):
 
 
 class BMPParser(GdkPixbufAbstractParser):
-    mimetypes = {'image/bmp', 'image/x-ms-bmp'}
+    mimetypes = {'image/x-ms-bmp'}
     meta_whitelist = {'SourceFile', 'ExifToolVersion', 'FileName', 'Directory',
             'FileSize', 'FileModifyDate', 'FileAccessDate',
             'FileInodeChangeDate', 'FilePermissions', 'FileType',
