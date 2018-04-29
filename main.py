@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 
 import os
+from typing import Tuple
+import sys
+import itertools
 import mimetypes
 import argparse
-from threading import Thread
 import multiprocessing
-from queue import Queue
 
 from src import parser_factory
 
@@ -52,14 +53,15 @@ def show_meta(filename:str):
             print("  %s: harmful content" % k)
 
 
-def clean_meta(filename:str, is_lightweigth:bool) -> bool:
+def clean_meta(params:Tuple[str, bool]) -> bool:
+    filename, is_lightweigth = params
     if not __check_file(filename, os.R_OK|os.W_OK):
         return
 
     p, mtype = parser_factory.get_parser(filename)
     if p is None:
         print("[-] %s's format (%s) is not supported" % (filename, mtype))
-        return
+        return False
     if is_lightweigth:
         return p.remove_all_lightweight()
     return p.remove_all()
@@ -82,15 +84,6 @@ def __get_files_recursively(files):
                 for _f in _files:
                     yield os.path.join(path, _f)
 
-def __do_clean_async(is_lightweigth, q):
-    while True:
-        f = q.get()
-        if f is None:  # nothing more to process
-            return
-        clean_meta(f, is_lightweigth)
-        q.task_done()
-
-
 def main():
     arg_parser = create_arg_parser()
     args = arg_parser.parse_args()
@@ -106,24 +99,13 @@ def main():
             show_meta(f)
         return
 
-    else:  # Thread the cleaning
+    else:
+        p = multiprocessing.Pool()
         mode = (args.lightweight is True)
-        q = Queue(maxsize=0)
-        threads = list()
-        for f in __get_files_recursively(args.files):
-            q.put(f)
+        l = zip(__get_files_recursively(args.files), itertools.repeat(mode))
 
-        for _ in range(multiprocessing.cpu_count()):
-            worker = Thread(target=__do_clean_async, args=(mode, q))
-            worker.start()
-            threads.append(worker)
-
-        for _ in range(multiprocessing.cpu_count()):
-            q.put(None)  # stop the threads
-
-        for worker in threads:
-            worker.join()
-
+        ret = list(p.imap_unordered(clean_meta, list(l)))
+        return 0 if all(ret) else -1
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

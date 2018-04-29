@@ -16,6 +16,22 @@ class TestHelp(unittest.TestCase):
         self.assertIn(b'usage: main.py [-h] [-c] [-l] [-s] [-L] [files [files ...]]', stdout)
 
 
+class TestReturnValue(unittest.TestCase):
+    def test_nonzero(self):
+        ret = subprocess.call(['./main.py', './main.py'], stdout=subprocess.DEVNULL)
+        self.assertEqual(255, ret)
+
+        ret = subprocess.call(['./main.py', '--whololo'], stderr=subprocess.DEVNULL)
+        self.assertEqual(2, ret)
+
+    def test_zero(self):
+        ret = subprocess.call(['./main.py'], stdout=subprocess.DEVNULL)
+        self.assertEqual(0, ret)
+
+        ret = subprocess.call(['./main.py', '--show', './main.py'], stdout=subprocess.DEVNULL)
+        self.assertEqual(0, ret)
+
+
 class TestCleanMeta(unittest.TestCase):
     def test_jpg(self):
         shutil.copy('./tests/data/dirty.jpg', './tests/data/clean.jpg')
