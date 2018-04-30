@@ -123,6 +123,7 @@ class TestDeepCleaning(unittest.TestCase):
         self.__check_deep_meta(p)
 
         os.remove('./tests/data/clean.docx')
+        os.remove('./tests/data/clean.cleaned.docx')
 
 
     def test_libreoffice(self):
@@ -142,6 +143,7 @@ class TestDeepCleaning(unittest.TestCase):
         self.__check_deep_meta(p)
 
         os.remove('./tests/data/clean.odt')
+        os.remove('./tests/data/clean.cleaned.odt')
 
 class TestLightWeightCleaning(unittest.TestCase):
     def test_pdf(self):
@@ -159,6 +161,7 @@ class TestLightWeightCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), expected_meta)
 
         os.remove('./tests/data/clean.pdf')
+        os.remove('./tests/data/clean.cleaned.pdf')
 
     def test_png(self):
         shutil.copy('./tests/data/dirty.png', './tests/data/clean.png')
@@ -174,6 +177,7 @@ class TestLightWeightCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.png')
+        os.remove('./tests/data/clean.cleaned.png')
 
 class TestCleaning(unittest.TestCase):
     def test_pdf(self):
@@ -191,6 +195,7 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), expected_meta)
 
         os.remove('./tests/data/clean.pdf')
+        os.remove('./tests/data/clean.cleaned.pdf')
 
     def test_png(self):
         shutil.copy('./tests/data/dirty.png', './tests/data/clean.png')
@@ -206,6 +211,7 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.png')
+        os.remove('./tests/data/clean.cleaned.png')
 
     def test_jpg(self):
         shutil.copy('./tests/data/dirty.jpg', './tests/data/clean.jpg')
@@ -221,6 +227,7 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.jpg')
+        os.remove('./tests/data/clean.cleaned.jpg')
 
     def test_mp3(self):
         shutil.copy('./tests/data/dirty.mp3', './tests/data/clean.mp3')
@@ -236,6 +243,7 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.mp3')
+        os.remove('./tests/data/clean.cleaned.mp3')
 
     def test_ogg(self):
         shutil.copy('./tests/data/dirty.ogg', './tests/data/clean.ogg')
@@ -251,6 +259,7 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.ogg')
+        os.remove('./tests/data/clean.cleaned.ogg')
 
     def test_flac(self):
         shutil.copy('./tests/data/dirty.flac', './tests/data/clean.flac')
@@ -266,6 +275,7 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.flac')
+        os.remove('./tests/data/clean.cleaned.flac')
 
     def test_office(self):
         shutil.copy('./tests/data/dirty.docx', './tests/data/clean.docx')
@@ -281,6 +291,7 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.docx')
+        os.remove('./tests/data/clean.cleaned.docx')
 
 
     def test_libreoffice(self):
@@ -297,6 +308,7 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.odt')
+        os.remove('./tests/data/clean.cleaned.odt')
 
     def test_tiff(self):
         shutil.copy('./tests/data/dirty.tiff', './tests/data/clean.tiff')
@@ -312,6 +324,7 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.tiff')
+        os.remove('./tests/data/clean.cleaned.tiff')
 
     def test_bmp(self):
         shutil.copy('./tests/data/dirty.bmp', './tests/data/clean.bmp')
@@ -327,6 +340,7 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.bmp')
+        os.remove('./tests/data/clean.cleaned.bmp')
 
     def test_torrent(self):
         shutil.copy('./tests/data/dirty.torrent', './tests/data/clean.torrent')
@@ -342,6 +356,7 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.torrent')
+        os.remove('./tests/data/clean.cleaned.torrent')
 
     def test_odf(self):
         shutil.copy('./tests/data/dirty.odf', './tests/data/clean.odf')
@@ -357,6 +372,7 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.odf')
+        os.remove('./tests/data/clean.cleaned.odf')
 
 
     def test_odg(self):
@@ -373,3 +389,4 @@ class TestCleaning(unittest.TestCase):
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.odg')
+        os.remove('./tests/data/clean.cleaned.odg')
