@@ -116,7 +116,7 @@ class TestDeepCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = office.MSOfficeParser('./tests/data/clean.docx.cleaned')
+        p = office.MSOfficeParser('./tests/data/clean.cleaned.docx')
         self.assertEqual(p.get_meta(), {})
 
         self.__check_zip_meta(p)
@@ -135,7 +135,7 @@ class TestDeepCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = office.LibreOfficeParser('./tests/data/clean.odt.cleaned')
+        p = office.LibreOfficeParser('./tests/data/clean.cleaned.odt')
         self.assertEqual(p.get_meta(), {})
 
         self.__check_zip_meta(p)
@@ -154,7 +154,7 @@ class TestLightWeightCleaning(unittest.TestCase):
         ret = p.remove_all_lightweight()
         self.assertTrue(ret)
 
-        p = pdf.PDFParser('./tests/data/clean.pdf.cleaned')
+        p = pdf.PDFParser('./tests/data/clean.cleaned.pdf')
         expected_meta = {'creation-date': -1, 'format': 'PDF-1.5', 'mod-date': -1}
         self.assertEqual(p.get_meta(), expected_meta)
 
@@ -170,7 +170,7 @@ class TestLightWeightCleaning(unittest.TestCase):
         ret = p.remove_all_lightweight()
         self.assertTrue(ret)
 
-        p = images.PNGParser('./tests/data/clean.png.cleaned')
+        p = images.PNGParser('./tests/data/clean.cleaned.png')
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.png')
@@ -186,7 +186,7 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = pdf.PDFParser('./tests/data/clean.pdf.cleaned')
+        p = pdf.PDFParser('./tests/data/clean.cleaned.pdf')
         expected_meta = {'creation-date': -1, 'format': 'PDF-1.5', 'mod-date': -1}
         self.assertEqual(p.get_meta(), expected_meta)
 
@@ -202,7 +202,7 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = images.PNGParser('./tests/data/clean.png.cleaned')
+        p = images.PNGParser('./tests/data/clean.cleaned.png')
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.png')
@@ -217,7 +217,7 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = images.JPGParser('./tests/data/clean.jpg.cleaned')
+        p = images.JPGParser('./tests/data/clean.cleaned.jpg')
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.jpg')
@@ -232,7 +232,7 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = audio.MP3Parser('./tests/data/clean.mp3.cleaned')
+        p = audio.MP3Parser('./tests/data/clean.cleaned.mp3')
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.mp3')
@@ -247,7 +247,7 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = audio.OGGParser('./tests/data/clean.ogg.cleaned')
+        p = audio.OGGParser('./tests/data/clean.cleaned.ogg')
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.ogg')
@@ -262,7 +262,7 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = audio.FLACParser('./tests/data/clean.flac.cleaned')
+        p = audio.FLACParser('./tests/data/clean.cleaned.flac')
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.flac')
@@ -277,7 +277,7 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = office.MSOfficeParser('./tests/data/clean.docx.cleaned')
+        p = office.MSOfficeParser('./tests/data/clean.cleaned.docx')
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.docx')
@@ -293,7 +293,7 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = office.LibreOfficeParser('./tests/data/clean.odt.cleaned')
+        p = office.LibreOfficeParser('./tests/data/clean.cleaned.odt')
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.odt')
@@ -308,7 +308,7 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = images.TiffParser('./tests/data/clean.tiff.cleaned')
+        p = images.TiffParser('./tests/data/clean.cleaned.tiff')
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.tiff')
@@ -323,7 +323,7 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = images.BMPParser('./tests/data/clean.bmp.cleaned')
+        p = images.BMPParser('./tests/data/clean.cleaned.bmp')
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.bmp')
@@ -338,7 +338,7 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = torrent.TorrentParser('./tests/data/clean.torrent.cleaned')
+        p = torrent.TorrentParser('./tests/data/clean.cleaned.torrent')
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.torrent')
@@ -353,7 +353,7 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = office.LibreOfficeParser('./tests/data/clean.odf.cleaned')
+        p = office.LibreOfficeParser('./tests/data/clean.cleaned.odf')
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.odf')
@@ -369,7 +369,7 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = office.LibreOfficeParser('./tests/data/clean.odg.cleaned')
+        p = office.LibreOfficeParser('./tests/data/clean.cleaned.odg')
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.odg')

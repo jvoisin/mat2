@@ -45,7 +45,7 @@ class TestCleanMeta(unittest.TestCase):
                 stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
 
-        proc = subprocess.Popen(['./main.py', '--show', './tests/data/clean.jpg.cleaned'],
+        proc = subprocess.Popen(['./main.py', '--show', './tests/data/clean.cleaned.jpg'],
                 stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
         self.assertNotIn(b'Comment: Created with GIMP', stdout)

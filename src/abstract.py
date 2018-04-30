@@ -1,4 +1,5 @@
 import abc
+import os
 
 
 class AbstractParser(abc.ABC):
@@ -7,7 +8,8 @@ class AbstractParser(abc.ABC):
 
     def __init__(self, filename: str):
         self.filename = filename
-        self.output_filename = filename + '.cleaned'
+        fname, extension = os.path.splitext(filename)
+        self.output_filename = fname + '.cleaned' + extension
 
     @abc.abstractmethod
     def get_meta(self) -> dict:
