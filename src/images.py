@@ -21,7 +21,7 @@ class PNGParser(abstract.AbstractParser):
             'Megapixels', 'ImageHeight'}
 
     def get_meta(self):
-        out = subprocess.check_output(['exiftool', '-json', self.filename])
+        out = subprocess.check_output(['/usr/bin/exiftool', '-json', self.filename])
         meta = json.loads(out.decode('utf-8'))[0]
         for key in self.meta_whitelist:
             meta.pop(key, None)
@@ -38,7 +38,7 @@ class GdkPixbufAbstractParser(abstract.AbstractParser):
         this has the side-effect of removing metadata completely.
     """
     def get_meta(self):
-        out = subprocess.check_output(['exiftool', '-json', self.filename])
+        out = subprocess.check_output(['/usr/bin/exiftool', '-json', self.filename])
         meta = json.loads(out.decode('utf-8'))[0]
         for key in self.meta_whitelist:
             meta.pop(key, None)
