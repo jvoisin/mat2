@@ -16,6 +16,18 @@ class TestParserFactory(unittest.TestCase):
         self.assertEqual(mimetype, 'audio/mpeg')
         self.assertEqual(parser.__class__, audio.MP3Parser)
 
+class TestCorruptedFiles(unittest.TestCase):
+    def test_pdf(self):
+        shutil.copy('./tests/data/dirty.png', './tests/data/clean.png')
+        with self.assertRaises(ValueError):
+            pdf.PDFParser('./tests/data/clean.png')
+        os.remove('./tests/data/clean.png')
+
+    def test_png(self):
+        shutil.copy('./tests/data/dirty.pdf', './tests/data/clean.pdf')
+        with self.assertRaises(ValueError):
+            images.PNGParser('./tests/data/clean.pdf')
+        os.remove('./tests/data/clean.pdf')
 
 class TestGetMeta(unittest.TestCase):
     def test_pdf(self):

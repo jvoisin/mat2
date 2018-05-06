@@ -11,7 +11,7 @@ import io
 import cairo
 import gi
 gi.require_version('Poppler', '0.18')
-from gi.repository import Poppler
+from gi.repository import Poppler, GLib
 
 from . import abstract
 
@@ -28,6 +28,10 @@ class PDFParser(abstract.AbstractParser):
         super().__init__(filename)
         self.uri = 'file://' + os.path.abspath(self.filename)
         self.__scale = 2  # how much precision do we want for the render
+        try:  # Check now that the file is valid, to avoid surprises later
+            Poppler.Document.new_from_file(self.uri, None)
+        except GLib.GError:  # Invalid PDF
+            raise ValueError
 
     def remove_all_lightweight(self):
         """
@@ -116,8 +120,9 @@ class PDFParser(abstract.AbstractParser):
     def get_meta(self):
         """ Return a dict with all the meta of the file
         """
-        document = Poppler.Document.new_from_file(self.uri, None)
         metadata = {}
+        document = Poppler.Document.new_from_file(self.uri, None)
+
         for key in self.meta_list:
             if document.get_property(key):
                 metadata[key] = document.get_property(key)

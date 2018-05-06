@@ -9,6 +9,14 @@ that only cleans the superficial metadata of your file, but not
 the ones that might be in **embeded** resources. Like for example,
 images in a PDF or an office document.
 
+Race conditions
+---------------
+
+MAT2 does its very best to avoid crashing at runtime. This is why it's checking
+if the file is valid __at parser creation__. MAT2 doesn't take any measure to
+ensure that the file is not changed between the time the parser is
+instantiated, and the call to clean or show the metadata.
+
 Symlink attacks
 ---------------
 

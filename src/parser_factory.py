@@ -30,5 +30,8 @@ def get_parser(filename: str) -> (T, str):
 
     for c in _get_parsers():
         if mtype in c.mimetypes:
-            return c(filename), mtype
+            try:
+                return c(filename), mtype
+            except ValueError:
+                return None, mtype
     return None, mtype

@@ -20,6 +20,13 @@ class PNGParser(abstract.AbstractParser):
             'Compression', 'Filter', 'Interlace', 'BackgroundColor', 'ImageSize',
             'Megapixels', 'ImageHeight'}
 
+    def __init__(self, filename):
+        super().__init__(filename)
+        try:  # better fail here than later
+            cairo.ImageSurface.create_from_png(self.filename)
+        except MemoryError:
+            raise ValueError
+
     def get_meta(self):
         out = subprocess.check_output(['/usr/bin/exiftool', '-json', self.filename])
         meta = json.loads(out.decode('utf-8'))[0]
