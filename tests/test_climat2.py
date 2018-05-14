@@ -8,12 +8,20 @@ class TestHelp(unittest.TestCase):
     def test_help(self):
         proc = subprocess.Popen(['./main.py', '--help'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'usage: main.py [-h] [-c] [-l] [-s] [-L] [files [files ...]]', stdout)
+        self.assertIn(b'usage: main.py [-h] [-v] [-c] [-l] [-s] [-L] [files [files ...]]', stdout)
 
     def test_no_arg(self):
         proc = subprocess.Popen(['./main.py'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'usage: main.py [-h] [-c] [-l] [-s] [-L] [files [files ...]]', stdout)
+        self.assertIn(b'usage: main.py [-h] [-v] [-c] [-l] [-s] [-L] [files [files ...]]', stdout)
+
+
+class TestVersion(unittest.TestCase):
+    def test_version(self):
+        proc = subprocess.Popen(['./main.py', '--version'], stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+        self.assertTrue(stdout.startswith(b'MAT2 '))
+
 
 
 class TestReturnValue(unittest.TestCase):

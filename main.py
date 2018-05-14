@@ -10,6 +10,7 @@ import multiprocessing
 
 from src import parser_factory
 
+__version__ = '0.1'
 
 def __check_file(filename:str, mode:int = os.R_OK) -> bool:
     if not os.path.isfile(filename):
@@ -24,6 +25,8 @@ def __check_file(filename:str, mode:int = os.R_OK) -> bool:
 def create_arg_parser():
     parser = argparse.ArgumentParser(description='Metadata anonymisation toolkit 2')
     parser.add_argument('files', nargs='*')
+    parser.add_argument('-v', '--version', action='version',
+            version='MAT2 %s' % __version__)
 
     info = parser.add_argument_group('Information')
     info.add_argument('-c', '--check', action='store_true',
