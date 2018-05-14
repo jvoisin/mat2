@@ -107,6 +107,7 @@ class PDFParser(abstract.AbstractParser):
         document = Poppler.Document.new_from_file('file://' + in_file)
         document.set_producer('')
         document.set_creator('')
+        document.set_creation_date(-1)
         document.save('file://' + os.path.abspath(out_file))
         return True
 
