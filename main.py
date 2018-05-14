@@ -10,7 +10,7 @@ import multiprocessing
 
 from src import parser_factory
 
-__version__ = '0.1'
+__version__ = '0.1.0'
 
 def __check_file(filename:str, mode:int = os.R_OK) -> bool:
     if not os.path.isfile(filename):
