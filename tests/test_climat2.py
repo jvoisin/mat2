@@ -8,12 +8,12 @@ class TestHelp(unittest.TestCase):
     def test_help(self):
         proc = subprocess.Popen(['./main.py', '--help'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'usage: main.py [-h] [-v] [-c] [-l] [-s] [-L] [files [files ...]]', stdout)
+        self.assertIn(b'usage: main.py [-h] [-v] [-l] [-c | -s | -L] [files [files ...]]', stdout)
 
     def test_no_arg(self):
         proc = subprocess.Popen(['./main.py'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'usage: main.py [-h] [-v] [-c] [-l] [-s] [-L] [files [files ...]]', stdout)
+        self.assertIn(b'usage: main.py [-h] [-v] [-l] [-c | -s | -L] [files [files ...]]', stdout)
 
 
 class TestVersion(unittest.TestCase):
@@ -22,6 +22,12 @@ class TestVersion(unittest.TestCase):
         stdout, _ = proc.communicate()
         self.assertTrue(stdout.startswith(b'MAT2 '))
 
+
+class TestExclusiveArgs(unittest.TestCase):
+    def test_version(self):
+        proc = subprocess.Popen(['./main.py', '-s', '-c'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = proc.communicate()
+        self.assertIn(b'main.py: error: argument -c/--check: not allowed with argument -s/--show', stderr)
 
 
 class TestReturnValue(unittest.TestCase):

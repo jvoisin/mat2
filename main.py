@@ -30,7 +30,7 @@ def create_arg_parser():
     parser.add_argument('-l', '--list', action='store_true',
                       help='list all supported fileformats')
 
-    info = parser.add_argument_group('Information')
+    info = parser.add_mutually_exclusive_group()
     info.add_argument('-c', '--check', action='store_true',
                       help='check if a file is free of harmful metadatas')
     info.add_argument('-s', '--show', action='store_true',
