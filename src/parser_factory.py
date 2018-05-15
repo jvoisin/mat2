@@ -1,3 +1,4 @@
+import os
 import mimetypes
 import importlib
 import pkgutil
@@ -26,8 +27,14 @@ def _get_parsers() -> list:
 
 
 def get_parser(filename: str) -> (T, str):
-    mtype, _ = mimetypes.guess_type(filename)
+    # A set of extension that aren't supported, despite matching a known mimetype
+    unknown_extensions = set(['bat', 'c', 'h', 'ksh', 'pl', 'txt', 'asc',
+        'text', 'pot', 'brf', 'srt', 'rdf', 'wsdl', 'xpdl', 'xsl', 'xsd'])
+    _, extension = os.path.splitext(filename)
+    if extension in unknown_extensions:
+        return None, mtype
 
+    mtype, _ = mimetypes.guess_type(filename)
     for c in _get_parsers():
         if mtype in c.mimetypes:
             try:
