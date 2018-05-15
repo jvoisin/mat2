@@ -27,12 +27,12 @@ def create_arg_parser():
     parser.add_argument('files', nargs='*')
     parser.add_argument('-v', '--version', action='version',
             version='MAT2 %s' % __version__)
+    parser.add_argument('-l', '--list', action='store_true',
+                      help='list all supported fileformats')
 
     info = parser.add_argument_group('Information')
     info.add_argument('-c', '--check', action='store_true',
                       help='check if a file is free of harmful metadatas')
-    info.add_argument('-l', '--list', action='store_true',
-                      help='list all supported fileformats')
     info.add_argument('-s', '--show', action='store_true',
                       help='list all the harmful metadata of a file without removing them')
     info.add_argument('-L', '--lightweight', action='store_true',
