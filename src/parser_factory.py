@@ -30,11 +30,12 @@ def get_parser(filename: str) -> (T, str):
     # A set of extension that aren't supported, despite matching a known mimetype
     unknown_extensions = set(['bat', 'c', 'h', 'ksh', 'pl', 'txt', 'asc',
         'text', 'pot', 'brf', 'srt', 'rdf', 'wsdl', 'xpdl', 'xsl', 'xsd'])
+    mtype, _ = mimetypes.guess_type(filename)
+
     _, extension = os.path.splitext(filename)
     if extension in unknown_extensions:
         return None, mtype
 
-    mtype, _ = mimetypes.guess_type(filename)
     for c in _get_parsers():
         if mtype in c.mimetypes:
             try:
