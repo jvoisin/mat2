@@ -8,7 +8,7 @@ import mimetypes
 import argparse
 import multiprocessing
 
-from src import parser_factory
+from src import parser_factory, unsupported_extensions
 
 __version__ = '0.1.0'
 
@@ -74,8 +74,15 @@ def show_parsers():
     print('[+] Supported formats:')
     for parser in parser_factory._get_parsers():
         for mtype in parser.mimetypes:
-            extensions = ', '.join(mimetypes.guess_all_extensions(mtype))
-            print('  - %s (%s)' % (mtype, extensions))
+            extensions = set()
+            for extension in mimetypes.guess_all_extensions(mtype):
+                if extension[1:] not in unsupported_extensions:  # skip the dot
+                    extensions.add(extension)
+            if not extensions:
+                # we're not supporting a single extension in the current
+                # mimetype, so there is not point in showing the mimetype at all
+                continue
+            print('  - %s (%s)' % (mtype, ', '.join(extensions)))
 
 
 def __get_files_recursively(files):

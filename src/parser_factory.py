@@ -3,7 +3,7 @@ import mimetypes
 import importlib
 import pkgutil
 
-from . import abstract
+from . import abstract, unsupported_extensions
 
 from typing import TypeVar
 
@@ -27,13 +27,10 @@ def _get_parsers() -> list:
 
 
 def get_parser(filename: str) -> (T, str):
-    # A set of extension that aren't supported, despite matching a known mimetype
-    unknown_extensions = set(['bat', 'c', 'h', 'ksh', 'pl', 'txt', 'asc',
-        'text', 'pot', 'brf', 'srt', 'rdf', 'wsdl', 'xpdl', 'xsl', 'xsd'])
     mtype, _ = mimetypes.guess_type(filename)
 
     _, extension = os.path.splitext(filename)
-    if extension in unknown_extensions:
+    if extension in unsupported_extensions:
         return None, mtype
 
     for c in _get_parsers():
