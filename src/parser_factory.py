@@ -2,10 +2,10 @@ import os
 import mimetypes
 import importlib
 import pkgutil
+from typing import TypeVar
 
 from . import abstract, unsupported_extensions
 
-from typing import TypeVar
 
 T = TypeVar('T', bound='abstract.AbstractParser')
 

@@ -9,7 +9,7 @@ class MutagenParser(abstract.AbstractParser):
     def get_meta(self):
         f = mutagen.File(self.filename)
         if f.tags:
-            return {k:', '.join(v) for k,v in f.tags.items()}
+            return {k:', '.join(v) for k, v in f.tags.items()}
         return {}
 
     def remove_all(self):

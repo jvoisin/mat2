@@ -21,8 +21,8 @@ logging.basicConfig(level=logging.DEBUG)
 class PDFParser(abstract.AbstractParser):
     mimetypes = {'application/pdf', }
     meta_list = {'author', 'creation-date', 'creator', 'format', 'keywords',
-            'metadata', 'mod-date', 'producer', 'subject', 'title',
-            'viewer-preferences'}
+                 'metadata', 'mod-date', 'producer', 'subject', 'title',
+                 'viewer-preferences'}
 
     def __init__(self, filename):
         super().__init__(filename)
@@ -103,7 +103,8 @@ class PDFParser(abstract.AbstractParser):
 
         return True
 
-    def __remove_superficial_meta(self, in_file:str, out_file: str) -> bool:
+    @staticmethod
+    def __remove_superficial_meta(in_file: str, out_file: str) -> bool:
         document = Poppler.Document.new_from_file('file://' + in_file)
         document.set_producer('')
         document.set_creator('')
@@ -112,7 +113,8 @@ class PDFParser(abstract.AbstractParser):
         return True
 
 
-    def __parse_metadata_field(self, data:str) -> dict:
+    @staticmethod
+    def __parse_metadata_field(data: str) -> dict:
         metadata = {}
         for (_, key, value) in re.findall(r"<(xmp|pdfx|pdf|xmpMM):(.+)>(.+)</\1:\2>", data, re.I):
             metadata[key] = value
@@ -128,6 +130,6 @@ class PDFParser(abstract.AbstractParser):
             if document.get_property(key):
                 metadata[key] = document.get_property(key)
         if 'metadata' in metadata:
-            parsed_meta =  self.__parse_metadata_field(metadata['metadata'])
+            parsed_meta = self.__parse_metadata_field(metadata['metadata'])
             return {**metadata, **parsed_meta}
         return metadata

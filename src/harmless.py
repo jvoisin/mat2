@@ -6,6 +6,7 @@ class HarmlessParser(abstract.AbstractParser):
     mimetypes = {'application/xml', 'text/plain'}
 
     def __init__(self, filename: str):
+        super().__init__(filename)
         self.filename = filename
         self.output_filename = filename
 

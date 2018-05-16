@@ -14,11 +14,12 @@ from . import abstract
 class PNGParser(abstract.AbstractParser):
     mimetypes = {'image/png', }
     meta_whitelist = {'SourceFile', 'ExifToolVersion', 'FileName',
-            'Directory', 'FileSize', 'FileModifyDate', 'FileAccessDate',
-            "FileInodeChangeDate", 'FilePermissions', 'FileType',
-            'FileTypeExtension', 'MIMEType', 'ImageWidth', 'BitDepth', 'ColorType',
-            'Compression', 'Filter', 'Interlace', 'BackgroundColor', 'ImageSize',
-            'Megapixels', 'ImageHeight'}
+                      'Directory', 'FileSize', 'FileModifyDate',
+                      'FileAccessDate', 'FileInodeChangeDate',
+                      'FilePermissions', 'FileType', 'FileTypeExtension',
+                      'MIMEType', 'ImageWidth', 'BitDepth', 'ColorType',
+                      'Compression', 'Filter', 'Interlace', 'BackgroundColor',
+                      'ImageSize', 'Megapixels', 'ImageHeight'}
 
     def __init__(self, filename):
         super().__init__(filename)
@@ -63,36 +64,38 @@ class GdkPixbufAbstractParser(abstract.AbstractParser):
 class JPGParser(GdkPixbufAbstractParser):
     mimetypes = {'image/jpeg'}
     meta_whitelist = {'SourceFile', 'ExifToolVersion', 'FileName',
-            'Directory', 'FileSize', 'FileModifyDate', 'FileAccessDate',
-            "FileInodeChangeDate", 'FilePermissions', 'FileType',
-            'FileTypeExtension', 'MIMEType', 'ImageWidth',
-            'ImageSize', 'BitsPerSample', 'ColorComponents', 'EncodingProcess',
-            'JFIFVersion', 'ResolutionUnit', 'XResolution', 'YCbCrSubSampling',
-            'YResolution', 'Megapixels', 'ImageHeight'}
+                      'Directory', 'FileSize', 'FileModifyDate',
+                      'FileAccessDate', "FileInodeChangeDate",
+                      'FilePermissions', 'FileType', 'FileTypeExtension',
+                      'MIMEType', 'ImageWidth', 'ImageSize', 'BitsPerSample',
+                      'ColorComponents', 'EncodingProcess', 'JFIFVersion',
+                      'ResolutionUnit', 'XResolution', 'YCbCrSubSampling',
+                      'YResolution', 'Megapixels', 'ImageHeight'}
 
 
 class TiffParser(GdkPixbufAbstractParser):
     mimetypes = {'image/tiff'}
     meta_whitelist = {'Compression', 'ExifByteOrder', 'ExtraSamples',
-            'FillOrder', 'PhotometricInterpretation', 'PlanarConfiguration',
-            'RowsPerStrip', 'SamplesPerPixel', 'StripByteCounts',
-            'StripOffsets', 'BitsPerSample', 'Directory', 'ExifToolVersion',
-            'FileAccessDate', 'FileInodeChangeDate', 'FileModifyDate',
-            'FileName', 'FilePermissions', 'FileSize', 'FileType',
-            'FileTypeExtension', 'ImageHeight', 'ImageSize', 'ImageWidth',
-            'MIMEType', 'Megapixels', 'SourceFile'}
+                      'FillOrder', 'PhotometricInterpretation',
+                      'PlanarConfiguration', 'RowsPerStrip', 'SamplesPerPixel',
+                      'StripByteCounts', 'StripOffsets', 'BitsPerSample',
+                      'Directory', 'ExifToolVersion', 'FileAccessDate',
+                      'FileInodeChangeDate', 'FileModifyDate', 'FileName',
+                      'FilePermissions', 'FileSize', 'FileType',
+                      'FileTypeExtension', 'ImageHeight', 'ImageSize',
+                      'ImageWidth', 'MIMEType', 'Megapixels', 'SourceFile'}
 
 
 class BMPParser(GdkPixbufAbstractParser):
     mimetypes = {'image/x-ms-bmp'}
     meta_whitelist = {'SourceFile', 'ExifToolVersion', 'FileName', 'Directory',
-            'FileSize', 'FileModifyDate', 'FileAccessDate',
-            'FileInodeChangeDate', 'FilePermissions', 'FileType',
-            'FileTypeExtension', 'MIMEType', 'BMPVersion', 'ImageWidth',
-            'ImageHeight', 'Planes', 'BitDepth', 'Compression', 'ImageLength',
-            'PixelsPerMeterX', 'PixelsPerMeterY', 'NumColors',
-            'NumImportantColors', 'RedMask', 'GreenMask', 'BlueMask',
-            'AlphaMask', 'ColorSpace', 'RedEndpoint', 'GreenEndpoint',
-            'BlueEndpoint', 'GammaRed', 'GammaGreen', 'GammaBlue', 'ImageSize',
-            'Megapixels'}
-
+                      'FileSize', 'FileModifyDate', 'FileAccessDate',
+                      'FileInodeChangeDate', 'FilePermissions', 'FileType',
+                      'FileTypeExtension', 'MIMEType', 'BMPVersion',
+                      'ImageWidth', 'ImageHeight', 'Planes', 'BitDepth',
+                      'Compression', 'ImageLength', 'PixelsPerMeterX',
+                      'PixelsPerMeterY', 'NumColors', 'NumImportantColors',
+                      'RedMask', 'GreenMask', 'BlueMask', 'AlphaMask',
+                      'ColorSpace', 'RedEndpoint', 'GreenEndpoint',
+                      'BlueEndpoint', 'GammaRed', 'GammaGreen', 'GammaBlue',
+                      'ImageSize', 'Megapixels'}

@@ -9,14 +9,14 @@ from . import abstract, parser_factory
 
 
 class ArchiveBasedAbstractParser(abstract.AbstractParser):
-    def _clean_zipinfo(self, zipinfo:zipfile.ZipInfo) -> zipfile.ZipInfo:
+    def _clean_zipinfo(self, zipinfo: zipfile.ZipInfo) -> zipfile.ZipInfo:
         zipinfo.compress_type = zipfile.ZIP_DEFLATED
         zipinfo.create_system = 3  # Linux
         zipinfo.comment = b''
         zipinfo.date_time = (1980, 1, 1, 0, 0, 0)
         return zipinfo
 
-    def _get_zipinfo_meta(self, zipinfo:zipfile.ZipInfo) -> dict:
+    def _get_zipinfo_meta(self, zipinfo: zipfile.ZipInfo) -> dict:
         metadata = {}
         if zipinfo.create_system == 3:
             #metadata['create_system'] = 'Linux'
@@ -35,7 +35,8 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
         return metadata
 
 
-    def _clean_internal_file(self, item:zipfile.ZipInfo, temp_folder:str, zin:zipfile.ZipFile, zout:zipfile.ZipFile):
+    def _clean_internal_file(self, item: zipfile.ZipInfo, temp_folder: str,
+                             zin: zipfile.ZipFile, zout: zipfile.ZipFile):
         zin.extract(member=item, path=temp_folder)
         tmp_parser, mtype = parser_factory.get_parser(os.path.join(temp_folder, item.filename))
         if not tmp_parser:
@@ -50,9 +51,9 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
 class MSOfficeParser(ArchiveBasedAbstractParser):
     mimetypes = {
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation'
     }
     files_to_keep = {'_rels/.rels', 'word/_rels/document.xml.rels'}
 
@@ -103,13 +104,13 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
 
 class LibreOfficeParser(ArchiveBasedAbstractParser):
     mimetypes = {
-            'application/vnd.oasis.opendocument.text',
-            'application/vnd.oasis.opendocument.spreadsheet',
-            'application/vnd.oasis.opendocument.presentation',
-            'application/vnd.oasis.opendocument.graphics',
-            'application/vnd.oasis.opendocument.chart',
-            'application/vnd.oasis.opendocument.formula',
-            'application/vnd.oasis.opendocument.image',
+        'application/vnd.oasis.opendocument.text',
+        'application/vnd.oasis.opendocument.spreadsheet',
+        'application/vnd.oasis.opendocument.presentation',
+        'application/vnd.oasis.opendocument.graphics',
+        'application/vnd.oasis.opendocument.chart',
+        'application/vnd.oasis.opendocument.formula',
+        'application/vnd.oasis.opendocument.image',
     }
 
     def get_meta(self):

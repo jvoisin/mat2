@@ -12,7 +12,7 @@ from src import parser_factory, unsupported_extensions
 
 __version__ = '0.1.0'
 
-def __check_file(filename:str, mode:int = os.R_OK) -> bool:
+def __check_file(filename: str, mode: int = os.R_OK) -> bool:
     if not os.path.isfile(filename):
         print("[-] %s is not a regular file." % filename)
         return False
@@ -26,9 +26,9 @@ def create_arg_parser():
     parser = argparse.ArgumentParser(description='Metadata anonymisation toolkit 2')
     parser.add_argument('files', nargs='*')
     parser.add_argument('-v', '--version', action='version',
-            version='MAT2 %s' % __version__)
+                        version='MAT2 %s' % __version__)
     parser.add_argument('-l', '--list', action='store_true',
-                      help='list all supported fileformats')
+                        help='list all supported fileformats')
 
     info = parser.add_mutually_exclusive_group()
     info.add_argument('-c', '--check', action='store_true',
@@ -40,7 +40,7 @@ def create_arg_parser():
     return parser
 
 
-def show_meta(filename:str):
+def show_meta(filename: str):
     if not __check_file(filename):
         return
 
@@ -48,18 +48,18 @@ def show_meta(filename:str):
     if p is None:
         print("[-] %s's format (%s) is not supported" % (filename, mtype))
         return
+
     print("[+] Metadata for %s:" % filename)
-    for k,v in p.get_meta().items():
+    for k, v in p.get_meta().items():
         try:  # FIXME this is ugly.
             print("  %s: %s" % (k, v))
         except UnicodeEncodeError:
             print("  %s: harmful content" % k)
 
-
-def clean_meta(params:Tuple[str, bool]) -> bool:
+def clean_meta(params: Tuple[str, bool]) -> bool:
     filename, is_lightweigth = params
     if not __check_file(filename, os.R_OK|os.W_OK):
-        return
+        return False
 
     p, mtype = parser_factory.get_parser(filename)
     if p is None:
@@ -102,12 +102,12 @@ def main():
         if not args.list:
             return arg_parser.print_help()
         show_parsers()
-        return
+        return 0
 
     elif args.show:
         for f in __get_files_recursively(args.files):
             show_meta(f)
-        return
+        return 0
 
     else:
         p = multiprocessing.Pool()
