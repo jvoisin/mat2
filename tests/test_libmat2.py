@@ -16,6 +16,16 @@ class TestParserFactory(unittest.TestCase):
         self.assertEqual(mimetype, 'audio/mpeg')
         self.assertEqual(parser.__class__, audio.MP3Parser)
 
+
+class TestUnsupportedFiles(unittest.TestCase):
+    def test_pdf(self):
+        shutil.copy('./tests/test_libmat2.py', './tests/clean.py')
+        parser, mimetype = parser_factory.get_parser('./tests/data/clean.py')
+        self.assertEqual(mimetype, 'text/x-python')
+        self.assertEqual(parser, None)
+        os.remove('./tests/clean.py')
+
+
 class TestCorruptedFiles(unittest.TestCase):
     def test_pdf(self):
         shutil.copy('./tests/data/dirty.png', './tests/data/clean.png')
