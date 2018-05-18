@@ -10,10 +10,10 @@ from . import abstract, unsupported_extensions
 T = TypeVar('T', bound='abstract.AbstractParser')
 
 # This loads every parser in a dynamic way
-for module_loader, name, ispkg in pkgutil.walk_packages('.src'):
-    if not name.startswith('src.'):
+for module_loader, name, ispkg in pkgutil.walk_packages('.libmat2'):
+    if not name.startswith('libmat2.'):
         continue
-    elif name == 'src.abstract':
+    elif name == 'libmat2.abstract':
         continue
     importlib.import_module(name)
 

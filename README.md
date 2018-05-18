@@ -47,7 +47,7 @@ $ python3 -m unittest discover -v
 # Supported formats
 
 ```bash
-$ python3 ./main.py -l
+$ python3 ./mat2.py -l
 ```
 
 # Related softwares

@@ -8,7 +8,7 @@ import mimetypes
 import argparse
 import multiprocessing
 
-from src import parser_factory, unsupported_extensions
+from libmat2 import parser_factory, unsupported_extensions
 
 __version__ = '0.1.1'
 

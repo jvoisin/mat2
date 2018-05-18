@@ -6,7 +6,7 @@ import os
 import zipfile
 import tempfile
 
-from src import pdf, images, audio, office, parser_factory, torrent
+from libmat2 import pdf, images, audio, office, parser_factory, torrent
 
 
 class TestParserFactory(unittest.TestCase):
