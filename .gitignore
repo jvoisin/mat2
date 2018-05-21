@@ -1,1 +1,5 @@
 *.pyc
+.eggs
+build
+dist
+mat2.egg-info
