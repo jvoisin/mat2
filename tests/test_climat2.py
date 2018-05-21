@@ -6,43 +6,43 @@ import unittest
 
 class TestHelp(unittest.TestCase):
     def test_help(self):
-        proc = subprocess.Popen(['./mat2.py', '--help'], stdout=subprocess.PIPE)
+        proc = subprocess.Popen(['./mat2', '--help'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'usage: mat2.py [-h] [-v] [-l] [-c | -s | -L] [files [files ...]]', stdout)
+        self.assertIn(b'usage: mat2 [-h] [-v] [-l] [-c | -s | -L] [files [files ...]]', stdout)
 
     def test_no_arg(self):
-        proc = subprocess.Popen(['./mat2.py'], stdout=subprocess.PIPE)
+        proc = subprocess.Popen(['./mat2'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'usage: mat2.py [-h] [-v] [-l] [-c | -s | -L] [files [files ...]]', stdout)
+        self.assertIn(b'usage: mat2 [-h] [-v] [-l] [-c | -s | -L] [files [files ...]]', stdout)
 
 
 class TestVersion(unittest.TestCase):
     def test_version(self):
-        proc = subprocess.Popen(['./mat2.py', '--version'], stdout=subprocess.PIPE)
+        proc = subprocess.Popen(['./mat2', '--version'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
         self.assertTrue(stdout.startswith(b'MAT2 '))
 
 
 class TestExclusiveArgs(unittest.TestCase):
     def test_version(self):
-        proc = subprocess.Popen(['./mat2.py', '-s', '-c'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        proc = subprocess.Popen(['./mat2', '-s', '-c'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = proc.communicate()
-        self.assertIn(b'mat2.py: error: argument -c/--check: not allowed with argument -s/--show', stderr)
+        self.assertIn(b'mat2: error: argument -c/--check: not allowed with argument -s/--show', stderr)
 
 
 class TestReturnValue(unittest.TestCase):
     def test_nonzero(self):
-        ret = subprocess.call(['./mat2.py', './mat2.py'], stdout=subprocess.DEVNULL)
+        ret = subprocess.call(['./mat2', './mat2'], stdout=subprocess.DEVNULL)
         self.assertEqual(255, ret)
 
-        ret = subprocess.call(['./mat2.py', '--whololo'], stderr=subprocess.DEVNULL)
+        ret = subprocess.call(['./mat2', '--whololo'], stderr=subprocess.DEVNULL)
         self.assertEqual(2, ret)
 
     def test_zero(self):
-        ret = subprocess.call(['./mat2.py'], stdout=subprocess.DEVNULL)
+        ret = subprocess.call(['./mat2'], stdout=subprocess.DEVNULL)
         self.assertEqual(0, ret)
 
-        ret = subprocess.call(['./mat2.py', '--show', './mat2.py'], stdout=subprocess.DEVNULL)
+        ret = subprocess.call(['./mat2', '--show', './mat2'], stdout=subprocess.DEVNULL)
         self.assertEqual(0, ret)
 
 
@@ -50,16 +50,16 @@ class TestCleanMeta(unittest.TestCase):
     def test_jpg(self):
         shutil.copy('./tests/data/dirty.jpg', './tests/data/clean.jpg')
 
-        proc = subprocess.Popen(['./mat2.py', '--show', './tests/data/clean.jpg'],
+        proc = subprocess.Popen(['./mat2', '--show', './tests/data/clean.jpg'],
                 stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
         self.assertIn(b'Comment: Created with GIMP', stdout)
 
-        proc = subprocess.Popen(['./mat2.py', './tests/data/clean.jpg'],
+        proc = subprocess.Popen(['./mat2', './tests/data/clean.jpg'],
                 stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
 
-        proc = subprocess.Popen(['./mat2.py', '--show', './tests/data/clean.cleaned.jpg'],
+        proc = subprocess.Popen(['./mat2', '--show', './tests/data/clean.cleaned.jpg'],
                 stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
         self.assertNotIn(b'Comment: Created with GIMP', stdout)
@@ -69,25 +69,25 @@ class TestCleanMeta(unittest.TestCase):
 
 class TestGetMeta(unittest.TestCase):
     def test_pdf(self):
-        proc = subprocess.Popen(['./mat2.py', '--show', './tests/data/dirty.pdf'],
+        proc = subprocess.Popen(['./mat2', '--show', './tests/data/dirty.pdf'],
                 stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
         self.assertIn(b'producer: pdfTeX-1.40.14', stdout)
 
     def test_png(self):
-        proc = subprocess.Popen(['./mat2.py', '--show', './tests/data/dirty.png'],
+        proc = subprocess.Popen(['./mat2', '--show', './tests/data/dirty.png'],
                 stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
         self.assertIn(b'Comment: This is a comment, be careful!', stdout)
 
     def test_jpg(self):
-        proc = subprocess.Popen(['./mat2.py', '--show', './tests/data/dirty.jpg'],
+        proc = subprocess.Popen(['./mat2', '--show', './tests/data/dirty.jpg'],
                 stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
         self.assertIn(b'Comment: Created with GIMP', stdout)
 
     def test_docx(self):
-        proc = subprocess.Popen(['./mat2.py', '--show', './tests/data/dirty.docx'],
+        proc = subprocess.Popen(['./mat2', '--show', './tests/data/dirty.docx'],
                 stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
         self.assertIn(b'Application: LibreOffice/5.4.5.1$Linux_X86_64', stdout)
@@ -95,7 +95,7 @@ class TestGetMeta(unittest.TestCase):
         self.assertIn(b'revision: 1', stdout)
 
     def test_odt(self):
-        proc = subprocess.Popen(['./mat2.py', '--show', './tests/data/dirty.odt'],
+        proc = subprocess.Popen(['./mat2', '--show', './tests/data/dirty.odt'],
                 stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
         self.assertIn(b'generator: LibreOffice/3.3$Unix', stdout)
@@ -103,14 +103,14 @@ class TestGetMeta(unittest.TestCase):
         self.assertIn(b'date_time: 2011-07-26 02:40:16', stdout)
 
     def test_mp3(self):
-        proc = subprocess.Popen(['./mat2.py', '--show', './tests/data/dirty.mp3'],
+        proc = subprocess.Popen(['./mat2', '--show', './tests/data/dirty.mp3'],
                 stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
         self.assertIn(b'TALB: harmfull', stdout)
         self.assertIn(b'COMM::: Thank you for using MAT !', stdout)
 
     def test_flac(self):
-        proc = subprocess.Popen(['./mat2.py', '--show', './tests/data/dirty.flac'],
+        proc = subprocess.Popen(['./mat2', '--show', './tests/data/dirty.flac'],
                 stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
         self.assertIn(b'comments: Thank you for using MAT !', stdout)
@@ -118,7 +118,7 @@ class TestGetMeta(unittest.TestCase):
         self.assertIn(b'title: I am so', stdout)
 
     def test_ogg(self):
-        proc = subprocess.Popen(['./mat2.py', '--show', './tests/data/dirty.ogg'],
+        proc = subprocess.Popen(['./mat2', '--show', './tests/data/dirty.ogg'],
                 stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
         self.assertIn(b'comments: Thank you for using MAT !', stdout)
