@@ -13,7 +13,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://0xacab.org/jvoisin/mat2",
     python_requires = '>=3.5.0',
-    scripts=['mat2.py'],
+    scripts=['mat2'],
     install_requires=[
         'mutagen',
         'PyGObject',
