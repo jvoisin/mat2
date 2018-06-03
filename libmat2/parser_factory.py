@@ -1,22 +1,24 @@
+import glob
 import os
 import mimetypes
 import importlib
-import pkgutil
 from typing import TypeVar, List
 
 from . import abstract, unsupported_extensions
 
-
 T = TypeVar('T', bound='abstract.AbstractParser')
 
-# This loads every parser in a dynamic way
-for module_loader, name, ispkg in pkgutil.walk_packages('.libmat2'):
-    if not name.startswith('libmat2.'):
-        continue
-    elif name == 'libmat2.abstract':
-        continue
-    importlib.import_module(name)
+def __load_all_parsers():
+    """ Loads every parser in a dynamic way """
+    current_dir = os.path.dirname(__file__)
+    for name in glob.glob(os.path.join(current_dir, '*.py')):
+        if name in ('abstract.py', '__init__.py'):
+            continue
+        basename = os.path.basename(name)
+        name, _ = os.path.splitext(basename)
+        importlib.import_module('.' + name, package='libmat2')
 
+__load_all_parsers()
 
 def _get_parsers() -> List[T]:
     """ Get all our parsers!"""
