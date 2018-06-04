@@ -2,6 +2,8 @@ import abc
 import os
 from typing import Set
 
+assert Set  # make pyflakes happy
+
 
 class AbstractParser(abc.ABC):
     meta_list = set()  # type: Set[str]
