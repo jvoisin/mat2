@@ -1,6 +1,6 @@
 import abc
 import os
-from typing import Set
+from typing import Set, Dict
 
 assert Set  # make pyflakes happy
 
@@ -15,7 +15,7 @@ class AbstractParser(abc.ABC):
         self.output_filename = fname + '.cleaned' + extension
 
     @abc.abstractmethod
-    def get_meta(self) -> dict:
+    def get_meta(self) -> Dict[str, str]:
         pass
 
     @abc.abstractmethod

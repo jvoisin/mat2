@@ -72,6 +72,7 @@ def clean_meta(params: Tuple[str, bool]) -> bool:
 
 def show_parsers():
     print('[+] Supported formats:')
+    formats = list()
     for parser in parser_factory._get_parsers():
         for mtype in parser.mimetypes:
             extensions = set()
@@ -82,7 +83,8 @@ def show_parsers():
                 # we're not supporting a single extension in the current
                 # mimetype, so there is not point in showing the mimetype at all
                 continue
-            print('  - %s (%s)' % (mtype, ', '.join(extensions)))
+            formats.append('  - %s (%s)' % (mtype, ', '.join(extensions)))
+    print('\n'.join(sorted(formats)))
 
 
 def __get_files_recursively(files):
