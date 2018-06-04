@@ -2,7 +2,7 @@ import os
 import mimetypes
 import importlib
 import pkgutil
-from typing import TypeVar
+from typing import TypeVar, List
 
 from . import abstract, unsupported_extensions
 
@@ -18,7 +18,7 @@ for module_loader, name, ispkg in pkgutil.walk_packages('.libmat2'):
     importlib.import_module(name)
 
 
-def _get_parsers() -> list:
+def _get_parsers() -> List[T]:
     """ Get all our parsers!"""
     def __get_parsers(cls):
         return cls.__subclasses__() + \
