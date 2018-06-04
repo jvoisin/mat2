@@ -80,8 +80,8 @@ Copyright 2018 Julien (jvoisin) Voisin <julien.voisin+mat2@dustri.org>
 
 MAT2 wouldn't existe without:
 
-- the Google Summer of Code,
-- the fine people from the Tails project
+- the [Google Summer of Code](https://summerofcode.withgoogle.com/);
+- the fine people from [Tails]( https://tails.boum.org);
 - friends
 
 Many thanks to them!
