@@ -9,7 +9,7 @@ bandit:
   script:
   - apt-get -qqy update
   - apt-get -qqy install --no-install-recommends python3-bandit
-  - bandit -r ./libmat2 --format txt --skip B404,B603
+  - bandit -r ./libmat2 --format txt --skip B101,B404,B603
 
 pyflakes:
   stage: linting
