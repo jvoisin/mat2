@@ -1,12 +1,13 @@
 import abc
 import os
+from typing import Set
 
 
 class AbstractParser(abc.ABC):
-    meta_list = set()
-    mimetypes = set()
+    meta_list = set()  # type: Set[str]
+    mimetypes = set()  # type: Set[str]
 
-    def __init__(self, filename: str):
+    def __init__(self, filename: str) -> None:
         self.filename = filename
         fname, extension = os.path.splitext(filename)
         self.output_filename = fname + '.cleaned' + extension

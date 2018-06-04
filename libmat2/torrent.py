@@ -2,7 +2,7 @@ from . import abstract
 
 
 class TorrentParser(abstract.AbstractParser):
-    mimetypes = {'application/x-bittorrent', }
+    mimetypes = {b'application/x-bittorrent', }
     whitelist = {b'announce', b'announce-list', b'info'}
 
     def get_meta(self) -> dict:
