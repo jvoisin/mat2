@@ -67,6 +67,13 @@ class TestCleanMeta(unittest.TestCase):
         os.remove('./tests/data/clean.jpg')
 
 
+class TestIsSupported(unittest.TestCase):
+    def test_pdf(self):
+        proc = subprocess.Popen(['./mat2', '--show', './tests/data/dirty.pdf'],
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+        self.assertNotIn(b"isn't supported", stdout)
+
 class TestGetMeta(unittest.TestCase):
     def test_pdf(self):
         proc = subprocess.Popen(['./mat2', '--show', './tests/data/dirty.pdf'],

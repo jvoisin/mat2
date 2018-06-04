@@ -4,11 +4,15 @@ import shutil
 import tempfile
 import datetime
 import zipfile
+from typing import Dict, Set
 
 from . import abstract, parser_factory
 
+assert Set   # make pyflakes happy
 
 class ArchiveBasedAbstractParser(abstract.AbstractParser):
+    whitelist = set()  # type: Set[str]
+
     def _clean_zipinfo(self, zipinfo: zipfile.ZipInfo) -> zipfile.ZipInfo:
         zipinfo.compress_type = zipfile.ZIP_DEFLATED
         zipinfo.create_system = 3  # Linux
@@ -16,7 +20,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
         zipinfo.date_time = (1980, 1, 1, 0, 0, 0)
         return zipinfo
 
-    def _get_zipinfo_meta(self, zipinfo: zipfile.ZipInfo) -> dict:
+    def _get_zipinfo_meta(self, zipinfo: zipfile.ZipInfo) -> Dict[str, str]:
         metadata = {}
         if zipinfo.create_system == 3:
             #metadata['create_system'] = 'Linux'
@@ -27,25 +31,31 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
             metadata['create_system'] = 'Weird'
 
         if zipinfo.comment:
-            metadata['comment'] = zipinfo.comment
+            metadata['comment'] = zipinfo.comment  # type: ignore
 
         if zipinfo.date_time != (1980, 1, 1, 0, 0, 0):
-            metadata['date_time'] = datetime.datetime(*zipinfo.date_time)
+            metadata['date_time'] =str(datetime.datetime(*zipinfo.date_time))
 
         return metadata
 
 
     def _clean_internal_file(self, item: zipfile.ZipInfo, temp_folder: str,
                              zin: zipfile.ZipFile, zout: zipfile.ZipFile):
+        output = ''
         zin.extract(member=item, path=temp_folder)
-        tmp_parser, mtype = parser_factory.get_parser(os.path.join(temp_folder, item.filename))
-        if not tmp_parser:
-            print("%s's format (%s) isn't supported" % (item.filename, mtype))
-            return
-        tmp_parser.remove_all()
-        zinfo = zipfile.ZipInfo(item.filename)
+        if item.filename not in self.whitelist:
+            full_path = os.path.join(temp_folder, item.filename)
+            tmp_parser, mtype = parser_factory.get_parser(full_path)  # type: ignore
+            if not tmp_parser:
+                print("%s's format (%s) isn't supported" % (item.filename, mtype))
+                return
+            tmp_parser.remove_all()
+            output = tmp_parser.output_filename
+        else:
+            output = os.path.join(temp_folder, item.filename)
+        zinfo = zipfile.ZipInfo(item.filename)  # type: ignore
         clean_zinfo = self._clean_zipinfo(zinfo)
-        with open(tmp_parser.output_filename, 'rb') as f:
+        with open(output, 'rb') as f:
             zout.writestr(clean_zinfo, f.read())
 
 
@@ -72,7 +82,8 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
                 if not metadata:  # better safe than sorry
                     metadata[item] = 'harmful content'
 
-            metadata = {**metadata, **self._get_zipinfo_meta(item)}
+            for key, value in self._get_zipinfo_meta(item).items():
+                metadata[key] = value
         zipin.close()
         return metadata
 
@@ -112,6 +123,8 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
         'application/vnd.oasis.opendocument.formula',
         'application/vnd.oasis.opendocument.image',
     }
+    whitelist = {'mimetype', 'manifest.rdf'}
+
 
     def get_meta(self):
         """
@@ -127,7 +140,8 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
                     metadata[key] = value
                 if not metadata:  # better safe than sorry
                     metadata[item] = 'harmful content'
-            metadata = {**metadata, **self._get_zipinfo_meta(item)}
+            for key, value in self._get_zipinfo_meta(item).items():
+                metadata[key] = value
         zipin.close()
         return metadata
 

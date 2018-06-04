@@ -1,11 +1,12 @@
+from typing import Union, Tuple, Dict
 from . import abstract
 
 
 class TorrentParser(abstract.AbstractParser):
-    mimetypes = {b'application/x-bittorrent', }
+    mimetypes = {'application/x-bittorrent', }
     whitelist = {b'announce', b'announce-list', b'info'}
 
-    def get_meta(self) -> dict:
+    def get_meta(self) -> Dict[str, str]:
         metadata = {}
         with open(self.filename, 'rb') as f:
             d = _BencodeHandler().bdecode(f.read())
@@ -54,7 +55,7 @@ class _BencodeHandler(object):
         }
 
     @staticmethod
-    def __decode_int(s: str) -> (int, str):
+    def __decode_int(s: bytes) -> Tuple[int, bytes]:
         s = s[1:]
         next_idx = s.index(b'e')
         if s.startswith(b'-0'):
@@ -64,7 +65,7 @@ class _BencodeHandler(object):
         return int(s[:next_idx]), s[next_idx+1:]
 
     @staticmethod
-    def __decode_string(s: str) -> (str, str):
+    def __decode_string(s: bytes) -> Tuple[bytes, bytes]:
         sep = s.index(b':')
         str_len = int(s[:sep])
         if str_len < 0:
@@ -74,7 +75,7 @@ class _BencodeHandler(object):
         s = s[1:]
         return s[sep:sep+str_len], s[sep+str_len:]
 
-    def __decode_list(self, s: str) -> (list, str):
+    def __decode_list(self, s: bytes) -> Tuple[list, bytes]:
         r = list()
         s = s[1:]  # skip leading `l`
         while s[0] != ord('e'):
@@ -82,7 +83,7 @@ class _BencodeHandler(object):
             r.append(v)
         return r, s[1:]
 
-    def __decode_dict(self, s: str) -> (dict, str):
+    def __decode_dict(self, s: bytes) -> Tuple[dict, bytes]:
         r = dict()
         s = s[1:]  # skip leading `d`
         while s[0] != ord(b'e'):
@@ -91,11 +92,11 @@ class _BencodeHandler(object):
         return r, s[1:]
 
     @staticmethod
-    def __encode_int(x: str) -> bytes:
+    def __encode_int(x: bytes) -> bytes:
         return b'i' + bytes(str(x), 'utf-8') + b'e'
 
     @staticmethod
-    def __encode_string(x: str) -> bytes:
+    def __encode_string(x: bytes) -> bytes:
         return bytes((str(len(x))), 'utf-8') + b':' + x
 
     def __encode_list(self, x: str) -> bytes:
@@ -104,17 +105,17 @@ class _BencodeHandler(object):
             ret += self.__encode_func[type(i)](i)
         return b'l' + ret + b'e'
 
-    def __encode_dict(self, x: str) -> bytes:
+    def __encode_dict(self, x: dict) -> bytes:
         ret = b''
         for k, v in sorted(x.items()):
             ret += self.__encode_func[type(k)](k)
             ret += self.__encode_func[type(v)](v)
         return b'd' + ret + b'e'
 
-    def bencode(self, s: str) -> bytes:
+    def bencode(self, s: Union[dict, list, bytes, int]) -> bytes:
         return self.__encode_func[type(s)](s)
 
-    def bdecode(self, s: str):
+    def bdecode(self, s: bytes) -> Union[dict, None]:
         try:
             r, l = self.__decode_func[s[0]](s)
         except (IndexError, KeyError, ValueError) as e:

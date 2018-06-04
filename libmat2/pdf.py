@@ -131,5 +131,6 @@ class PDFParser(abstract.AbstractParser):
                 metadata[key] = document.get_property(key)
         if 'metadata' in metadata:
             parsed_meta = self.__parse_metadata_field(metadata['metadata'])
-            return {**metadata, **parsed_meta}
+            for key, value in parsed_meta.items():
+                metadata[key] = value
         return metadata

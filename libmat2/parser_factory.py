@@ -2,9 +2,11 @@ import glob
 import os
 import mimetypes
 import importlib
-from typing import TypeVar, List
+from typing import TypeVar, List, Tuple, Optional
 
 from . import abstract, unsupported_extensions
+
+assert Tuple  # make pyflakes happy
 
 T = TypeVar('T', bound='abstract.AbstractParser')
 
@@ -28,14 +30,14 @@ def _get_parsers() -> List[T]:
     return __get_parsers(abstract.AbstractParser)
 
 
-def get_parser(filename: str) -> (T, str):
+def get_parser(filename: str) -> Tuple[Optional[T], Optional[str]]:
     mtype, _ = mimetypes.guess_type(filename)
 
     _, extension = os.path.splitext(filename)
     if extension in unsupported_extensions:
         return None, mtype
 
-    for c in _get_parsers():
+    for c in _get_parsers():  # type: ignore
         if mtype in c.mimetypes:
             try:
                 return c(filename), mtype

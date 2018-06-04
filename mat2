@@ -44,7 +44,7 @@ def show_meta(filename: str):
     if not __check_file(filename):
         return
 
-    p, mtype = parser_factory.get_parser(filename)
+    p, mtype = parser_factory.get_parser(filename)  # type: ignore
     if p is None:
         print("[-] %s's format (%s) is not supported" % (filename, mtype))
         return
@@ -61,7 +61,7 @@ def clean_meta(params: Tuple[str, bool]) -> bool:
     if not __check_file(filename, os.R_OK|os.W_OK):
         return False
 
-    p, mtype = parser_factory.get_parser(filename)
+    p, mtype = parser_factory.get_parser(filename)  # type: ignore
     if p is None:
         print("[-] %s's format (%s) is not supported" % (filename, mtype))
         return False

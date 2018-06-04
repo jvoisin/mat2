@@ -18,6 +18,14 @@ pyflakes:
   - apt-get -qqy install --no-install-recommends pyflakes3
   - pyflakes3 ./libmat2
 
+mypy:
+  stage: linting
+  script:
+  - apt-get -qqy update
+  - apt-get -qqy install --no-install-recommends python3-pip
+  - pip3 install mypy
+  - mypy mat2 libmat2/*.py --ignore-missing-imports
+
 tests:
   stage: test
   script:
