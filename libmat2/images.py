@@ -1,6 +1,8 @@
 import subprocess
 import json
 import os
+import shutil
+import tempfile
 
 import cairo
 
@@ -11,7 +13,26 @@ from gi.repository import GdkPixbuf
 from . import abstract
 
 
-class PNGParser(abstract.AbstractParser):
+class __ImageParser(abstract.AbstractParser):
+    def get_meta(self):
+        """ There is no way to escape the leading(s) dash(es) of the current
+        self.filename to prevent parameter injections, so we do have to copy it
+        """
+        fname = self.filename
+        tmpdirname = ""
+        if self.filename.startswith('-'):
+            tmpdirname = tempfile.mkdtemp()
+            fname = os.path.join(tmpdirname, self.filename)
+            shutil.copy(self.filename, fname)
+        out = subprocess.check_output(['/usr/bin/exiftool', '-json', fname])
+        if self.filename.startswith('-'):
+            shutil.rmtree(tmpdirname)
+        meta = json.loads(out.decode('utf-8'))[0]
+        for key in self.meta_whitelist:
+            meta.pop(key, None)
+        return meta
+
+class PNGParser(__ImageParser):
     mimetypes = {'image/png', }
     meta_whitelist = {'SourceFile', 'ExifToolVersion', 'FileName',
                       'Directory', 'FileSize', 'FileModifyDate',
@@ -28,30 +49,16 @@ class PNGParser(abstract.AbstractParser):
         except MemoryError:
             raise ValueError
 
-    def get_meta(self):
-        out = subprocess.check_output(['/usr/bin/exiftool', '-json', self.filename])
-        meta = json.loads(out.decode('utf-8'))[0]
-        for key in self.meta_whitelist:
-            meta.pop(key, None)
-        return meta
-
     def remove_all(self):
         surface = cairo.ImageSurface.create_from_png(self.filename)
         surface.write_to_png(self.output_filename)
         return True
 
 
-class GdkPixbufAbstractParser(abstract.AbstractParser):
+class GdkPixbufAbstractParser(__ImageParser):
     """ GdkPixbuf can handle a lot of surfaces, so we're rending images on it,
         this has the side-effect of removing metadata completely.
     """
-    def get_meta(self):
-        out = subprocess.check_output(['/usr/bin/exiftool', '-json', self.filename])
-        meta = json.loads(out.decode('utf-8'))[0]
-        for key in self.meta_whitelist:
-            meta.pop(key, None)
-        return meta
-
     def remove_all(self):
         _, extension = os.path.splitext(self.filename)
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.filename)

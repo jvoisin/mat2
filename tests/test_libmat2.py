@@ -17,6 +17,16 @@ class TestParserFactory(unittest.TestCase):
         self.assertEqual(parser.__class__, audio.MP3Parser)
 
 
+class TestParameterInjection(unittest.TestCase):
+    def test_ver_injection(self):
+        shutil.copy('./tests/data/dirty.png', './-ver')
+        p = images.PNGParser('-ver')
+        meta = p.get_meta()
+        self.assertEqual(meta['Comment'], 'This is a comment, be careful!')
+        self.assertEqual(meta['ModifyDate'], "2018:03:20 21:59:25")
+        os.remove('-ver')
+
+
 class TestUnsupportedFiles(unittest.TestCase):
     def test_pdf(self):
         shutil.copy('./tests/test_libmat2.py', './tests/clean.py')
