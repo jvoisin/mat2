@@ -7,6 +7,9 @@ Do feel free to pick up [an issue]( https://0xacab.org/jvoisin/mat2/issues )
 and to send a pull-request. Please do check that everything is fine by running the
 testsuite with `python3 -m unittest discover -v` before submitting one :)
 
+If you're fixing a bug or adding a new feature, please add tests accordingly,
+this will greatly improve the odds of your merge-request getting merged.
+
 # Doing a release
 
 1. Update the [changelog](https://0xacab.org/jvoisin/mat2/blob/master/CHANGELOG.md)
