@@ -59,6 +59,13 @@ $ python3 ./mat2 -l
 - [pdfparanoia](https://github.com/kanzure/pdfparanoia), that removes
 	watermarks from PDF.
 
+# Contact
+
+If possible, use the [issues system](https://0xacab.org/jvoisin/mat2/issues).
+If you think that a more private contact is needed (eg. for reporting security issues),
+you can email Julien (jvoisin) Voisin at `julien.voisin+mat@dustri.org`,
+using the gpg key `9FCDEE9E1A381F311EA62A7404D041E8171901CC`.
+
 # License
 
 This program is free software: you can redistribute it and/or modify
