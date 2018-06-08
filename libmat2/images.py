@@ -3,6 +3,7 @@ import json
 import os
 import shutil
 import tempfile
+import re
 
 import cairo
 
@@ -14,19 +15,27 @@ from . import abstract
 
 
 class __ImageParser(abstract.AbstractParser):
+    @staticmethod
+    def __handle_problematic_filename(filename:str, callback) -> str:
+        """ This method takes a filename with a problematic name,
+        and safely applies it a `callback`."""
+        tmpdirname = tempfile.mkdtemp()
+        fname = os.path.join(tmpdirname, "temp_file")
+        shutil.copy(filename, fname)
+        out = callback(fname)
+        shutil.rmtree(tmpdirname)
+        return out
+
     def get_meta(self):
         """ There is no way to escape the leading(s) dash(es) of the current
-        self.filename to prevent parameter injections, so we do have to copy it
+        self.filename to prevent parameter injections, so we need to take care
+        of this.
         """
-        fname = self.filename
-        tmpdirname = ""
-        if self.filename.startswith('-'):
-            tmpdirname = tempfile.mkdtemp()
-            fname = os.path.join(tmpdirname, self.filename)
-            shutil.copy(self.filename, fname)
-        out = subprocess.check_output(['/usr/bin/exiftool', '-json', fname])
-        if self.filename.startswith('-'):
-            shutil.rmtree(tmpdirname)
+        fun = lambda f: subprocess.check_output(['/usr/bin/exiftool', '-json', f])
+        if not re.match('^[a-z0-9]', self.filename):
+            out = self.__handle_problematic_filename(self.filename, fun)
+        else:
+            out = fun(self.filename)
         meta = json.loads(out.decode('utf-8'))[0]
         for key in self.meta_whitelist:
             meta.pop(key, None)
@@ -63,7 +72,7 @@ class GdkPixbufAbstractParser(__ImageParser):
         _, extension = os.path.splitext(self.filename)
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.filename)
         if extension == '.jpg':
-            extension = '.jpeg'
+            extension = '.jpeg'  # gdk is picky
         pixbuf.savev(self.output_filename, extension[1:], [], [])
         return True
 
