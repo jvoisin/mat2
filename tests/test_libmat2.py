@@ -57,6 +57,20 @@ class TestCorruptedFiles(unittest.TestCase):
             images.PNGParser('./tests/data/clean.pdf')
         os.remove('./tests/data/clean.pdf')
 
+    def test_torrent(self):
+        shutil.copy('./tests/data/dirty.png', './tests/data/clean.torrent')
+        p = torrent.TorrentParser('./tests/data/clean.torrent')
+        self.assertFalse(p.remove_all())
+        expected = {'Unknown meta': 'Unable to parse torrent file "./tests/data/clean.torrent".'}
+        self.assertEqual(p.get_meta(), expected)
+
+        with open("./tests/data/clean.torrent", "a") as f:
+            f.write("trailing garbage")
+        p = torrent.TorrentParser('./tests/data/clean.torrent')
+        self.assertEqual(p.get_meta(), expected)
+
+        os.remove('./tests/data/clean.torrent')
+
 class TestGetMeta(unittest.TestCase):
     def test_pdf(self):
         p = pdf.PDFParser('./tests/data/dirty.pdf')

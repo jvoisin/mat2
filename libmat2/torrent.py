@@ -1,4 +1,6 @@
+import logging
 from typing import Union, Tuple, Dict
+
 from . import abstract
 
 
@@ -58,6 +60,8 @@ class _BencodeHandler(object):
     def __decode_int(s: bytes) -> Tuple[int, bytes]:
         s = s[1:]
         next_idx = s.index(b'e')
+        if next_idx is None:
+            raise ValueError  # missing suffix
         if s.startswith(b'-0'):
             raise ValueError  # negative zero doesn't exist
         elif s.startswith(b'0') and next_idx != 1:
@@ -67,6 +71,8 @@ class _BencodeHandler(object):
     @staticmethod
     def __decode_string(s: bytes) -> Tuple[bytes, bytes]:
         sep = s.index(b':')
+        if set is None:
+            raise ValueError  # missing suffix
         str_len = int(s[:sep])
         if str_len < 0:
             raise ValueError
@@ -119,9 +125,9 @@ class _BencodeHandler(object):
         try:
             r, l = self.__decode_func[s[0]](s)
         except (IndexError, KeyError, ValueError) as e:
-            print("not a valid bencoded string: %s" % e)
+            logging.debug("Not a valid bencoded string: %s" % e)
             return None
         if l != b'':
-            print("invalid bencoded value (data after valid prefix)")
+            logging.debug("Invalid bencoded value (data after valid prefix)")
             return None
         return r
