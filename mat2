@@ -13,7 +13,10 @@ from libmat2 import parser_factory, unsupported_extensions
 __version__ = '0.1.1'
 
 def __check_file(filename: str, mode: int = os.R_OK) -> bool:
-    if not os.path.isfile(filename):
+    if not os.path.exists(filename):
+        print("[-] %s is doesn't exist." % filename)
+        return False
+    elif not os.path.isfile(filename):
         print("[-] %s is not a regular file." % filename)
         return False
     elif not os.access(filename, mode):
@@ -89,12 +92,14 @@ def show_parsers():
 
 def __get_files_recursively(files):
     for f in files:
-        if os.path.isfile(f):
-            yield f
-        else:
+        if os.path.isdir(f):
             for path, _, _files in os.walk(f):
                 for _f in _files:
-                    yield os.path.join(path, _f)
+                    fname = os.path.join(path, _f)
+                    if __check_file(fname):
+                        yield fname
+        elif __check_file(f):
+            yield f
 
 def main():
     arg_parser = create_arg_parser()
