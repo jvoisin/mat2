@@ -16,11 +16,11 @@ class AbstractParser(abc.ABC):
 
     @abc.abstractmethod
     def get_meta(self) -> Dict[str, str]:
-        pass
+        pass  # pragma: no cover
 
     @abc.abstractmethod
     def remove_all(self) -> bool:
-        pass
+        pass  # pragma: no cover
 
     def remove_all_lightweight(self) -> bool:
         """ Remove _SOME_ metadata. """
