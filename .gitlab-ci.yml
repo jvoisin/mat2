@@ -31,5 +31,5 @@ tests:
   script:
   - apt-get -qqy update
   - apt-get -qqy install --no-install-recommends python3-mutagen python3-gi-cairo gir1.2-poppler-0.18 gir1.2-gdkpixbuf-2.0 libimage-exiftool-perl python3-coverage
-  - python3-coverage run -m unittest discover -s tests/
+  - python3-coverage run --branch -m unittest discover -s tests/
   - python3-coverage report -m --include 'libmat2/*'
