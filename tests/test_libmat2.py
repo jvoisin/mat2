@@ -35,6 +35,14 @@ class TestUnsupportedFiles(unittest.TestCase):
         self.assertEqual(parser, None)
         os.remove('./tests/clean.py')
 
+class TestExplicitelyUnsupportedFiles(unittest.TestCase):
+    def test_pdf(self):
+        shutil.copy('./tests/test_libmat2.py', './tests/clean.txt')
+        parser, mimetype = parser_factory.get_parser('./tests/data/clean.txt')
+        self.assertEqual(mimetype, 'text/plain')
+        self.assertEqual(parser, None)
+        os.remove('./tests/clean.txt')
+
 
 class TestCorruptedFiles(unittest.TestCase):
     def test_pdf(self):
