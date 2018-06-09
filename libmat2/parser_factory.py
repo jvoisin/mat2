@@ -14,7 +14,7 @@ def __load_all_parsers():
     """ Loads every parser in a dynamic way """
     current_dir = os.path.dirname(__file__)
     for name in glob.glob(os.path.join(current_dir, '*.py')):
-        if name in ('abstract.py', '__init__.py'):
+        if name.endswith('abstract.py') or name.endswith('__init__.py'):
             continue
         basename = os.path.basename(name)
         name, _ = os.path.splitext(basename)
