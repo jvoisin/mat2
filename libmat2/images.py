@@ -32,7 +32,7 @@ class __ImageParser(abstract.AbstractParser):
         of this.
         """
         fun = lambda f: subprocess.check_output(['/usr/bin/exiftool', '-json', f])
-        if re.search('^[a-z0-9]', self.filename) is None:
+        if re.search('^[a-z0-9/]', self.filename) is None:
             out = self.__handle_problematic_filename(self.filename, fun)
         else:
             out = fun(self.filename)
