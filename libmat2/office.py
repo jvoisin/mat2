@@ -78,8 +78,12 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
         for item in zipin.infolist():
             if item.filename.startswith('docProps/') and item.filename.endswith('.xml'):
                 content = zipin.read(item).decode('utf-8')
-                for (key, value) in re.findall(r"<(.+)>(.+)</\1>", content, re.I):
-                    metadata[key] = value
+                try:
+                    results = re.findall(r"<(.+)>(.+)</\1>", content, re.I|re.M)
+                    for (key, value) in results:
+                        metadata[key] = value
+                except TypeError:  # We didn't manage to parse the xml file
+                    pass
                 if not metadata:  # better safe than sorry
                     metadata[item] = 'harmful content'
 
@@ -140,8 +144,12 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
         for item in zipin.infolist():
             if item.filename == 'meta.xml':
                 content = zipin.read(item).decode('utf-8')
-                for (key, value) in re.findall(r"<((?:meta|dc|cp).+?)>(.+)</\1>", content, re.I):
-                    metadata[key] = value
+                try:
+                    results = re.findall(r"<((?:meta|dc|cp).+?)>(.+)</\1>", content, re.I|re.M)
+                    for (key, value) in results:
+                        metadata[key] = value
+                except TypeError:  # We didn't manage to parse the xml file
+                    pass
                 if not metadata:  # better safe than sorry
                     metadata[item] = 'harmful content'
             for key, value in self._get_zipinfo_meta(item).items():
