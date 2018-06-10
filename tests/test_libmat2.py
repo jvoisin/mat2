@@ -70,6 +70,12 @@ class TestCorruptedFiles(unittest.TestCase):
             images.PNGParser('./tests/data/clean.pdf')
         os.remove('./tests/data/clean.pdf')
 
+    def test_png2(self):
+        shutil.copy('./tests/test_libmat2.py', './tests/clean.png')
+        parser, mimetype = parser_factory.get_parser('./tests/clean.png')
+        self.assertIsNone(parser)
+        os.remove('./tests/clean.png')
+
     def test_torrent(self):
         shutil.copy('./tests/data/dirty.png', './tests/data/clean.torrent')
         p = torrent.TorrentParser('./tests/data/clean.torrent')
