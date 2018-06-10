@@ -102,8 +102,7 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
             if item.filename[-1] == '/':
                 continue  # `is_dir` is added in Python3.6
             elif item.filename.startswith('docProps/'):
-                if not item.filename.endswith('.rels'):
-                    continue  # don't keep metadata files
+                continue  # don't keep metadata files
             if item.filename in self.files_to_keep:
                 item = self._clean_zipinfo(item)
                 zout.writestr(item, zin.read(item))
