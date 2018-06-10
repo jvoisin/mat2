@@ -40,7 +40,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
 
     def _clean_internal_file(self, item: zipfile.ZipInfo, temp_folder: str,
-                             zin: zipfile.ZipFile, zout: zipfile.ZipFile):
+                             zin: zipfile.ZipFile, zout: zipfile.ZipFile) -> bool:
         output = ''
         zin.extract(member=item, path=temp_folder)
         if item.filename not in self.whitelist:
@@ -48,7 +48,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
             tmp_parser, mtype = parser_factory.get_parser(full_path)  # type: ignore
             if not tmp_parser:
                 print("%s's format (%s) isn't supported" % (item.filename, mtype))
-                return
+                return False
             tmp_parser.remove_all()
             output = tmp_parser.output_filename
         else:
@@ -57,6 +57,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
         clean_zinfo = self._clean_zipinfo(zinfo)
         with open(output, 'rb') as f:
             zout.writestr(clean_zinfo, f.read())
+        return True
 
 
 class MSOfficeParser(ArchiveBasedAbstractParser):
@@ -104,7 +105,10 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
                 zout.writestr(item, zin.read(item))
                 continue
 
-            self._clean_internal_file(item, temp_folder, zin, zout)
+            if self._clean_internal_file(item, temp_folder, zin, zout) is False:
+                zout.close()
+                os.remove(self.output_filename)
+                return False
 
         shutil.rmtree(temp_folder)
         zout.close()
@@ -156,7 +160,9 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
             elif item.filename == 'meta.xml':
                 continue  # don't keep metadata files
 
-            self._clean_internal_file(item, temp_folder, zin, zout)
+            if self._clean_internal_file(item, temp_folder, zin, zout) is False:
+                os.remove(self.output_filename)
+                return False
 
         shutil.rmtree(temp_folder)
         zout.close()

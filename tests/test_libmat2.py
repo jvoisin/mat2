@@ -27,6 +27,19 @@ class TestParameterInjection(unittest.TestCase):
         os.remove('-ver')
 
 
+class TestUnsupportedEmbeddedFiles(unittest.TestCase):
+    def test_odt_with_svg(self):
+        shutil.copy('./tests/data/embedded.odt', './tests/data/clean.odt')
+        p = office.LibreOfficeParser('./tests/data/clean.odt')
+        self.assertFalse(p.remove_all())
+        os.remove('./tests/data/clean.odt')
+
+    def test_docx_with_svg(self):
+        shutil.copy('./tests/data/embedded.docx', './tests/data/clean.docx')
+        p = office.MSOfficeParser('./tests/data/clean.docx')
+        self.assertFalse(p.remove_all())
+        os.remove('./tests/data/clean.docx')
+
 class TestUnsupportedFiles(unittest.TestCase):
     def test_pdf(self):
         shutil.copy('./tests/test_libmat2.py', './tests/clean.py')
