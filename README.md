@@ -1,9 +1,9 @@
 ```
- _____ _____ _____ ___ 
+ _____ _____ _____ ___
 |     |  _  |_   _|_  |  Keep you data,
 | | | |     | | | |  _|     trash your meta!
 |_|_|_|__|__| |_| |___|
-                       
+
 ```
 
 This software is currently in **beta**, please don't use it for anything
@@ -11,16 +11,16 @@ critical.
 
 # Metadata and privacy
 
-Metadata consist of information that characterizes data.                                             
-Metadata are used to provide documentation for data products.                                        
-In essence, metadata answer who, what, when, where, why, and how about                               
-every facet of the data that are being documented.                                                   
+Metadata consist of information that characterizes data.
+Metadata are used to provide documentation for data products.
+In essence, metadata answer who, what, when, where, why, and how about
+every facet of the data that are being documented.
 
-Metadata within a file can tell a lot about you.                                                     
-Cameras record data about when a picture was taken and what                                          
-camera was used. Office documents like PDF or Office automatically adds                              
-author and company information to documents and spreadsheets.                                        
-Maybe you don't want to disclose those information on the web. 
+Metadata within a file can tell a lot about you.
+Cameras record data about when a picture was taken and what
+camera was used. Office documents like PDF or Office automatically adds
+author and company information to documents and spreadsheets.
+Maybe you don't want to disclose those information on the web.
 
 This is precisely the job of MAT2: getting rid, as much as possible, of
 metadata.
