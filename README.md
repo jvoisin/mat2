@@ -82,7 +82,7 @@ Copyright 2018 Julien (jvoisin) Voisin <julien.voisin+mat2@dustri.org>
 
 # Thanks
 
-MAT2 wouldn't existe without:
+MAT2 wouldn't exist without:
 
 - the [Google Summer of Code](https://summerofcode.withgoogle.com/);
 - the fine people from [Tails]( https://tails.boum.org);
