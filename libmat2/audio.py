@@ -36,4 +36,4 @@ class OGGParser(MutagenParser):
 
 
 class FLACParser(MutagenParser):
-    mimetypes = {'audio/flac', }
+    mimetypes = {'audio/flac', 'audio/x-flac' }
