@@ -26,10 +26,21 @@ mypy:
   - pip3 install mypy
   - mypy mat2 libmat2/*.py --ignore-missing-imports
 
-tests:
+tests:debian:
   stage: test
   script:
   - apt-get -qqy update
   - apt-get -qqy install --no-install-recommends python3-mutagen python3-gi-cairo gir1.2-poppler-0.18 gir1.2-gdkpixbuf-2.0 libimage-exiftool-perl python3-coverage
   - python3-coverage run --branch -m unittest discover -s tests/
   - python3-coverage report -m --include 'libmat2/*'
+
+tests:fedora:
+  image: fedora
+  stage: test
+  script:
+  - dnf install -y python3 python3-mutagen python3-gobject
+  - dnf install -y gdk-pixbuf2 poppler-glib gdk-pixbuf2 gdk-pixbuf2-modules
+  - dnf install -y cairo-gobject cairo python3-cairo
+  - dnf install -y perl-Image-ExifTool mailcap
+  - gdk-pixbuf-query-loaders-64 > /usr/lib64/gdk-pixbuf-2.0/2.10.0/loaders.cache
+  - python3 setup.py test
