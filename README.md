@@ -35,7 +35,7 @@ metadata.
 Please note that MAT2 requires at least Python3.5, meaning that it
 doesn't run on [Debian Jessie](https://packages.debian.org/jessie/python3),
 
-# Running the testsuite
+# Running the test suite
 
 ```bash
 $ python3 -m unittest discover -v
@@ -47,7 +47,7 @@ $ python3 -m unittest discover -v
 $ python3 ./mat2 -l
 ```
 
-# Related softwares
+# Related software
 
 - The first iteration of [MAT](http://mat.boum.org)
 - [Exiftool](https://sno.phy.queensu.ca/~phil/exiftool/mat)
