@@ -17,6 +17,7 @@ Mat only removes standard metadata from your files, it does _not_:
   - handle steganography nor homoglyphs
   - handle stylometry
   - handle any non-standard metadata field/system
+  - handle file-system related metadata
 
 If you really want to be anonymous format that does not contain any
 metadata, or better : use plain-text ASCII without trailing spaces.
@@ -91,3 +92,9 @@ Requirements
 
 		- MAT2 *must not* fail silently. Upon failure,
 		MAT2 *must not* modify the file in any way.
+
+		- MAT2 *might* leak the fact that MAT2 was used on the file,
+		since it might be uncommon for some file formats to come
+		without any kind of metadata, an adversary might suspect that
+		the user used MAT2 on certain files.
+
