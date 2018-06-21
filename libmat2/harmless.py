@@ -4,7 +4,7 @@ from . import abstract
 
 class HarmlessParser(abstract.AbstractParser):
     """ This is the parser for filetypes that do not contain metadata. """
-    mimetypes = {'application/xml', 'text/plain', 'text/xml', 'application/rdf+xml'}
+    mimetypes = {'text/plain', }
 
     def __init__(self, filename: str) -> None:
         super().__init__(filename)
