@@ -8,10 +8,13 @@ from typing import Dict, Set, Pattern
 
 from . import abstract, parser_factory
 
+# Make pyflakes happy
+assert Set
+assert Pattern
 
 class ArchiveBasedAbstractParser(abstract.AbstractParser):
-    files_to_keep : Set[str] = set()
-    files_to_omit : Set[Pattern] = set()
+    files_to_keep = set()  # type: Set[str] 
+    files_to_omit = set() # type: Set[Pattern] 
 
     def _clean_zipinfo(self, zipinfo: zipfile.ZipInfo) -> zipfile.ZipInfo:
         zipinfo.create_system = 3  # Linux
