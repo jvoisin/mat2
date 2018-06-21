@@ -16,6 +16,13 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
     files_to_keep = set()  # type: Set[str] 
     files_to_omit = set() # type: Set[Pattern] 
 
+    def __init__(self, filename):
+        super().__init__(filename)
+        try:  # better fail here than later
+            zipfile.ZipFile(self.filename)
+        except zipfile.BadZipFile:
+            raise ValueError
+
     def _clean_zipinfo(self, zipinfo: zipfile.ZipInfo) -> zipfile.ZipInfo:
         zipinfo.create_system = 3  # Linux
         zipinfo.comment = b''

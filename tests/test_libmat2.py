@@ -90,6 +90,11 @@ class TestCorruptedFiles(unittest.TestCase):
 
         os.remove('./tests/data/clean.torrent')
 
+    def test_odg(self):
+        shutil.copy('./tests/data/dirty.png', './tests/data/clean.odg')
+        with self.assertRaises(ValueError):
+            office.LibreOfficeParser('./tests/data/clean.odg')
+
 class TestGetMeta(unittest.TestCase):
     def test_pdf(self):
         p = pdf.PDFParser('./tests/data/dirty.pdf')
