@@ -47,6 +47,8 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
             full_path = os.path.join(temp_folder, item.filename)
             tmp_parser, mtype = parser_factory.get_parser(full_path)  # type: ignore
             if not tmp_parser:
+                zout.close()
+                os.remove(self.output_filename)
                 print("%s's format (%s) isn't supported" % (item.filename, mtype))
                 return False
             tmp_parser.remove_all()
@@ -109,8 +111,6 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
                 continue
 
             if self._clean_internal_file(item, temp_folder, zin, zout) is False:
-                zout.close()
-                os.remove(self.output_filename)
                 return False
 
         shutil.rmtree(temp_folder)
@@ -168,7 +168,6 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
                 continue  # don't keep metadata files
 
             if self._clean_internal_file(item, temp_folder, zin, zout) is False:
-                os.remove(self.output_filename)
                 return False
 
         shutil.rmtree(temp_folder)
