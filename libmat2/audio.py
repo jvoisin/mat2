@@ -6,6 +6,17 @@ from . import abstract
 
 
 class MutagenParser(abstract.AbstractParser):
+    def __init__(self, filename):
+        super().__init__(filename)
+        try:
+            mutagen.File(self.filename)
+        except mutagen.flac.MutagenError:
+            raise ValueError
+        except mutagen.mp3.MutagenError:
+            raise ValueError
+        except mutagen.ogg.MutagenError:
+            raise ValueError
+
     def get_meta(self):
         f = mutagen.File(self.filename)
         if f.tags:
