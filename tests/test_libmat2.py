@@ -87,13 +87,25 @@ class TestCorruptedFiles(unittest.TestCase):
             f.write("trailing garbage")
         p = torrent.TorrentParser('./tests/data/clean.torrent')
         self.assertEqual(p.get_meta(), expected)
-
         os.remove('./tests/data/clean.torrent')
 
     def test_odg(self):
         shutil.copy('./tests/data/dirty.png', './tests/data/clean.odg')
         with self.assertRaises(ValueError):
             office.LibreOfficeParser('./tests/data/clean.odg')
+        os.remove('./tests/data/clean.odg')
+
+    def test_bmp(self):
+        shutil.copy('./tests/data/dirty.png', './tests/data/clean.bmp')
+        with self.assertRaises(ValueError):
+            p = images.BMPParser('./tests/data/clean.bmp')
+        os.remove('./tests/data/clean.bmp')
+
+    def test_docx(self):
+        shutil.copy('./tests/data/dirty.png', './tests/data/clean.docx')
+        with self.assertRaises(ValueError):
+            p = office.MSOfficeParser('./tests/data/clean.docx')
+        os.remove('./tests/data/clean.docx')
 
 class TestGetMeta(unittest.TestCase):
     def test_pdf(self):
@@ -123,7 +135,7 @@ class TestGetMeta(unittest.TestCase):
         self.assertEqual(meta['Comment'], 'Created with GIMP')
 
     def test_tiff(self):
-        p = images.JPGParser('./tests/data/dirty.tiff')
+        p = images.TiffParser('./tests/data/dirty.tiff')
         meta = p.get_meta()
         self.assertEqual(meta['Make'], 'OLYMPUS IMAGING CORP.')
         self.assertEqual(meta['Model'], 'C7070WZ')

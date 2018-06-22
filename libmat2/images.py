@@ -1,4 +1,5 @@
 import subprocess
+import imghdr
 import json
 import os
 import shutil
@@ -68,6 +69,8 @@ class GdkPixbufAbstractParser(__ImageParser):
     """ GdkPixbuf can handle a lot of surfaces, so we're rending images on it,
         this has the side-effect of removing metadata completely.
     """
+    _type = ''
+
     def remove_all(self):
         _, extension = os.path.splitext(self.filename)
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.filename)
@@ -76,8 +79,14 @@ class GdkPixbufAbstractParser(__ImageParser):
         pixbuf.savev(self.output_filename, extension[1:], [], [])
         return True
 
+    def __init__(self, filename):
+        super().__init__(filename)
+        if imghdr.what(filename) != self._type:  # better safe than sorry
+            raise ValueError
+
 
 class JPGParser(GdkPixbufAbstractParser):
+    _type = 'jpeg'
     mimetypes = {'image/jpeg'}
     meta_whitelist = {'SourceFile', 'ExifToolVersion', 'FileName',
                       'Directory', 'FileSize', 'FileModifyDate',
@@ -90,6 +99,7 @@ class JPGParser(GdkPixbufAbstractParser):
 
 
 class TiffParser(GdkPixbufAbstractParser):
+    _type = 'tiff'
     mimetypes = {'image/tiff'}
     meta_whitelist = {'Compression', 'ExifByteOrder', 'ExtraSamples',
                       'FillOrder', 'PhotometricInterpretation',
@@ -103,6 +113,7 @@ class TiffParser(GdkPixbufAbstractParser):
 
 
 class BMPParser(GdkPixbufAbstractParser):
+    _type = 'bmp'
     mimetypes = {'image/x-ms-bmp'}
     meta_whitelist = {'SourceFile', 'ExifToolVersion', 'FileName', 'Directory',
                       'FileSize', 'FileModifyDate', 'FileAccessDate',
