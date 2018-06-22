@@ -10,6 +10,12 @@ testsuite with `python3 -m unittest discover -v` before submitting one :)
 If you're fixing a bug or adding a new feature, please add tests accordingly,
 this will greatly improve the odds of your merge-request getting merged.
 
+If you're adding a new fileformat, please add tests for:
+
+1. Getting metadata
+2. Cleaning metadata
+3. Raising `ValueError` upon a corrupted file
+
 # Doing a release
 
 1. Update the [changelog](https://0xacab.org/jvoisin/mat2/blob/master/CHANGELOG.md)
