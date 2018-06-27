@@ -6,10 +6,10 @@ stages:
 
 bandit:
   stage: linting
-  script:
+  script:  # TODO: remove B405 and B314
   - apt-get -qqy update
   - apt-get -qqy install --no-install-recommends python3-bandit
-  - bandit -r ./libmat2 --format txt --skip B101,B404,B603
+  - bandit -r ./libmat2 --format txt --skip B101,B404,B603,B405,B314
 
 pyflakes:
   stage: linting

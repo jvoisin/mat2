@@ -4,7 +4,9 @@ import shutil
 import tempfile
 import datetime
 import zipfile
+import xml.etree.ElementTree as ET
 from typing import Dict, Set, Pattern
+
 
 from . import abstract, parser_factory
 
@@ -13,7 +15,12 @@ assert Set
 assert Pattern
 
 class ArchiveBasedAbstractParser(abstract.AbstractParser):
+    # Those are the files that have a format that _isn't_
+    # supported by MAT2, but that we want to keep anyway.
     files_to_keep = set()  # type: Set[str] 
+
+    # Those are the files that we _do not_ want to keep,
+    # no matter if they are supported or not.
     files_to_omit = set() # type: Set[Pattern] 
 
     def __init__(self, filename):
@@ -22,6 +29,11 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
             zipfile.ZipFile(self.filename)
         except zipfile.BadZipFile:
             raise ValueError
+
+    def _specific_cleanup(self, full_path:str) -> bool:
+        """ This method can be used to apply specific treatment
+        to files present in the archive."""
+        return True
 
     def _clean_zipinfo(self, zipinfo: zipfile.ZipInfo) -> zipfile.ZipInfo:
         zipinfo.create_system = 3  # Linux
@@ -56,26 +68,31 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
             for item in zin.infolist():
                 if item.filename[-1] == '/':  # `is_dir` is added in Python3.6
                     continue  # don't keep empty folders
-                elif item.filename in self.files_to_keep:
-                    item = self._clean_zipinfo(item)
-                    zout.writestr(item, zin.read(item))
-                    continue
-                elif any(map(lambda r: r.search(item.filename), self.files_to_omit)):
-                    continue
 
                 zin.extract(member=item, path=temp_folder)
                 full_path = os.path.join(temp_folder, item.filename)
-                tmp_parser, mtype = parser_factory.get_parser(full_path)  # type: ignore
-                if not tmp_parser:
-                    shutil.rmtree(temp_folder)
-                    os.remove(self.output_filename)
-                    print("%s's format (%s) isn't supported" % (item.filename, mtype))
-                    return False
-                tmp_parser.remove_all()
+
+                self._specific_cleanup(full_path)
+
+                if item.filename in self.files_to_keep:
+                    # those files aren't supported, but we want to add them anyway
+                    pass
+                elif any(map(lambda r: r.search(item.filename), self.files_to_omit)):
+                    continue
+                else:
+                    # supported files that we want to clean then add
+                    tmp_parser, mtype = parser_factory.get_parser(full_path)  # type: ignore
+                    if not tmp_parser:
+                        shutil.rmtree(temp_folder)
+                        os.remove(self.output_filename)
+                        print("%s's format (%s) isn't supported" % (item.filename, mtype))
+                        return False
+                    tmp_parser.remove_all()
+                    os.rename(tmp_parser.output_filename, full_path)
 
                 zinfo = zipfile.ZipInfo(item.filename)  # type: ignore
                 clean_zinfo = self._clean_zipinfo(zinfo)
-                with open(tmp_parser.output_filename, 'rb') as f:
+                with open(full_path, 'rb') as f:
                     zout.writestr(clean_zinfo, f.read())
 
         shutil.rmtree(temp_folder)
@@ -148,6 +165,37 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
             '^Configurations2/',
             '^Thumbnails/',
     }))
+
+
+    def __remove_revisions(self, full_path:str) -> bool:
+        def parse_map(f):  # etree support for ns is a bit rough
+            ns_map = dict()
+            for event, (k, v) in ET.iterparse(f, ("start-ns", )):
+                if event == "start-ns":
+                    ns_map[k] = v
+            return ns_map
+
+        ns = parse_map(full_path)
+        if 'office' not in ns.keys():  # no revisions in the current file
+            return True
+
+        # Register the namespaces
+        for k,v in ns.items():
+            ET.register_namespace(k, v)
+
+        tree = ET.parse(full_path)
+        for text in tree.getroot().iterfind('.//office:text', ns):
+            for changes in text.iterfind('.//text:tracked-changes', ns):
+                text.remove(changes)
+
+        tree.write(full_path, xml_declaration = True)
+
+        return True
+
+    def _specific_cleanup(self, full_path:str) -> bool:
+        if os.path.basename(full_path) == 'content.xml':
+            return self.__remove_revisions(full_path)
+        return True
 
     def get_meta(self) -> Dict[str, str]:
         """

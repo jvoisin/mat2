@@ -122,6 +122,27 @@ class TestRemovingThumbnails(unittest.TestCase):
 
         os.remove('./tests/data/clean.cleaned.odt')
 
+
+class TestRevisionsCleaning(unittest.TestCase):
+    def test_libreoffice(self):
+        with zipfile.ZipFile('./tests/data/revision.odt') as zipin:
+            c = zipin.open('content.xml')
+            r = c.read()
+            self.assertIn(b'tracked-changes', r)
+
+        shutil.copy('./tests/data/revision.odt', './tests/data/clean.odt')
+        p = office.LibreOfficeParser('./tests/data/clean.odt')
+        self.assertTrue(p.remove_all())
+
+        with zipfile.ZipFile('./tests/data/clean.cleaned.odt') as zipin:
+            c = zipin.open('content.xml')
+            r = c.read()
+            self.assertNotIn(b'tracked-changes', r)
+
+        os.remove('./tests/data/clean.odt')
+        os.remove('./tests/data/clean.cleaned.odt')
+
+
 class TestDeepCleaning(unittest.TestCase):
     def __check_deep_meta(self, p):
         tempdir = tempfile.mkdtemp()
