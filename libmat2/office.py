@@ -47,45 +47,38 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
         return metadata
 
-
-    def _clean_internal_file(self, item: zipfile.ZipInfo, temp_folder: str,
-                             zin: zipfile.ZipFile, zout: zipfile.ZipFile) -> bool:
-        zin.extract(member=item, path=temp_folder)
-        full_path = os.path.join(temp_folder, item.filename)
-        tmp_parser, mtype = parser_factory.get_parser(full_path)  # type: ignore
-        if not tmp_parser:
-            zout.close()
-            os.remove(self.output_filename)
-            print("%s's format (%s) isn't supported" % (item.filename, mtype))
-            return False
-        tmp_parser.remove_all()
-
-        zinfo = zipfile.ZipInfo(item.filename)  # type: ignore
-        clean_zinfo = self._clean_zipinfo(zinfo)
-        with open(tmp_parser.output_filename, 'rb') as f:
-            zout.writestr(clean_zinfo, f.read())
-        return True
-
     def remove_all(self) -> bool:
-        zin = zipfile.ZipFile(self.filename, 'r')
-        zout = zipfile.ZipFile(self.output_filename, 'w')
-        temp_folder = tempfile.mkdtemp()
+        with zipfile.ZipFile(self.filename) as zin,\
+             zipfile.ZipFile(self.output_filename, 'w') as zout:
 
-        for item in zin.infolist():
-            if item.filename[-1] == '/':  # `is_dir` is added in Python3.6
-                continue  # don't keep empty folders
-            elif item.filename in self.files_to_keep:
-                item = self._clean_zipinfo(item)
-                zout.writestr(item, zin.read(item))
-                continue
-            elif any(map(lambda r: r.search(item.filename), self.files_to_omit)):
-                continue
-            elif not self._clean_internal_file(item, temp_folder, zin, zout):
-                return False
+            temp_folder = tempfile.mkdtemp()
+
+            for item in zin.infolist():
+                if item.filename[-1] == '/':  # `is_dir` is added in Python3.6
+                    continue  # don't keep empty folders
+                elif item.filename in self.files_to_keep:
+                    item = self._clean_zipinfo(item)
+                    zout.writestr(item, zin.read(item))
+                    continue
+                elif any(map(lambda r: r.search(item.filename), self.files_to_omit)):
+                    continue
+
+                zin.extract(member=item, path=temp_folder)
+                full_path = os.path.join(temp_folder, item.filename)
+                tmp_parser, mtype = parser_factory.get_parser(full_path)  # type: ignore
+                if not tmp_parser:
+                    shutil.rmtree(temp_folder)
+                    os.remove(self.output_filename)
+                    print("%s's format (%s) isn't supported" % (item.filename, mtype))
+                    return False
+                tmp_parser.remove_all()
+
+                zinfo = zipfile.ZipInfo(item.filename)  # type: ignore
+                clean_zinfo = self._clean_zipinfo(zinfo)
+                with open(tmp_parser.output_filename, 'rb') as f:
+                    zout.writestr(clean_zinfo, f.read())
 
         shutil.rmtree(temp_folder)
-        zout.close()
-        zin.close()
         return True
 
 
