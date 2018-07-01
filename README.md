@@ -41,10 +41,24 @@ doesn't run on [Debian Jessie](https://packages.debian.org/jessie/python3),
 $ python3 -m unittest discover -v
 ```
 
-# Supported formats
+# How to use MAT2
 
 ```bash
-$ python3 ./mat2 -l
+usage: mat2 [-h] [-v] [-l] [-c | -s | -L] [files [files ...]]
+
+Metadata anonymisation toolkit 2
+
+positional arguments:
+  files
+
+optional arguments:
+  -h, --help         show this help message and exit
+  -v, --version      show program's version number and exit
+  -l, --list         list all supported fileformats
+  -c, --check        check if a file is free of harmful metadatas
+  -s, --show         list all the harmful metadata of a file without removing
+                     them
+  -L, --lightweight  remove SOME metadata
 ```
 
 # Related software
