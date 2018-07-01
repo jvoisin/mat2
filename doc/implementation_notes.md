@@ -9,6 +9,16 @@ that only cleans the superficial metadata of your file, but not
 the ones that might be in **embeded** resources. Like for example,
 images in a PDF or an office document.
 
+Revisions handling
+------------------
+
+Revisions are handled according to the principle of least astonishment: they are entirely removed.
+
+- Either the users aren't aware of the revisions, are thus they should be deleted. For example journalists that are editing a document to erase mentions sources mentions.
+
+- Or they are aware of it, and will likely not expect MAT2 to be able to keep the revisions, that are basically traces about how, when and who edited the document.
+
+
 Race conditions
 ---------------
 
