@@ -121,6 +121,7 @@ class TestRemovingThumbnails(unittest.TestCase):
         zipin.close()
 
         os.remove('./tests/data/clean.cleaned.odt')
+        os.remove('./tests/data/clean.odt')
 
 
 class TestRevisionsCleaning(unittest.TestCase):
@@ -141,6 +142,26 @@ class TestRevisionsCleaning(unittest.TestCase):
 
         os.remove('./tests/data/clean.odt')
         os.remove('./tests/data/clean.cleaned.odt')
+
+    def test_msoffice(self):
+        with zipfile.ZipFile('./tests/data/revision.docx') as zipin:
+            c = zipin.open('word/document.xml')
+            content = c.read()
+            r = b'<w:ins w:id="1" w:author="Unknown Author" w:date="2018-06-28T23:48:00Z">'
+            self.assertIn(r, content)
+
+        shutil.copy('./tests/data/revision.docx', './tests/data/revision_clean.docx')
+        p = office.MSOfficeParser('./tests/data/revision_clean.docx')
+        self.assertTrue(p.remove_all())
+
+        with zipfile.ZipFile('./tests/data/revision_clean.cleaned.docx') as zipin:
+            c = zipin.open('word/document.xml')
+            content = c.read()
+            r = b'<w:ins w:id="1" w:author="Unknown Author" w:date="2018-06-28T23:48:00Z">'
+            self.assertNotIn(r, content)
+
+        os.remove('./tests/data/revision_clean.docx')
+        os.remove('./tests/data/revision_clean.cleaned.docx')
 
 
 class TestDeepCleaning(unittest.TestCase):

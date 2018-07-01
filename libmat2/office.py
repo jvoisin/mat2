@@ -14,6 +14,24 @@ from . import abstract, parser_factory
 assert Set
 assert Pattern
 
+def _parse_xml(full_path: str):
+    """ This function parse XML with namespace support. """
+    def parse_map(f):  # etree support for ns is a bit rough
+        ns_map = dict()
+        for event, (k, v) in ET.iterparse(f, ("start-ns", )):
+            if event == "start-ns":
+                ns_map[k] = v
+        return ns_map
+
+    ns = parse_map(full_path)
+
+    # Register the namespaces
+    for k,v in ns.items():
+        ET.register_namespace(k, v)
+
+    return ET.parse(full_path), ns
+
+
 class ArchiveBasedAbstractParser(abstract.AbstractParser):
     # Those are the files that have a format that _isn't_
     # supported by MAT2, but that we want to keep anyway.
@@ -72,7 +90,11 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                 zin.extract(member=item, path=temp_folder)
                 full_path = os.path.join(temp_folder, item.filename)
 
-                self._specific_cleanup(full_path)
+                if self._specific_cleanup(full_path) is False:
+                    shutil.rmtree(temp_folder)
+                    os.remove(self.output_filename)
+                    print("Something went wrong during deep cleaning of %s" % item.filename)
+                    return False
 
                 if item.filename in self.files_to_keep:
                     # those files aren't supported, but we want to add them anyway
@@ -117,6 +139,45 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
     files_to_omit = set(map(re.compile, {  # type: ignore
             '^docProps/',
     }))
+
+    def __remove_revisions(self, full_path:str) -> bool:
+        """ In this function, we're changing the XML
+        document in two times, since we don't want
+        to change the tree we're iterating on."""
+        tree, ns = _parse_xml(full_path)
+
+        # No revisions are present
+        if tree.find('.//w:del', ns) is None:
+            return True
+        elif tree.find('.//w:ins', ns) is None:
+            return True
+
+        parent_map = {c:p for p in tree.iter( ) for c in p}
+
+        elements = list([element for element in tree.iterfind('.//w:del', ns)])
+        for element in elements:
+            parent_map[element].remove(element)
+
+        elements = list()
+        for element in tree.iterfind('.//w:ins', ns):
+            for position, item in enumerate(tree.iter()):
+                if item == element:
+                    for children in element.iterfind('./*'):
+                        elements.append((element, position, children))
+                    break
+
+        for (element, position, children) in elements:
+            parent_map[element].insert(position, children)
+            parent_map[element].remove(element)
+
+        tree.write(full_path, xml_declaration=True)
+
+        return True
+
+    def _specific_cleanup(self, full_path:str) -> bool:
+        if full_path.endswith('/word/document.xml'):
+            return self.__remove_revisions(full_path)
+        return True
 
     def get_meta(self) -> Dict[str, str]:
         """
@@ -168,27 +229,16 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
 
 
     def __remove_revisions(self, full_path:str) -> bool:
-        def parse_map(f):  # etree support for ns is a bit rough
-            ns_map = dict()
-            for event, (k, v) in ET.iterparse(f, ("start-ns", )):
-                if event == "start-ns":
-                    ns_map[k] = v
-            return ns_map
+        tree, ns = _parse_xml(full_path)
 
-        ns = parse_map(full_path)
         if 'office' not in ns.keys():  # no revisions in the current file
             return True
 
-        # Register the namespaces
-        for k,v in ns.items():
-            ET.register_namespace(k, v)
-
-        tree = ET.parse(full_path)
         for text in tree.getroot().iterfind('.//office:text', ns):
             for changes in text.iterfind('.//text:tracked-changes', ns):
                 text.remove(changes)
 
-        tree.write(full_path, xml_declaration = True)
+        tree.write(full_path, xml_declaration=True)
 
         return True
 
@@ -219,4 +269,3 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
                 metadata[key] = value
         zipin.close()
         return metadata
-
