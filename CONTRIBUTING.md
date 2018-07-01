@@ -16,6 +16,9 @@ If you're adding a new fileformat, please add tests for:
 2. Cleaning metadata
 3. Raising `ValueError` upon a corrupted file
 
+Since MAT2 is written in Python3, please conform as much as possible to the
+[pep8]( https://pep8.org/ ) style; except where it makes no sense of course.
+
 # Doing a release
 
 1. Update the [changelog](https://0xacab.org/jvoisin/mat2/blob/master/CHANGELOG.md)
