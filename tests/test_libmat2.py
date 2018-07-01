@@ -105,6 +105,23 @@ class TestGetMeta(unittest.TestCase):
         self.assertEqual(meta['meta:generator'], 'LibreOffice/3.3$Unix LibreOffice_project/330m19$Build-202')
 
 
+class TestRemovingThumbnails(unittest.TestCase):
+    def test_odt(self):
+        shutil.copy('./tests/data/revision.odt', './tests/data/clean.odt')
+
+        zipin = zipfile.ZipFile(os.path.abspath('./tests/data/clean.odt'))
+        self.assertIn('Thumbnails/thumbnail.png', zipin.namelist())
+        zipin.close()
+
+        p = office.LibreOfficeParser('./tests/data/clean.odt')
+        self.assertTrue(p.remove_all())
+
+        zipin = zipfile.ZipFile(os.path.abspath('./tests/data/clean.cleaned.odt'))
+        self.assertNotIn('Thumbnails/thumbnail.png', zipin.namelist())
+        zipin.close()
+
+        os.remove('./tests/data/clean.cleaned.odt')
+
 class TestDeepCleaning(unittest.TestCase):
     def __check_deep_meta(self, p):
         tempdir = tempfile.mkdtemp()

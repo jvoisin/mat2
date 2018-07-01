@@ -146,6 +146,7 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
     files_to_omit = set(map(re.compile, {  # type: ignore
             '^meta\.xml$',
             '^Configurations2/',
+            '^Thumbnails/',
     }))
 
     def get_meta(self) -> Dict[str, str]:
