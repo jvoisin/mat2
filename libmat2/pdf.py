@@ -83,7 +83,9 @@ class PDFParser(abstract.AbstractParser):
             page_width, page_height = page.get_size()
             logging.info("Rendering page %d/%d", pagenum + 1, pages_count)
 
-            img_surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, int(page_width) * self.__scale, int(page_height) * self.__scale)
+            width = int(page_width) * self.__scale
+            height = int(page_height) * self.__scale
+            img_surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
             img_context = cairo.Context(img_surface)
 
             img_context.scale(self.__scale, self.__scale)

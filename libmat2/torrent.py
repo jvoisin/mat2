@@ -125,7 +125,7 @@ class _BencodeHandler(object):
         try:
             r, l = self.__decode_func[s[0]](s)
         except (IndexError, KeyError, ValueError) as e:
-            logging.debug("Not a valid bencoded string: %s" % e)
+            logging.debug("Not a valid bencoded string: %s", e)
             return None
         if l != b'':
             logging.debug("Invalid bencoded value (data after valid prefix)")

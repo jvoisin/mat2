@@ -37,10 +37,10 @@ def get_parser(filename: str) -> Tuple[Optional[T], Optional[str]]:
     if extension in unsupported_extensions:
         return None, mtype
 
-    for c in _get_parsers():  # type: ignore
-        if mtype in c.mimetypes:
+    for parser_class in _get_parsers():  # type: ignore
+        if mtype in parser_class.mimetypes:
             try:
-                return c(filename), mtype
+                return parser_class(filename), mtype
             except ValueError:
                 return None, mtype
     return None, mtype

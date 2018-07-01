@@ -15,9 +15,9 @@ from gi.repository import GdkPixbuf
 from . import abstract
 
 
-class __ImageParser(abstract.AbstractParser):
+class _ImageParser(abstract.AbstractParser):
     @staticmethod
-    def __handle_problematic_filename(filename:str, callback) -> str:
+    def __handle_problematic_filename(filename: str, callback) -> str:
         """ This method takes a filename with a problematic name,
         and safely applies it a `callback`."""
         tmpdirname = tempfile.mkdtemp()
@@ -42,7 +42,7 @@ class __ImageParser(abstract.AbstractParser):
             meta.pop(key, None)
         return meta
 
-class PNGParser(__ImageParser):
+class PNGParser(_ImageParser):
     mimetypes = {'image/png', }
     meta_whitelist = {'SourceFile', 'ExifToolVersion', 'FileName',
                       'Directory', 'FileSize', 'FileModifyDate',
@@ -65,7 +65,7 @@ class PNGParser(__ImageParser):
         return True
 
 
-class GdkPixbufAbstractParser(__ImageParser):
+class GdkPixbufAbstractParser(_ImageParser):
     """ GdkPixbuf can handle a lot of surfaces, so we're rending images on it,
         this has the side-effect of removing metadata completely.
     """

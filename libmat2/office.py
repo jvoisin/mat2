@@ -26,7 +26,7 @@ def _parse_xml(full_path: str):
     ns = parse_map(full_path)
 
     # Register the namespaces
-    for k,v in ns.items():
+    for k, v in ns.items():
         ET.register_namespace(k, v)
 
     return ET.parse(full_path), ns
@@ -35,11 +35,11 @@ def _parse_xml(full_path: str):
 class ArchiveBasedAbstractParser(abstract.AbstractParser):
     # Those are the files that have a format that _isn't_
     # supported by MAT2, but that we want to keep anyway.
-    files_to_keep = set()  # type: Set[str] 
+    files_to_keep = set()  # type: Set[str]
 
     # Those are the files that we _do not_ want to keep,
     # no matter if they are supported or not.
-    files_to_omit = set() # type: Set[Pattern] 
+    files_to_omit = set() # type: Set[Pattern]
 
     def __init__(self, filename):
         super().__init__(filename)
@@ -48,7 +48,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
         except zipfile.BadZipFile:
             raise ValueError
 
-    def _specific_cleanup(self, full_path:str) -> bool:
+    def _specific_cleanup(self, full_path: str) -> bool:
         """ This method can be used to apply specific treatment
         to files present in the archive."""
         return True
@@ -128,19 +128,19 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
         'application/vnd.openxmlformats-officedocument.presentationml.presentation'
     }
     files_to_keep = {
-            '[Content_Types].xml',
-            '_rels/.rels',
-            'word/_rels/document.xml.rels',
-            'word/document.xml',
-            'word/fontTable.xml',
-            'word/settings.xml',
-            'word/styles.xml',
+        '[Content_Types].xml',
+        '_rels/.rels',
+        'word/_rels/document.xml.rels',
+        'word/document.xml',
+        'word/fontTable.xml',
+        'word/settings.xml',
+        'word/styles.xml',
     }
     files_to_omit = set(map(re.compile, {  # type: ignore
-            '^docProps/',
+        '^docProps/',
     }))
 
-    def __remove_revisions(self, full_path:str) -> bool:
+    def __remove_revisions(self, full_path: str) -> bool:
         """ In this function, we're changing the XML
         document in two times, since we don't want
         to change the tree we're iterating on."""
@@ -152,7 +152,7 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
         elif tree.find('.//w:ins', ns) is None:
             return True
 
-        parent_map = {c:p for p in tree.iter( ) for c in p}
+        parent_map = {c:p for p in tree.iter() for c in p}
 
         elements = list([element for element in tree.iterfind('.//w:del', ns)])
         for element in elements:
@@ -174,7 +174,7 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
 
         return True
 
-    def _specific_cleanup(self, full_path:str) -> bool:
+    def _specific_cleanup(self, full_path: str) -> bool:
         if full_path.endswith('/word/document.xml'):
             return self.__remove_revisions(full_path)
         return True
@@ -214,21 +214,21 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
         'application/vnd.oasis.opendocument.image',
     }
     files_to_keep = {
-            'META-INF/manifest.xml',
-            'content.xml',
-            'manifest.rdf',
-            'mimetype',
-            'settings.xml',
-            'styles.xml',
+        'META-INF/manifest.xml',
+        'content.xml',
+        'manifest.rdf',
+        'mimetype',
+        'settings.xml',
+        'styles.xml',
     }
     files_to_omit = set(map(re.compile, {  # type: ignore
-            '^meta\.xml$',
-            '^Configurations2/',
-            '^Thumbnails/',
+        r'^meta\.xml$',
+        '^Configurations2/',
+        '^Thumbnails/',
     }))
 
 
-    def __remove_revisions(self, full_path:str) -> bool:
+    def __remove_revisions(self, full_path: str) -> bool:
         tree, ns = _parse_xml(full_path)
 
         if 'office' not in ns.keys():  # no revisions in the current file
@@ -242,7 +242,7 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
 
         return True
 
-    def _specific_cleanup(self, full_path:str) -> bool:
+    def _specific_cleanup(self, full_path: str) -> bool:
         if os.path.basename(full_path) == 'content.xml':
             return self.__remove_revisions(full_path)
         return True

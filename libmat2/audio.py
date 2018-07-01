@@ -10,11 +10,7 @@ class MutagenParser(abstract.AbstractParser):
         super().__init__(filename)
         try:
             mutagen.File(self.filename)
-        except mutagen.flac.MutagenError:
-            raise ValueError
-        except mutagen.mp3.MutagenError:
-            raise ValueError
-        except mutagen.ogg.MutagenError:
+        except mutagen.MutagenError:
             raise ValueError
 
     def get_meta(self):
@@ -47,4 +43,4 @@ class OGGParser(MutagenParser):
 
 
 class FLACParser(MutagenParser):
-    mimetypes = {'audio/flac', 'audio/x-flac' }
+    mimetypes = {'audio/flac', 'audio/x-flac'}
