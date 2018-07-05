@@ -1,3 +1,14 @@
+# 0.1.3 - 2018-07-06
+
+- Improve MAT2 resilience against corrupted images
+- Check that the minimal version of Poppler is available
+- Simplify how MAT2 deals with office files
+- Improve cleaning of office files
+	- Thumbnails are removed
+	- Revisions are removed
+- Add support for plain text files
+
+
 # 0.1.2 - 2018-06-21
 
 - Rename some files to ease the packaging
