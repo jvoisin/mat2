@@ -1,0 +1,1 @@
+I'm a file that can't have metadata, but I'm supposed to be supported anyway.

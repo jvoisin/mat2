@@ -12,8 +12,6 @@ unsupported_extensions = {
     '.pot',
     '.rdf',
     '.srt',
-    '.text',
-    '.txt',
     '.wsdl',
     '.xpdl',
     '.xsd',

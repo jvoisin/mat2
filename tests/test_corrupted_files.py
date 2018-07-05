@@ -18,11 +18,11 @@ class TestUnsupportedFiles(unittest.TestCase):
 
 class TestExplicitelyUnsupportedFiles(unittest.TestCase):
     def test_pdf(self):
-        shutil.copy('./tests/test_libmat2.py', './tests/clean.txt')
-        parser, mimetype = parser_factory.get_parser('./tests/data/clean.txt')
-        self.assertEqual(mimetype, 'text/plain')
+        shutil.copy('./tests/test_libmat2.py', './tests/data/clean.py')
+        parser, mimetype = parser_factory.get_parser('./tests/data/clean.py')
+        self.assertEqual(mimetype, 'text/x-python')
         self.assertEqual(parser, None)
-        os.remove('./tests/clean.txt')
+        os.remove('./tests/data/clean.py')
 
 
 class TestCorruptedFiles(unittest.TestCase):

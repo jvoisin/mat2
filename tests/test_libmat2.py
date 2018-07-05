@@ -6,7 +6,7 @@ import os
 import zipfile
 import tempfile
 
-from libmat2 import pdf, images, audio, office, parser_factory, torrent
+from libmat2 import pdf, images, audio, office, parser_factory, torrent, harmless
 
 
 class TestParserFactory(unittest.TestCase):
@@ -103,6 +103,12 @@ class TestGetMeta(unittest.TestCase):
         self.assertEqual(meta['meta:initial-creator'], 'jvoisin ')
         self.assertEqual(meta['meta:creation-date'], '2011-07-26T03:27:48')
         self.assertEqual(meta['meta:generator'], 'LibreOffice/3.3$Unix LibreOffice_project/330m19$Build-202')
+
+    def test_txt(self):
+        p, mimetype = parser_factory.get_parser('./tests/data/dirty.txt')
+        self.assertEqual(mimetype, 'text/plain')
+        meta = p.get_meta()
+        self.assertEqual(meta, {})
 
 
 class TestRemovingThumbnails(unittest.TestCase):
@@ -473,3 +479,19 @@ class TestCleaning(unittest.TestCase):
 
         os.remove('./tests/data/clean.odg')
         os.remove('./tests/data/clean.cleaned.odg')
+
+    def test_txt(self):
+        shutil.copy('./tests/data/dirty.txt', './tests/data/clean.txt')
+        p = harmless.HarmlessParser('./tests/data/clean.txt')
+
+        meta = p.get_meta()
+        self.assertEqual(meta, {})
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = harmless.HarmlessParser('./tests/data/clean.cleaned.txt')
+        self.assertEqual(p.get_meta(), {})
+
+        os.remove('./tests/data/clean.txt')
+        os.remove('./tests/data/clean.cleaned.txt')
