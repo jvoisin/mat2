@@ -4,7 +4,7 @@ import unittest
 import shutil
 import os
 
-from libmat2 import pdf, images, audio, office, parser_factory, torrent
+from libmat2 import pdf, images, audio, office, parser_factory, torrent, harmless
 
 
 class TestUnsupportedFiles(unittest.TestCase):
@@ -65,8 +65,7 @@ class TestCorruptedFiles(unittest.TestCase):
 
     def test_bmp(self):
         shutil.copy('./tests/data/dirty.png', './tests/data/clean.bmp')
-        with self.assertRaises(ValueError):
-             images.BMPParser('./tests/data/clean.bmp')
+        harmless.HarmlessParser('./tests/data/clean.bmp')
         os.remove('./tests/data/clean.bmp')
 
     def test_docx(self):

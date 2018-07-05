@@ -417,7 +417,7 @@ class TestCleaning(unittest.TestCase):
 
     def test_bmp(self):
         shutil.copy('./tests/data/dirty.bmp', './tests/data/clean.bmp')
-        p = images.BMPParser('./tests/data/clean.bmp')
+        p = harmless.HarmlessParser('./tests/data/clean.bmp')
 
         meta = p.get_meta()
         self.assertEqual(meta, {})  # bmp has no meta :)
@@ -425,7 +425,7 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = images.BMPParser('./tests/data/clean.cleaned.bmp')
+        p = harmless.HarmlessParser('./tests/data/clean.cleaned.bmp')
         self.assertEqual(p.get_meta(), {})
 
         os.remove('./tests/data/clean.bmp')
