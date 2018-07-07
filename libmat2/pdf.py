@@ -19,9 +19,9 @@ from . import abstract
 logging.basicConfig(level=logging.DEBUG)
 
 poppler_version = Poppler.get_version()
-if LooseVersion(poppler_version) < LooseVersion('0.46'):
+if LooseVersion(poppler_version) < LooseVersion('0.46'): # pragma: no cover
     raise ValueError("MAT2 needs at least Poppler version 0.46 to work. \
-The installed version is %s." % poppler_version)
+The installed version is %s." % poppler_version)  # pragma: no cover
 
 
 class PDFParser(abstract.AbstractParser):
