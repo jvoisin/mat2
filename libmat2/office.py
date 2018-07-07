@@ -51,7 +51,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
     def _specific_cleanup(self, full_path: str) -> bool:
         """ This method can be used to apply specific treatment
         to files present in the archive."""
-        return True
+        return True  # pragma: no cover
 
     def _clean_zipinfo(self, zipinfo: zipfile.ZipInfo) -> zipfile.ZipInfo:
         zipinfo.create_system = 3  # Linux
@@ -147,9 +147,9 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
         tree, ns = _parse_xml(full_path)
 
         # No revisions are present
-        if tree.find('.//w:del', ns) is None:
-            return True
-        elif tree.find('.//w:ins', ns) is None:
+        del_presence = tree.find('.//w:del', ns)
+        ins_presence = tree.find('.//w:ins', ns)
+        if del_presence is None and ins_presence is None:
             return True
 
         parent_map = {c:p for p in tree.iter() for c in p}
