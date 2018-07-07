@@ -85,3 +85,9 @@ class TestCorruptedFiles(unittest.TestCase):
         with self.assertRaises(ValueError):
              audio.MP3Parser('./tests/data/clean.mp3')
         os.remove('./tests/data/clean.mp3')
+
+    def test_jpg(self):
+        shutil.copy('./tests/data/dirty.mp3', './tests/data/clean.jpg')
+        with self.assertRaises(ValueError):
+             images.JPGParser('./tests/data/clean.jpg')
+        os.remove('./tests/data/clean.jpg')
