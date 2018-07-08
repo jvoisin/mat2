@@ -20,18 +20,18 @@ assert Pattern
 def _parse_xml(full_path: str):
     """ This function parse XML with namespace support. """
     def parse_map(f):  # etree support for ns is a bit rough
-        ns_map = dict()
-        for _, (k, v) in ET.iterparse(f, ("start-ns", )):
-            ns_map[k] = v
-        return ns_map
+        namespace_map = dict()
+        for _, (key, value) in ET.iterparse(f, ("start-ns", )):
+            namespace_map[key] = value
+        return namespace_map
 
-    ns = parse_map(full_path)
+    namespace_map = parse_map(full_path)
 
     # Register the namespaces
-    for k, v in ns.items():
-        ET.register_namespace(k, v)
+    for key, value in namespace_map.items():
+        ET.register_namespace(key, value)
 
-    return ET.parse(full_path), ns
+    return ET.parse(full_path), namespace_map
 
 
 class ArchiveBasedAbstractParser(abstract.AbstractParser):
@@ -53,15 +53,18 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
     def _specific_cleanup(self, full_path: str) -> bool:
         """ This method can be used to apply specific treatment
         to files present in the archive."""
+        # pylint: disable=unused-argument,no-self-use
         return True  # pragma: no cover
 
-    def _clean_zipinfo(self, zipinfo: zipfile.ZipInfo) -> zipfile.ZipInfo:
+    @staticmethod
+    def _clean_zipinfo(zipinfo: zipfile.ZipInfo) -> zipfile.ZipInfo:
         zipinfo.create_system = 3  # Linux
         zipinfo.comment = b''
         zipinfo.date_time = (1980, 1, 1, 0, 0, 0)
         return zipinfo
 
-    def _get_zipinfo_meta(self, zipinfo: zipfile.ZipInfo) -> Dict[str, str]:
+    @staticmethod
+    def _get_zipinfo_meta(zipinfo: zipfile.ZipInfo) -> Dict[str, str]:
         metadata = {}
         if zipinfo.create_system == 3:
             #metadata['create_system'] = 'Linux'
@@ -142,29 +145,30 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
         '^docProps/',
     }))
 
-    def __remove_revisions(self, full_path: str) -> bool:
+    @staticmethod
+    def __remove_revisions(full_path: str) -> bool:
         """ In this function, we're changing the XML
         document in two times, since we don't want
         to change the tree we're iterating on."""
         try:
-            tree, ns = _parse_xml(full_path)
+            tree, namespace = _parse_xml(full_path)
         except ET.ParseError:
             return False
 
         # No revisions are present
-        del_presence = tree.find('.//w:del', ns)
-        ins_presence = tree.find('.//w:ins', ns)
+        del_presence = tree.find('.//w:del', namespace)
+        ins_presence = tree.find('.//w:ins', namespace)
         if del_presence is None and ins_presence is None:
             return True
 
         parent_map = {c:p for p in tree.iter() for c in p}
 
-        elements = list([element for element in tree.iterfind('.//w:del', ns)])
+        elements = list([element for element in tree.iterfind('.//w:del', namespace)])
         for element in elements:
             parent_map[element].remove(element)
 
         elements = list()
-        for element in tree.iterfind('.//w:ins', ns):
+        for element in tree.iterfind('.//w:ins', namespace):
             for position, item in enumerate(tree.iter()):  #pragma: no cover
                 if item == element:
                     for children in element.iterfind('./*'):
@@ -231,17 +235,18 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
     }))
 
 
-    def __remove_revisions(self, full_path: str) -> bool:
+    @staticmethod
+    def __remove_revisions(full_path: str) -> bool:
         try:
-            tree, ns = _parse_xml(full_path)
+            tree, namespace = _parse_xml(full_path)
         except ET.ParseError:
             return False
 
-        if 'office' not in ns.keys():  # no revisions in the current file
+        if 'office' not in namespace.keys():  # no revisions in the current file
             return True
 
-        for text in tree.getroot().iterfind('.//office:text', ns):
-            for changes in text.iterfind('.//text:tracked-changes', ns):
+        for text in tree.getroot().iterfind('.//office:text', namespace):
+            for changes in text.iterfind('.//text:tracked-changes', namespace):
                 text.remove(changes)
 
         tree.write(full_path, xml_declaration=True)
