@@ -4,8 +4,11 @@ import shutil
 import tempfile
 import datetime
 import zipfile
-import xml.etree.ElementTree as ET
 from typing import Dict, Set, Pattern
+try:  # protect against DoS
+    from defusedxml import ElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
 
 
 from . import abstract, parser_factory
