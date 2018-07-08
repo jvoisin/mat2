@@ -1,0 +1,16 @@
+[FORMAT]
+good-names=e,f,i,x,s
+max-locals=20
+
+[MESSAGES CONTROL]
+disable=
+    fixme,
+    invalid-name,
+    missing-docstring,
+    protected-access,
+		abstract-method,
+		wrong-import-position,
+		catching-non-exception,
+		cell-var-from-loop,
+		locally-disabled,
+		invalid-sequence-index,  # pylint doesn't like things like `Tuple[int, bytes]` in type annotation
