@@ -104,6 +104,11 @@ class TestGetMeta(unittest.TestCase):
         self.assertEqual(meta['meta:creation-date'], '2011-07-26T03:27:48')
         self.assertEqual(meta['meta:generator'], 'LibreOffice/3.3$Unix LibreOffice_project/330m19$Build-202')
 
+        p = office.LibreOfficeParser('./tests/data/weird_producer.odt')
+        meta = p.get_meta()
+        self.assertEqual(meta['create_system'], 'Windows')
+        self.assertEqual(meta['comment'], b'YAY FOR COMMENTS')
+
     def test_txt(self):
         p, mimetype = parser_factory.get_parser('./tests/data/dirty.txt')
         self.assertEqual(mimetype, 'text/plain')
