@@ -21,7 +21,7 @@ def _parse_xml(full_path: str):
     """ This function parse XML with namespace support. """
     def parse_map(f):  # etree support for ns is a bit rough
         ns_map = dict()
-        for event, (k, v) in ET.iterparse(f, ("start-ns", )):
+        for _, (k, v) in ET.iterparse(f, ("start-ns", )):
             ns_map[k] = v
         return ns_map
 

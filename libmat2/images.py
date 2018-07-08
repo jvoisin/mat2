@@ -5,6 +5,7 @@ import os
 import shutil
 import tempfile
 import re
+from typing import Set
 
 import cairo
 
@@ -14,8 +15,12 @@ from gi.repository import GdkPixbuf
 
 from . import abstract
 
+# Make pyflakes happy
+assert Set
 
 class _ImageParser(abstract.AbstractParser):
+    meta_whitelist = set()  # type: Set[str]
+
     @staticmethod
     def __handle_problematic_filename(filename: str, callback) -> str:
         """ This method takes a filename with a problematic name,

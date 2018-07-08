@@ -17,17 +17,17 @@ class TorrentParser(abstract.AbstractParser):
 
     def get_meta(self) -> Dict[str, str]:
         metadata = {}
-        for k, v in self.dict_repr.items():
-            if k not in self.whitelist:
-                metadata[k.decode('utf-8')] = v
+        for key, value in self.dict_repr.items():
+            if key not in self.whitelist:
+                metadata[key.decode('utf-8')] = value
         return metadata
 
 
     def remove_all(self) -> bool:
         cleaned = dict()
-        for k, v in self.dict_repr.items():
-            if k in self.whitelist:
-                cleaned[k] = v
+        for key, value in self.dict_repr.items():
+            if key in self.whitelist:
+                cleaned[key] = value
         with open(self.output_filename, 'wb') as f:
             f.write(_BencodeHandler().bencode(cleaned))
         self.dict_repr = cleaned  # since we're stateful
@@ -78,20 +78,20 @@ class _BencodeHandler(object):
         return s[colon:colon+str_len], s[colon+str_len:]
 
     def __decode_list(self, s: bytes) -> Tuple[list, bytes]:
-        r = list()
+        ret = list()
         s = s[1:]  # skip leading `l`
         while s[0] != ord('e'):
-            v, s = self.__decode_func[s[0]](s)
-            r.append(v)
-        return r, s[1:]
+            value, s = self.__decode_func[s[0]](s)
+            ret.append(value)
+        return ret, s[1:]
 
     def __decode_dict(self, s: bytes) -> Tuple[dict, bytes]:
-        r = dict()
+        ret = dict()
         s = s[1:]  # skip leading `d`
         while s[0] != ord(b'e'):
-            k, s = self.__decode_string(s)
-            r[k], s = self.__decode_func[s[0]](s)
-        return r, s[1:]
+            key, s = self.__decode_string(s)
+            ret[key], s = self.__decode_func[s[0]](s)
+        return ret, s[1:]
 
     @staticmethod
     def __encode_int(x: bytes) -> bytes:
@@ -109,9 +109,9 @@ class _BencodeHandler(object):
 
     def __encode_dict(self, x: dict) -> bytes:
         ret = b''
-        for k, v in sorted(x.items()):
-            ret += self.__encode_func[type(k)](k)
-            ret += self.__encode_func[type(v)](v)
+        for key, value in sorted(x.items()):
+            ret += self.__encode_func[type(key)](key)
+            ret += self.__encode_func[type(value)](value)
         return b'd' + ret + b'e'
 
     def bencode(self, s: Union[dict, list, bytes, int]) -> bytes:
@@ -119,11 +119,11 @@ class _BencodeHandler(object):
 
     def bdecode(self, s: bytes) -> Union[dict, None]:
         try:
-            r, l = self.__decode_func[s[0]](s)
+            ret, trail = self.__decode_func[s[0]](s)
         except (IndexError, KeyError, ValueError) as e:
             logging.debug("Not a valid bencoded string: %s", e)
             return None
-        if l != b'':
+        if trail != b'':
             logging.debug("Invalid bencoded value (data after valid prefix)")
             return None
-        return r
+        return ret

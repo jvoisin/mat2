@@ -4,7 +4,7 @@ import mimetypes
 import importlib
 from typing import TypeVar, List, Tuple, Optional
 
-from . import abstract, unsupported_extensions
+from . import abstract, UNSUPPORTED_EXTENSIONS
 
 assert Tuple  # make pyflakes happy
 
@@ -34,7 +34,7 @@ def get_parser(filename: str) -> Tuple[Optional[T], Optional[str]]:
     mtype, _ = mimetypes.guess_type(filename)
 
     _, extension = os.path.splitext(filename)
-    if extension in unsupported_extensions:
+    if extension in UNSUPPORTED_EXTENSIONS:
         return None, mtype
 
     for parser_class in _get_parsers():  # type: ignore
