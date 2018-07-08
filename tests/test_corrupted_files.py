@@ -54,6 +54,26 @@ class TestCorruptedFiles(unittest.TestCase):
         with self.assertRaises(ValueError):
             torrent.TorrentParser('./tests/data/clean.torrent')
 
+        with open("./tests/data/clean.torrent", "w") as f:
+            f.write("i-0e")
+        with self.assertRaises(ValueError):
+            torrent.TorrentParser('./tests/data/clean.torrent')
+
+        with open("./tests/data/clean.torrent", "w") as f:
+            f.write("i00e")
+        with self.assertRaises(ValueError):
+            torrent.TorrentParser('./tests/data/clean.torrent')
+
+        with open("./tests/data/clean.torrent", "w") as f:
+            f.write("d01:AAAAAAAAA")
+        with self.assertRaises(ValueError):
+            torrent.TorrentParser('./tests/data/clean.torrent')
+
+        with open("./tests/data/clean.torrent", "w") as f:
+            f.write("1:aaa")
+        with self.assertRaises(ValueError):
+            torrent.TorrentParser('./tests/data/clean.torrent')
+
         os.remove('./tests/data/clean.torrent')
 
     def test_odg(self):

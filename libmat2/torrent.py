@@ -60,8 +60,6 @@ class _BencodeHandler(object):
     def __decode_int(s: bytes) -> Tuple[int, bytes]:
         s = s[1:]
         next_idx = s.index(b'e')
-        if next_idx is None:
-            raise ValueError  # missing suffix
         if s.startswith(b'-0'):
             raise ValueError  # negative zero doesn't exist
         elif s.startswith(b'0') and next_idx != 1:
@@ -70,16 +68,13 @@ class _BencodeHandler(object):
 
     @staticmethod
     def __decode_string(s: bytes) -> Tuple[bytes, bytes]:
-        sep = s.index(b':')
-        if set is None:
-            raise ValueError  # missing suffix
-        str_len = int(s[:sep])
-        if str_len < 0:
-            raise ValueError
-        elif s[0] == b'0' and sep != 1:
+        colon = s.index(b':')
+        str_len = int(s[:colon])
+        print('S: %s' % s)
+        if s[0] == '0' and colon != 1:
             raise ValueError
         s = s[1:]
-        return s[sep:sep+str_len], s[sep+str_len:]
+        return s[colon:colon+str_len], s[colon+str_len:]
 
     def __decode_list(self, s: bytes) -> Tuple[list, bytes]:
         r = list()
