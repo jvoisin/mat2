@@ -8,13 +8,16 @@ class TorrentParser(abstract.AbstractParser):
     mimetypes = {'application/x-bittorrent', }
     whitelist = {b'announce', b'announce-list', b'info'}
 
+    def __init__(self, filename):
+        super().__init__(filename)
+        with open(self.filename, 'rb') as f:
+            self.dict_repr = _BencodeHandler().bdecode(f.read())
+        if self.dict_repr is None:
+            raise ValueError
+
     def get_meta(self) -> Dict[str, str]:
         metadata = {}
-        with open(self.filename, 'rb') as f:
-            d = _BencodeHandler().bdecode(f.read())
-        if d is None:
-            return {'Unknown meta': 'Unable to parse torrent file "%s".' % self.filename}
-        for k, v in d.items():
+        for k, v in self.dict_repr.items():
             if k not in self.whitelist:
                 metadata[k.decode('utf-8')] = v
         return metadata
@@ -22,15 +25,12 @@ class TorrentParser(abstract.AbstractParser):
 
     def remove_all(self) -> bool:
         cleaned = dict()
-        with open(self.filename, 'rb') as f:
-            d = _BencodeHandler().bdecode(f.read())
-        if d is None:
-            return False
-        for k, v in d.items():
+        for k, v in self.dict_repr.items():
             if k in self.whitelist:
                 cleaned[k] = v
         with open(self.output_filename, 'wb') as f:
             f.write(_BencodeHandler().bencode(cleaned))
+        self.dict_repr = cleaned  # since we're stateful
         return True
 
 

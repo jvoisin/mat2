@@ -46,15 +46,14 @@ class TestCorruptedFiles(unittest.TestCase):
 
     def test_torrent(self):
         shutil.copy('./tests/data/dirty.png', './tests/data/clean.torrent')
-        p = torrent.TorrentParser('./tests/data/clean.torrent')
-        self.assertFalse(p.remove_all())
-        expected = {'Unknown meta': 'Unable to parse torrent file "./tests/data/clean.torrent".'}
-        self.assertEqual(p.get_meta(), expected)
+        with self.assertRaises(ValueError):
+            torrent.TorrentParser('./tests/data/clean.torrent')
 
         with open("./tests/data/clean.torrent", "a") as f:
             f.write("trailing garbage")
-        p = torrent.TorrentParser('./tests/data/clean.torrent')
-        self.assertEqual(p.get_meta(), expected)
+        with self.assertRaises(ValueError):
+            torrent.TorrentParser('./tests/data/clean.torrent')
+
         os.remove('./tests/data/clean.torrent')
 
     def test_odg(self):
