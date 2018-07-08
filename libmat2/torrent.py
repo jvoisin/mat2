@@ -70,7 +70,6 @@ class _BencodeHandler(object):
     def __decode_string(s: bytes) -> Tuple[bytes, bytes]:
         colon = s.index(b':')
         str_len = int(s[:colon])
-        print('S: %s' % s)
         if s[0] == '0' and colon != 1:
             raise ValueError
         s = s[1:]
