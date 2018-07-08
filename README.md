@@ -44,7 +44,7 @@ $ python3 -m unittest discover -v
 # How to use MAT2
 
 ```bash
-usage: mat2 [-h] [-v] [-l] [-c | -s | -L] [files [files ...]]
+usage: mat2 [-h] [-v] [-l] [-s | -L] [files [files ...]]
 
 Metadata anonymisation toolkit 2
 
@@ -55,15 +55,24 @@ optional arguments:
   -h, --help         show this help message and exit
   -v, --version      show program's version number and exit
   -l, --list         list all supported fileformats
-  -c, --check        check if a file is free of harmful metadatas
   -s, --show         list all the harmful metadata of a file without removing
                      them
   -L, --lightweight  remove SOME metadata
 ```
 
+# Notes about detecting metadata
+
+While MAT2 is doing its very best to display metadata when the `--show` flag is
+passed, it doesn't mean that a file is clean from any metadata if MAT2 doesn't
+show any. There is no reliable way to detect every single possible metadata for
+complex file formats.
+
+This is why you shouldn't rely on metadata's presence to decide if your file must
+be cleaned or not.
+
 # Related software
 
-- The first iteration of [MAT](http://mat.boum.org)
+- The first iteration of [MAT](https://mat.boum.org)
 - [Exiftool](https://sno.phy.queensu.ca/~phil/exiftool/mat)
 - [pdf-redact-tools](https://github.com/firstlookmedia/pdf-redact-tools), that
 	tries to deal with *printer dots* too.
