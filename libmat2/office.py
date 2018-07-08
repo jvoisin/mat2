@@ -147,7 +147,10 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
         """ In this function, we're changing the XML
         document in two times, since we don't want
         to change the tree we're iterating on."""
-        tree, ns = _parse_xml(full_path)
+        try:
+            tree, ns = _parse_xml(full_path)
+        except ET.ParseError:
+            return False
 
         # No revisions are present
         del_presence = tree.find('.//w:del', ns)
@@ -191,15 +194,13 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
         zipin = zipfile.ZipFile(self.filename)
         for item in zipin.infolist():
             if item.filename.startswith('docProps/') and item.filename.endswith('.xml'):
-                content = zipin.read(item).decode('utf-8')
                 try:
+                    content = zipin.read(item).decode('utf-8')
                     results = re.findall(r"<(.+)>(.+)</\1>", content, re.I|re.M)
                     for (key, value) in results:
                         metadata[key] = value
-                except TypeError:  # We didn't manage to parse the xml file
-                    pass
-                if not metadata:  # better safe than sorry
-                    metadata[item] = 'harmful content'
+                except (TypeError, UnicodeDecodeError):  # We didn't manage to parse the xml file
+                    metadata[item.filename] = 'harmful content'
             for key, value in self._get_zipinfo_meta(item).items():
                 metadata[key] = value
         zipin.close()
@@ -232,7 +233,10 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
 
 
     def __remove_revisions(self, full_path: str) -> bool:
-        tree, ns = _parse_xml(full_path)
+        try:
+            tree, ns = _parse_xml(full_path)
+        except ET.ParseError:
+            return False
 
         if 'office' not in ns.keys():  # no revisions in the current file
             return True
@@ -259,15 +263,13 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
         zipin = zipfile.ZipFile(self.filename)
         for item in zipin.infolist():
             if item.filename == 'meta.xml':
-                content = zipin.read(item).decode('utf-8')
                 try:
+                    content = zipin.read(item).decode('utf-8')
                     results = re.findall(r"<((?:meta|dc|cp).+?)>(.+)</\1>", content, re.I|re.M)
                     for (key, value) in results:
                         metadata[key] = value
-                except TypeError:  # We didn't manage to parse the xml file
-                    pass
-                if not metadata:  # better safe than sorry
-                    metadata[item] = 'harmful content'
+                except (TypeError, UnicodeDecodeError):  # We didn't manage to parse the xml file
+                    metadata[item.filename] = 'harmful content'
             for key, value in self._get_zipinfo_meta(item).items():
                 metadata[key] = value
         zipin.close()

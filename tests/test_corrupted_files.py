@@ -15,6 +15,21 @@ class TestUnsupportedFiles(unittest.TestCase):
         self.assertEqual(parser, None)
         os.remove('./tests/clean.py')
 
+class TestCorruptedEmbedded(unittest.TestCase):
+    def test_docx(self):
+        shutil.copy('./tests/data/embedded_corrupted.docx', './tests/data/clean.docx')
+        parser, mimetype = parser_factory.get_parser('./tests/data/clean.docx')
+        self.assertFalse(parser.remove_all())
+        self.assertIsNotNone(parser.get_meta())
+        os.remove('./tests/data/clean.docx')
+
+    def test_odt(self):
+        shutil.copy('./tests/data/embedded_corrupted.odt', './tests/data/clean.odt')
+        parser, mimetype = parser_factory.get_parser('./tests/data/clean.odt')
+        self.assertFalse(parser.remove_all())
+        self.assertEqual(parser.get_meta(), {'create_system': 'Weird', 'date_time': '2018-06-10 17:18:18', 'meta.xml': 'harmful content'})
+        os.remove('./tests/data/clean.odt')
+
 
 class TestExplicitelyUnsupportedFiles(unittest.TestCase):
     def test_pdf(self):
