@@ -22,8 +22,7 @@ def _parse_xml(full_path: str):
     def parse_map(f):  # etree support for ns is a bit rough
         ns_map = dict()
         for event, (k, v) in ET.iterparse(f, ("start-ns", )):
-            if event == "start-ns":
-                ns_map[k] = v
+            ns_map[k] = v
         return ns_map
 
     ns = parse_map(full_path)
@@ -166,7 +165,7 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
 
         elements = list()
         for element in tree.iterfind('.//w:ins', ns):
-            for position, item in enumerate(tree.iter()):
+            for position, item in enumerate(tree.iter()):  #pragma: no cover
                 if item == element:
                     for children in element.iterfind('./*'):
                         elements.append((element, position, children))

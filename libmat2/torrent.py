@@ -69,9 +69,11 @@ class _BencodeHandler(object):
     @staticmethod
     def __decode_string(s: bytes) -> Tuple[bytes, bytes]:
         colon = s.index(b':')
-        str_len = int(s[:colon])
-        if s[0] == '0' and colon != 1:
+        # FIXME Python3 is broken here, the call to `ord` shouldn't be needed,
+        # but apparently it is. This is utterly idiotic.
+        if (s[0] == ord('0') or s[0] == '0') and colon != 1:
             raise ValueError
+        str_len = int(s[:colon])
         s = s[1:]
         return s[colon:colon+str_len], s[colon+str_len:]
 

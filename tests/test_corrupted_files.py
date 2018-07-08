@@ -80,7 +80,7 @@ class TestCorruptedFiles(unittest.TestCase):
             torrent.TorrentParser('./tests/data/clean.torrent')
 
         with open("./tests/data/clean.torrent", "w") as f:
-            f.write("d01:AAAAAAAAA")
+            f.write("01:AAAAAAAAA")
         with self.assertRaises(ValueError):
             torrent.TorrentParser('./tests/data/clean.torrent')
 
