@@ -9,7 +9,7 @@ import argparse
 import multiprocessing
 
 try:
-    from libmat2 import parser_factory, UNSUPPORTED_EXTENSIONS
+    from libmat2 import parser_factory, UNSUPPORTED_EXTENSIONS, check_dependencies
 except ValueError as e:
     print(e)
     sys.exit(1)
@@ -36,6 +36,9 @@ def create_arg_parser():
                         version='MAT2 %s' % __version__)
     parser.add_argument('-l', '--list', action='store_true',
                         help='list all supported fileformats')
+    parser.add_argument('-c', '--check-dependencies', action='store_true',
+                      help='check if MAT2 has all the dependencies it needs')
+
 
     info = parser.add_mutually_exclusive_group()
     info.add_argument('-s', '--show', action='store_true',
@@ -108,9 +111,14 @@ def main():
     args = arg_parser.parse_args()
 
     if not args.files:
-        if not args.list:
+        if args.list:
+            show_parsers()
+        elif args.check_dependencies:
+            print("Dependencies required for MAT2 %s:" % __version__)
+            for key, value in sorted(check_dependencies().items()):
+                print('- %s: %s' % (key, 'yes' if value else 'no'))
+        else:
             return arg_parser.print_help()
-        show_parsers()
         return 0
 
     elif args.show:

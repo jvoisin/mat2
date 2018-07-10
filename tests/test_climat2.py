@@ -8,12 +8,12 @@ class TestHelp(unittest.TestCase):
     def test_help(self):
         proc = subprocess.Popen(['./mat2', '--help'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'usage: mat2 [-h] [-v] [-l] [-s | -L] [files [files ...]]', stdout)
+        self.assertIn(b'usage: mat2 [-h] [-v] [-l] [-c] [-s | -L] [files [files ...]]', stdout)
 
     def test_no_arg(self):
         proc = subprocess.Popen(['./mat2'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'usage: mat2 [-h] [-v] [-l] [-s | -L] [files [files ...]]', stdout)
+        self.assertIn(b'usage: mat2 [-h] [-v] [-l] [-c] [-s | -L] [files [files ...]]', stdout)
 
 
 class TestVersion(unittest.TestCase):
@@ -22,6 +22,11 @@ class TestVersion(unittest.TestCase):
         stdout, _ = proc.communicate()
         self.assertTrue(stdout.startswith(b'MAT2 '))
 
+class TestDependencies(unittest.TestCase):
+    def test_dependencies(self):
+        proc = subprocess.Popen(['./mat2', '--check-dependencies'], stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+        self.assertTrue(b'MAT2' in stdout)
 
 class TestReturnValue(unittest.TestCase):
     def test_nonzero(self):

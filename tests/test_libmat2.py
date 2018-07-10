@@ -7,6 +7,14 @@ import zipfile
 import tempfile
 
 from libmat2 import pdf, images, audio, office, parser_factory, torrent, harmless
+from libmat2 import check_dependencies
+
+
+class TestCheckDependencies(unittest.TestCase):
+    def test_deps(self):
+        ret = check_dependencies()
+        for key, value in ret.items():
+            self.assertTrue(value)
 
 
 class TestParserFactory(unittest.TestCase):
