@@ -1,3 +1,12 @@
+# 0.2.0 - 2018-07-010
+
+- Fix various crashes dues to malformed files
+- Simplify various code-paths
+- Remove superfluous debug message
+- Remove the `--check` option that never was implemented anyway
+- Add a `-c` option to check for MAT2's dependencies
+
+
 # 0.1.3 - 2018-07-06
 
 - Improve MAT2 resilience against corrupted images
