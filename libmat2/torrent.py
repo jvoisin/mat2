@@ -3,6 +3,8 @@ from typing import Union, Tuple, Dict
 
 from . import abstract
 
+logging.basicConfig(level=logging.ERROR)
+
 
 class TorrentParser(abstract.AbstractParser):
     mimetypes = {'application/x-bittorrent', }

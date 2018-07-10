@@ -195,7 +195,6 @@ class TestDeepCleaning(unittest.TestCase):
                 inside_p, _ = parser_factory.get_parser(complete_path)
                 if inside_p is None:
                     continue
-                print('[+] %s is clean inside %s' %(complete_path, p.filename))
                 self.assertEqual(inside_p.get_meta(), {})
         shutil.rmtree(tempdir)
 

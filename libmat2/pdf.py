@@ -16,7 +16,7 @@ from gi.repository import Poppler, GLib
 
 from . import abstract
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.ERROR)
 
 poppler_version = Poppler.get_version()
 if LooseVersion(poppler_version) < LooseVersion('0.46'): # pragma: no cover
