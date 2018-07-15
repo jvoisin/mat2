@@ -31,6 +31,7 @@ DEPENDENCIES = {
     'gi': 'PyGobject',
     'gi.repository.GdkPixbuf': 'GdkPixbuf from PyGobject',
     'gi.repository.Poppler': 'Poppler from PyGobject',
+    'gi.repository.GLib': 'GLib from PyGobject',
     'mutagen': 'Mutagen',
     }
 
