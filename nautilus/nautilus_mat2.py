@@ -57,7 +57,7 @@ class StatusWindow(Gtk.Window):
         label = Gtk.Label(xalign=0)
         label.set_markup("Lightweight mode (only remove <i>some</i> metadata)")
         hbox.pack_start(label, False, True, 0)
-        hbox.pack_start(Gtk.CheckButton(), False, True, 0)
+        hbox.pack_start(Gtk.Switch(), False, True, 0)
 
         self.window.show_all()
 
