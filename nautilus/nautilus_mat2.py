@@ -125,12 +125,6 @@ class ColumnExtension(GObject.GObject, Nautilus.MenuProvider):
             return False
         return True
 
-    def __validate_set(self, files):
-        for f in files:
-            if self.__validate(f):
-                return True
-        return False
-
     def menu_activate_cb(self, menu, files):
         items = list(map(lambda x: unquote(x.get_uri()[7:]), files))
         StatusWindow(items)
@@ -142,7 +136,7 @@ class ColumnExtension(GObject.GObject, Nautilus.MenuProvider):
     def get_file_items(self, window, files):
         # Do not show the menu item if not a single file has a chance to be
         # processed by mat2.
-        if not self.__validate_set(files):
+        if not any(map(self.__validate, files)):
             return
 
         item = Nautilus.MenuItem(
