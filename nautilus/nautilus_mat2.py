@@ -3,8 +3,9 @@
 import gi
 gi.require_version('Nautilus', '3.0')
 gi.require_version('Gtk', '3.0')
-from gi.repository import Nautilus, GObject, Gtk
+from gi.repository import Nautilus, GObject, Gtk, Gio
 from urllib.parse import unquote
+import mimetypes
 
 import os
 
@@ -45,7 +46,19 @@ class StatusWindow(Gtk.Window):
         self.main_box.pack_start(listbox, True, True, 0)
         listbox.set_selection_mode(Gtk.SelectionMode.NONE)
         for i in self.items:
-            listbox.add(Gtk.Label(os.path.basename(i), xalign=0))
+            row = Gtk.ListBoxRow()
+            hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+            row.add(hbox)
+            mtype, _ = mimetypes.guess_type(i)
+            if mtype is None:
+                icon = Gio.content_type_get_icon ('text/plain')
+            else:
+                icon = Gio.content_type_get_icon (mtype)
+            select_image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+            hbox.pack_start(select_image, False, False, 0)
+            label = Gtk.Label(os.path.basename(i))
+            hbox.pack_start(label, True, False, 0)
+            listbox.add(row)
         listbox.show_all()
 
         # Options
