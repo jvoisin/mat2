@@ -46,18 +46,23 @@ class StatusWindow(Gtk.Window):
         self.main_box.pack_start(listbox, True, True, 0)
         listbox.set_selection_mode(Gtk.SelectionMode.NONE)
         for i in self.items:
+            p, mtype = parser_factory.get_parser(i)
+
             row = Gtk.ListBoxRow()
             hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
             row.add(hbox)
-            mtype, _ = mimetypes.guess_type(i)
-            if mtype is None:
-                icon = Gio.content_type_get_icon ('text/plain')
-            else:
-                icon = Gio.content_type_get_icon (mtype)
+
+            icon = Gio.content_type_get_icon ('text/plain' if not mtype else mtype)
             select_image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
             hbox.pack_start(select_image, False, False, 0)
+
+            image = Gtk.Image()
+            image.set_from_stock(Gtk.STOCK_NO if not p else Gtk.STOCK_YES, Gtk.IconSize.BUTTON)
+            hbox.pack_start(image, False, False, 0)
+
             label = Gtk.Label(os.path.basename(i))
             hbox.pack_start(label, True, False, 0)
+
             listbox.add(row)
         listbox.show_all()
 
