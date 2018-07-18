@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+# TODO:
+# - Test with a large amount of files.
+# - Show a progression bar when the removal takes time.
+# - Improve the MessageDialog list for failed items.
+
 import os
 from urllib.parse import unquote
 
@@ -8,46 +13,65 @@ gi.require_version('Nautilus', '3.0')
 gi.require_version('Gtk', '3.0')
 from gi.repository import Nautilus, GObject, Gtk, Gio
 
-
 from libmat2 import parser_factory
 
 class Mat2Wrapper():
     def __init__(self, filepath):
-        self.filepath = filepath
+        self.__filepath = filepath
 
-class StatusWindow(Gtk.Window):
-    def __init__(self, items):
-        self.window = Gtk.Window()
-        self.window.set_border_width(10)
+    def remove_metadata(self):
+        parser, mtype = parser_factory.get_parser(self.__filepath)
+        if parser is None:
+            return False, mtype
+        return parser.remove_all(), mtype
 
-        self.items = items
-        self.confirm_window()
+class ColumnExtension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationWidgetProvider):
+    def notify(self):
+        self.infobar_msg.set_text("Failed to clean some items")
+        self.infobar.show_all()
 
-    def confirm_window(self):
-        # Header bar
+    def get_widget(self, uri, window):
+        self.infobar = Gtk.InfoBar()
+        self.infobar.set_message_type(Gtk.MessageType.ERROR)
+        self.infobar.set_show_close_button(True)
+        self.infobar.connect("response", self.__cb_infobar_response)
+
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        self.infobar.get_content_area().pack_start(hbox, False, False, 0)
+
+        btn = Gtk.Button("Show")
+        btn.connect("clicked", self.__cb_show_failed)
+        self.infobar.get_content_area().pack_end(btn, False, False, 0)
+
+        self.infobar_msg = Gtk.Label()
+        hbox.pack_start(self.infobar_msg, False, False, 0)
+
+        return self.infobar
+
+    def __cb_infobar_response(self, infobar, response):
+        if response == Gtk.ResponseType.CLOSE:
+            self.infobar.hide()
+
+    def __cb_show_failed(self, button):
+        self.infobar.hide()
+
+        window = Gtk.Window()
         hb = Gtk.HeaderBar()
-        self.window.set_titlebar(hb)
-        hb.props.title = "Remove metadata"
+        window.set_titlebar(hb)
+        hb.props.title = "Metadata removal failed"
 
-        cancel = Gtk.Button("Cancel")
-        cancel.connect("clicked", self.cancel_btn)
-        hb.pack_start(cancel)
+        exit_buton = Gtk.Button("Exit")
+        exit_buton.connect("clicked", lambda _: window.close())
+        hb.pack_end(exit_buton)
 
-        self.remove = Gtk.Button("Remove")
-        self.remove.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
-        self.remove.connect("clicked", self.remove_btn)
-        hb.pack_end(self.remove)
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        window.add(box)
 
-        self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.window.add(self.main_box)
-
-        # List of files to clean
         listbox = Gtk.ListBox()
-        self.main_box.pack_start(listbox, True, True, 0)
         listbox.set_selection_mode(Gtk.SelectionMode.NONE)
-        for i in self.items:
-            p, mtype = parser_factory.get_parser(i)
+        box.pack_start(listbox, True, True, 0)
 
+        for i, mtype in self.failed_items:
             row = Gtk.ListBoxRow()
             hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
             row.add(hbox)
@@ -56,78 +80,37 @@ class StatusWindow(Gtk.Window):
             select_image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
             hbox.pack_start(select_image, False, False, 0)
 
-            image = Gtk.Image()
-            image.set_from_stock(Gtk.STOCK_NO if not p else Gtk.STOCK_YES, Gtk.IconSize.BUTTON)
-            hbox.pack_start(image, False, False, 0)
-
             label = Gtk.Label(os.path.basename(i))
             hbox.pack_start(label, True, False, 0)
 
             listbox.add(row)
+
         listbox.show_all()
+        window.show_all()
 
-        # Options
-        separator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
-        self.main_box.pack_start(separator, True, True, 5)
 
-        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        self.main_box.pack_start(hbox, True, True, 0)
-        label = Gtk.Label(xalign=0)
-        label.set_markup("Lightweight mode (only remove <i>some</i> metadata)")
-        hbox.pack_start(label, False, True, 0)
-        hbox.pack_start(Gtk.Switch(), False, True, 0)
-
-        self.window.show_all()
-
-    def error_window(self, items):
-        self.window.remove(self.main_box)
-
-        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.window.add(box)
-
-        # Disclaimer
-        box.pack_start(Gtk.Label("Could not remove metadata from the following items:",
-                                 xalign=0), True, True, 0)
-
-        # List of failed files
-        listbox = Gtk.ListBox()
-        box.pack_start(listbox, True, True, 0)
-        listbox.set_selection_mode(Gtk.SelectionMode.NONE)
-        for i in items:
-            listbox.add(Gtk.Label(os.path.basename(i), xalign=0))
-        listbox.show_all()
-
-        self.window.show_all()
-        self.remove.hide()
-
-    def cancel_btn(self, button):
-        self.window.close()
-
-    def remove_btn(self, button):
-        failed = []
-        for i in self.items:
-            p, _ = parser_factory.get_parser(i)
-            if p is not None and p.remove_all():
-                continue
-            failed.append(i)
-
-        # Everything went the right way, exit
-        if not len(failed):
-            self.window.close()
-
-        self.error_window(failed)
-
-class ColumnExtension(GObject.GObject, Nautilus.MenuProvider):
-    def __validate(self, file):
-        if file.get_uri_scheme() != "file" or file.is_directory():
+    @staticmethod
+    def __validate(f):
+        if f.get_uri_scheme() != "file" or f.is_directory():
             return False
-        if not file.can_write():
+        elif not f.can_write():
             return False
         return True
 
-    def menu_activate_cb(self, menu, files):
-        items = list(map(lambda x: unquote(x.get_uri()[7:]), files))
-        StatusWindow(items)
+    def __cb_menu_activate(self, menu, files):
+        self.failed_items = list()
+        for f in files:
+            if not self.__validate(f):
+                self.failed_items.append((f.get_name(), None))
+                continue
+
+            fname = unquote(f.get_uri()[7:])
+            ret, mtype = Mat2Wrapper(fname).remove_metadata()
+            if not ret:
+                self.failed_items.append((f.get_name(), mtype))
+
+        if len(self.failed_items):
+            self.notify()
 
     def get_background_items(self, window, file):
         """ https://bugzilla.gnome.org/show_bug.cgi?id=784278 """
@@ -144,6 +127,6 @@ class ColumnExtension(GObject.GObject, Nautilus.MenuProvider):
             label="Remove metadata",
             tip="Remove metadata"
         )
-        item.connect('activate', self.menu_activate_cb, files)
+        item.connect('activate', self.__cb_menu_activate, files)
 
         return [item]
