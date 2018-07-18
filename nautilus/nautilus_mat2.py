@@ -49,6 +49,9 @@ class StatusWindow(Gtk.Window):
         listbox.show_all()
 
         # Options
+        separator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+        self.main_box.pack_start(separator, True, True, 5)
+
         hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.main_box.pack_start(hbox, True, True, 0)
         label = Gtk.Label(xalign=0)
