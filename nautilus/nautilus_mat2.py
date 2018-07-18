@@ -40,14 +40,6 @@ class StatusWindow(Gtk.Window):
         self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.window.add(self.main_box)
 
-        # Disclaimer
-        nitems = len(self.items)
-        if nitems > 1:
-            disclaimer = "Remove metadata from the %d following items:" % nitems
-        else:
-            disclaimer = "Remove metadata from the following item:"
-        self.main_box.pack_start(Gtk.Label(disclaimer, xalign=0), True, True, 0)
-
         # List of files to clean
         listbox = Gtk.ListBox()
         self.main_box.pack_start(listbox, True, True, 0)
