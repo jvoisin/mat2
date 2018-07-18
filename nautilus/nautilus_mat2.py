@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
+import os
+from urllib.parse import unquote
+
 import gi
 gi.require_version('Nautilus', '3.0')
 gi.require_version('Gtk', '3.0')
 from gi.repository import Nautilus, GObject, Gtk, Gio
-from urllib.parse import unquote
-import mimetypes
 
-import os
 
 from libmat2 import parser_factory
 
@@ -34,7 +34,7 @@ class StatusWindow(Gtk.Window):
         hb.pack_start(cancel)
 
         self.remove = Gtk.Button("Remove")
-        self.remove.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION);
+        self.remove.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
         self.remove.connect("clicked", self.remove_btn)
         hb.pack_end(self.remove)
 
@@ -52,7 +52,7 @@ class StatusWindow(Gtk.Window):
             hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
             row.add(hbox)
 
-            icon = Gio.content_type_get_icon ('text/plain' if not mtype else mtype)
+            icon = Gio.content_type_get_icon('text/plain' if not mtype else mtype)
             select_image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
             hbox.pack_start(select_image, False, False, 0)
 
@@ -106,7 +106,7 @@ class StatusWindow(Gtk.Window):
     def remove_btn(self, button):
         failed = []
         for i in self.items:
-            p, mtype = parser_factory.get_parser(i)
+            p, _ = parser_factory.get_parser(i)
             if p is not None and p.remove_all():
                 continue
             failed.append(i)
