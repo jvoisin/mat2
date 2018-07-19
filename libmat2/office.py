@@ -22,17 +22,11 @@ assert Pattern
 logging.basicConfig(level=logging.ERROR)
 
 def _parse_xml(full_path: str):
-    """ This function parse XML with namespace support. """
-    def parse_map(f):  # etree support for ns is a bit rough
-        namespace_map = dict()
-        for _, (key, value) in ET.iterparse(f, ("start-ns", )):
-            namespace_map[key] = value
-        return namespace_map
+    """ This function parse XML, with namespace support. """
 
-    namespace_map = parse_map(full_path)
-
-    # Register the namespaces
-    for key, value in namespace_map.items():
+    namespace_map = dict()
+    for _, (key, value) in ET.iterparse(full_path, ("start-ns", )):
+        namespace_map[key] = value
         ET.register_namespace(key, value)
 
     return ET.parse(full_path), namespace_map
