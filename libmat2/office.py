@@ -33,6 +33,7 @@ def _parse_xml(full_path: str):
 
 
 class ArchiveBasedAbstractParser(abstract.AbstractParser):
+    """ Office files (.docx, .odt, …) are zipped files. """
     # Those are the files that have a format that _isn't_
     # supported by MAT2, but that we want to keep anyway.
     files_to_keep = set()  # type: Set[str]
@@ -58,14 +59,13 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
     def _clean_zipinfo(zipinfo: zipfile.ZipInfo) -> zipfile.ZipInfo:
         zipinfo.create_system = 3  # Linux
         zipinfo.comment = b''
-        zipinfo.date_time = (1980, 1, 1, 0, 0, 0)
+        zipinfo.date_time = (1980, 1, 1, 0, 0, 0)  # this is as early as a zipfile can be
         return zipinfo
 
     @staticmethod
     def _get_zipinfo_meta(zipinfo: zipfile.ZipInfo) -> Dict[str, str]:
         metadata = {}
-        if zipinfo.create_system == 3:
-            #metadata['create_system'] = 'Linux'
+        if zipinfo.create_system == 3:  # this is Linux
             pass
         elif zipinfo.create_system == 2:
             metadata['create_system'] = 'Windows'
@@ -145,23 +145,27 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
 
     @staticmethod
     def __remove_revisions(full_path: str) -> bool:
-        """ In this function, we're changing the XML
-        document in two times, since we don't want
-        to change the tree we're iterating on."""
+        """ In this function, we're changing the XML document in several
+        different times, since we don't want to change the tree we're currently
+        iterating on.
+        """
         try:
             tree, namespace = _parse_xml(full_path)
         except ET.ParseError:
             return False
 
-        # No revisions are present
+        # Revisions are either deletions (`w:del`) or
+        # insertions (`w:ins`)
         del_presence = tree.find('.//w:del', namespace)
         ins_presence = tree.find('.//w:ins', namespace)
         if del_presence is None and ins_presence is None:
-            return True
+            return True  # No revisions are present
 
         parent_map = {c:p for p in tree.iter() for c in p}
 
-        elements = list([element for element in tree.iterfind('.//w:del', namespace)])
+        elements = list()
+        for element in tree.iterfind('.//w:del', namespace):
+            elements.append(element)
         for element in elements:
             parent_map[element].remove(element)
 
@@ -172,7 +176,6 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
                     for children in element.iterfind('./*'):
                         elements.append((element, position, children))
                     break
-
         for (element, position, children) in elements:
             parent_map[element].insert(position, children)
             parent_map[element].remove(element)
@@ -183,6 +186,7 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
 
     def _specific_cleanup(self, full_path: str) -> bool:
         if full_path.endswith('/word/document.xml'):
+            # this file contains the revisions
             return self.__remove_revisions(full_path)
         return True
 

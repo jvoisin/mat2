@@ -13,10 +13,12 @@ T = TypeVar('T', bound='abstract.AbstractParser')
 def __load_all_parsers():
     """ Loads every parser in a dynamic way """
     current_dir = os.path.dirname(__file__)
-    for name in glob.glob(os.path.join(current_dir, '*.py')):
-        if name.endswith('abstract.py') or name.endswith('__init__.py'):
+    for fname in glob.glob(os.path.join(current_dir, '*.py')):
+        if fname.endswith('abstract.py'):
             continue
-        basename = os.path.basename(name)
+        elif fname.endswith('__init__.py'):
+            continue
+        basename = os.path.basename(fname)
         name, _ = os.path.splitext(basename)
         importlib.import_module('.' + name, package='libmat2')
 

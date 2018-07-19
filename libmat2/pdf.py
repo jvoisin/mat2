@@ -47,7 +47,7 @@ class PDFParser(abstract.AbstractParser):
         pages_count = document.get_n_pages()
 
         tmp_path = tempfile.mkstemp()[1]
-        pdf_surface = cairo.PDFSurface(tmp_path, 10, 10)
+        pdf_surface = cairo.PDFSurface(tmp_path, 10, 10)  # resized later anyway
         pdf_context = cairo.Context(pdf_surface)  # context draws on the surface
 
         for pagenum in range(pages_count):
@@ -101,7 +101,7 @@ class PDFParser(abstract.AbstractParser):
             pdf_surface.set_size(page_width*self.__scale, page_height*self.__scale)
             pdf_context.set_source_surface(img, 0, 0)
             pdf_context.paint()
-            pdf_context.show_page()
+            pdf_context.show_page()  # draw pdf_context on pdf_surface
 
         pdf_surface.finish()
 

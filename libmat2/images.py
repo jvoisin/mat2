@@ -19,6 +19,9 @@ from . import abstract
 assert Set
 
 class _ImageParser(abstract.AbstractParser):
+    """ Since we use `exiftool` to get metadata from
+    all images fileformat, `get_meta` is implemented in this class,
+    and all the image-handling ones are inheriting from it."""
     meta_whitelist = set()  # type: Set[str]
 
     @staticmethod
@@ -72,7 +75,7 @@ class PNGParser(_ImageParser):
 
 class GdkPixbufAbstractParser(_ImageParser):
     """ GdkPixbuf can handle a lot of surfaces, so we're rending images on it,
-        this has the side-effect of removing metadata completely.
+        this has the side-effect of completely removing metadata.
     """
     _type = ''
 
