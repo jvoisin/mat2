@@ -7,7 +7,7 @@ assert Set  # make pyflakes happy
 
 class AbstractParser(abc.ABC):
     """ This is the base classe of every parser.
-    It might yeild `ValueError` on instanciation on invalid files.
+    It might yield `ValueError` on instanciation on invalid files.
     """
     meta_list = set()  # type: Set[str]
     mimetypes = set()  # type: Set[str]
@@ -30,7 +30,7 @@ class AbstractParser(abc.ABC):
 
     def remove_all_lightweight(self) -> bool:
         """ This method removes _SOME_ metadata.
-        I might be useful to implement it for fileformats that do
+        It might be useful to implement it for fileformats that do
         not support non-destructive cleaning.
         """
         return self.remove_all()
