@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# pylint: disable=unused-argument,len-as-condition,arguments-differ
+# pylint: disable=unused-argument,arguments-differ,no-self-use,no-name-in-module,import-error
 
 """
 Because writing GUI is non-trivial (cf. https://0xacab.org/jvoisin/mat2/issues/3),
