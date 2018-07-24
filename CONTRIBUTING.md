@@ -24,6 +24,9 @@ Since MAT2 is written in Python3, please conform as much as possible to the
 1. Update the [changelog](https://0xacab.org/jvoisin/mat2/blob/master/CHANGELOG.md)
 2. Update the version in the [mat2](https://0xacab.org/jvoisin/mat2/blob/master/mat2) file
 3. Update the version in the [setup.py](https://0xacab.org/jvoisin/mat2/blob/master/setup.py) file
-4. Commit the changelog, mat2 and setup.py files
-5. Create a tag with `git tag -s $VERSION`
-6. Push the tag with `git push --tags`
+4. Update the version and date in the [man page](https://0xacab.org/jvoisin/mat2/blob/master/doc/mat.1)
+5. Commit the changelog, man page, mat2 and setup.py files
+6. Create a tag with `git tag -s $VERSION`
+7. Push the commit with `git push origin master`
+8. Push the tag with `git push --tags`
+9. Do the secret release dance
