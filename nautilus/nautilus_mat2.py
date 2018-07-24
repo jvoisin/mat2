@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-# pylint: disable=unused-argument,arguments-differ,no-self-use,no-name-in-module,import-error
-
 """
 Because writing GUI is non-trivial (cf. https://0xacab.org/jvoisin/mat2/issues/3),
 we decided to write a Nautilus extensions instead
@@ -12,17 +10,23 @@ so we're not allowed to call anything Gtk-related outside of the main
 thread, so we'll have to resort to using a `queue` to pass "messages" around.
 """
 
-import os
+# pylint: disable=no-name-in-module,unused-argument,no-self-use,import-error
+
 import queue
 import threading
+from typing import Tuple
 from urllib.parse import unquote
 
 import gi
 gi.require_version('Nautilus', '3.0')
 gi.require_version('Gtk', '3.0')
-from gi.repository import Nautilus, GObject, Gtk, Gio, GLib
+gi.require_version('GdkPixbuf', '2.0')
+from gi.repository import Nautilus, GObject, Gtk, Gio, GLib, GdkPixbuf
 
 from libmat2 import parser_factory
+
+# make pyflakes happy
+assert Tuple
 
 def _remove_metadata(fpath):
     """ This is a simple wrapper around libmat2, because it's
@@ -35,6 +39,7 @@ def _remove_metadata(fpath):
 
 class ColumnExtension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationWidgetProvider):
     """ This class adds an item to the right-clic menu in Nautilus. """
+
     def __init__(self):
         super().__init__()
         self.infobar_hbox = None
@@ -96,38 +101,55 @@ class ColumnExtension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationW
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         window.add(box)
 
-        listbox = Gtk.ListBox()
-        listbox.set_selection_mode(Gtk.SelectionMode.NONE)
-        box.pack_start(listbox, True, True, 0)
-
-        for fname, mtype in self.failed_items:
-            row = Gtk.ListBoxRow()
-            hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-            row.add(hbox)
-
-            icon = Gio.content_type_get_icon('text/plain' if not mtype else mtype)
-            select_image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-            hbox.pack_start(select_image, False, False, 0)
-
-            label = Gtk.Label(os.path.basename(fname))
-            hbox.pack_start(label, True, False, 0)
-
-            listbox.add(row)
-
-        listbox.show_all()
+        box.add(self.__create_treeview())
         window.show_all()
 
 
     @staticmethod
-    def __validate(fileinfo):
-        """ Validate if a given file FileInfo `fileinfo` can be processed."""
+    def __validate(fileinfo) -> Tuple[bool, str]:
+        """ Validate if a given file FileInfo `fileinfo` can be processed.
+        Returns a boolean, and a textreason why"""
         if fileinfo.get_uri_scheme() != "file" or fileinfo.is_directory():
-            return False
+            return False, "Not a file"
         elif not fileinfo.can_write():
-            return False
-        return True
+            return False, "Not writeable"
+        return True, ""
 
-    def __create_progressbar(self):
+
+    def __create_treeview(self) -> Gtk.TreeView:
+        liststore = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str)
+        treeview = Gtk.TreeView(model=liststore)
+
+        renderer_pixbuf = Gtk.CellRendererPixbuf()
+        column_pixbuf = Gtk.TreeViewColumn("Image", renderer_pixbuf, pixbuf=0)
+        treeview.append_column(column_pixbuf)
+
+        for idx, name in enumerate(['Reason', 'Path']):
+            renderer_text = Gtk.CellRendererText()
+            column_text = Gtk.TreeViewColumn(name, renderer_text, text=idx+1)
+            treeview.append_column(column_text)
+
+        for (fname, mtype, reason) in self.failed_items:
+            # This part is all about adding mimetype icons to the liststore
+            icon = Gio.content_type_get_icon('text/plain' if not mtype else mtype)
+            # in case we don't have the corresponding icon,
+            # we're adding `text/plain`, because we have this one for sure™
+            names = icon.get_names() + ['text/plain', ]
+            icon_theme = Gtk.IconTheme.get_default()
+            for name in names:
+                try:
+                    img = icon_theme.load_icon(name, Gtk.IconSize.BUTTON, 0)
+                    break
+                except GLib.GError:
+                    pass
+
+            liststore.append([img, reason, fname])
+
+        treeview.show_all()
+        return treeview
+
+
+    def __create_progressbar(self) -> Gtk.ProgressBar:
         """ Create the progressbar used to notify that files are currently
         being processed.
         """
@@ -144,7 +166,7 @@ class ColumnExtension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationW
 
         return progressbar
 
-    def __update_progressbar(self, processing_queue, progressbar):
+    def __update_progressbar(self, processing_queue, progressbar) -> bool:
         """ This method is run via `Glib.add_idle` to update the progressbar."""
         try:
             fname = processing_queue.get(block=False)
@@ -169,7 +191,7 @@ class ColumnExtension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationW
         self.infobar.show_all()
         return True
 
-    def __clean_files(self, files, processing_queue):
+    def __clean_files(self, files: list, processing_queue: queue.Queue) -> bool:
         """ This method is threaded in order to avoid blocking the GUI
         while cleaning up the files.
         """
@@ -177,14 +199,15 @@ class ColumnExtension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationW
             fname = fileinfo.get_name()
             processing_queue.put(fname)
 
-            if not self.__validate(fileinfo):
-                self.failed_items.append((fname, None))
+            valid, reason = self.__validate(fileinfo)
+            if not valid:
+                self.failed_items.append((fname, None, reason))
                 continue
 
             fpath = unquote(fileinfo.get_uri()[7:])  # `len('file://') = 7`
             success, mtype = _remove_metadata(fpath)
             if not success:
-                self.failed_items.append((fname, mtype))
+                self.failed_items.append((fname, mtype, 'Unsupported/invalid'))
         processing_queue.put(None)  # signal that we processed all the files
         return True
 
@@ -215,7 +238,7 @@ class ColumnExtension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationW
         """
         # Do not show the menu item if not a single file has a chance to be
         # processed by mat2.
-        if not any(map(self.__validate, files)):
+        if not any([is_valid for (is_valid, _) in map(self.__validate, files)]):
             return None
 
         item = Nautilus.MenuItem(
