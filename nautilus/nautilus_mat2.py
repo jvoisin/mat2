@@ -121,7 +121,7 @@ class ColumnExtension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationW
         treeview = Gtk.TreeView(model=liststore)
 
         renderer_pixbuf = Gtk.CellRendererPixbuf()
-        column_pixbuf = Gtk.TreeViewColumn("Image", renderer_pixbuf, pixbuf=0)
+        column_pixbuf = Gtk.TreeViewColumn("Icon", renderer_pixbuf, pixbuf=0)
         treeview.append_column(column_pixbuf)
 
         for idx, name in enumerate(['File', 'Reason']):
