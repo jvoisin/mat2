@@ -94,9 +94,9 @@ class ColumnExtension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationW
         window.set_titlebar(headerbar)
         headerbar.props.title = "Metadata removal failed"
 
-        exit_buton = Gtk.Button("Exit")
-        exit_buton.connect("clicked", lambda _: window.close())
-        headerbar.pack_end(exit_buton)
+        close_buton = Gtk.Button("Close")
+        close_buton.connect("clicked", lambda _: window.close())
+        headerbar.pack_end(close_buton)
 
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         window.add(box)
