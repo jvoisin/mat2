@@ -124,7 +124,7 @@ class ColumnExtension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationW
         column_pixbuf = Gtk.TreeViewColumn("Image", renderer_pixbuf, pixbuf=0)
         treeview.append_column(column_pixbuf)
 
-        for idx, name in enumerate(['Reason', 'File']):
+        for idx, name in enumerate(['File', 'Reason']):
             renderer_text = Gtk.CellRendererText()
             column_text = Gtk.TreeViewColumn(name, renderer_text, text=idx+1)
             treeview.append_column(column_text)
@@ -143,7 +143,7 @@ class ColumnExtension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationW
                 except GLib.GError:
                     pass
 
-            liststore.append([img, reason, fname])
+            liststore.append([img, fname, reason])
 
         treeview.show_all()
         return treeview
