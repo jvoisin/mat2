@@ -1,5 +1,8 @@
 *.pyc
+.coverage
 .eggs
+.mypy_cache/
 build
 dist
 mat2.egg-info
+tags
