@@ -44,6 +44,33 @@ class TestReturnValue(unittest.TestCase):
         self.assertEqual(0, ret)
 
 
+class TestCleanFolder(unittest.TestCase):
+    def test_jpg(self):
+        os.mkdir('./tests/data/folder/')
+        shutil.copy('./tests/data/dirty.jpg', './tests/data/folder/clean1.jpg')
+        shutil.copy('./tests/data/dirty.jpg', './tests/data/folder/clean2.jpg')
+
+        proc = subprocess.Popen(['./mat2', '--show', './tests/data/folder/'],
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+        self.assertIn(b'Comment: Created with GIMP', stdout)
+
+        proc = subprocess.Popen(['./mat2', './tests/data/folder/'],
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+
+        os.remove('./tests/data/folder/clean1.jpg')
+        os.remove('./tests/data/folder/clean2.jpg')
+
+        proc = subprocess.Popen(['./mat2', '--show', './tests/data/folder/'],
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+        self.assertNotIn(b'Comment: Created with GIMP', stdout)
+
+        shutil.rmtree('./tests/data/folder/')
+
+
+
 class TestCleanMeta(unittest.TestCase):
     def test_jpg(self):
         shutil.copy('./tests/data/dirty.jpg', './tests/data/clean.jpg')
