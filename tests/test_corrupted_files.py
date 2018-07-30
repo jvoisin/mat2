@@ -7,6 +7,41 @@ import os
 from libmat2 import pdf, images, audio, office, parser_factory, torrent, harmless
 
 
+class TestInexistentFiles(unittest.TestCase):
+    def test_ro(self):
+        parser, mimetype = parser_factory.get_parser('/etc/passwd')
+        self.assertEqual(mimetype, None)
+        self.assertEqual(parser, None)
+
+    def test_notaccessible(self):
+        parser, mimetype = parser_factory.get_parser('/etc/shadow')
+        self.assertEqual(mimetype, None)
+        self.assertEqual(parser, None)
+
+    def test_folder(self):
+        parser, mimetype = parser_factory.get_parser('./tests/')
+        self.assertEqual(mimetype, None)
+        self.assertEqual(parser, None)
+
+    def test_inexistingfile(self):
+        parser, mimetype = parser_factory.get_parser('./tests/NONEXISTING_FILE')
+        self.assertEqual(mimetype, None)
+        self.assertEqual(parser, None)
+
+    def test_chardevice(self):
+        parser, mimetype = parser_factory.get_parser('/dev/zero')
+        self.assertEqual(mimetype, None)
+        self.assertEqual(parser, None)
+
+    def test_brokensymlink(self):
+        shutil.copy('./tests/test_libmat2.py', './tests/clean.py')
+        os.symlink('./tests/clean.py', './tests/SYMLINK')
+        os.remove('./tests/clean.py')
+        parser, mimetype = parser_factory.get_parser('./tests/SYMLINK')
+        self.assertEqual(mimetype, None)
+        self.assertEqual(parser, None)
+        os.unlink('./tests/SYMLINK')
+
 class TestUnsupportedFiles(unittest.TestCase):
     def test_pdf(self):
         shutil.copy('./tests/test_libmat2.py', './tests/clean.py')
