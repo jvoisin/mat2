@@ -1,4 +1,15 @@
-# 0.2.0 - 2018-07-010
+# 0.3.0 - 2018-08-03
+
+- Add a check for missing dependencies
+- Add Nautilus extension
+- Minors code simplifications
+- Improve our linters' coverage
+- Add a manpage
+- Add folder/multiple files related tests
+- Change the logo
+
+
+# 0.2.0 - 2018-07-10
 
 - Fix various crashes dues to malformed files
 - Simplify various code-paths
