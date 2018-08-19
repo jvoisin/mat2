@@ -29,4 +29,5 @@ Since MAT2 is written in Python3, please conform as much as possible to the
 6. Create a tag with `git tag -s $VERSION`
 7. Push the commit with `git push origin master`
 8. Push the tag with `git push --tags`
-9. Do the secret release dance
+9. Tell the [downstreams](https://0xacab.org/jvoisin/mat2/blob/master/INSTALL.md) about it
+10. Do the secret release dance
