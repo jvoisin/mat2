@@ -32,3 +32,7 @@ $ cp ./nautilus/nautilus_mat2.py ~/.local/share/nautilus-python/extensions/
 $ PYTHONPATH=/home/$USER/mat2 PYTHON=/usr/bin/python3 nautilus
 ```
 
+## Arch Linux
+
+Thanks to [Francois_B](https://www.sciunto.org/), there is an package available on
+[Arch linux's AUR](https://aur.archlinux.org/packages/mat2/).
