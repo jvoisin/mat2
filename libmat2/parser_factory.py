@@ -36,7 +36,7 @@ def get_parser(filename: str) -> Tuple[Optional[T], Optional[str]]:
     mtype, _ = mimetypes.guess_type(filename)
 
     _, extension = os.path.splitext(filename)
-    if extension in UNSUPPORTED_EXTENSIONS:
+    if extension.lower() in UNSUPPORTED_EXTENSIONS:
         return None, mtype
 
     for parser_class in _get_parsers():  # type: ignore
