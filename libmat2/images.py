@@ -82,7 +82,7 @@ class GdkPixbufAbstractParser(_ImageParser):
     def remove_all(self):
         _, extension = os.path.splitext(self.filename)
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.filename)
-        if extension == '.jpg':
+        if extension.lower() == '.jpg':
             extension = '.jpeg'  # gdk is picky
         pixbuf.savev(self.output_filename, extension[1:], [], [])
         return True
