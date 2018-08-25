@@ -44,7 +44,7 @@ $ cd nautilus-python
 $ PYTHON=/usr/bin/python3 ./autogen.sh
 $ make
 # make install
-$ cp ./nautilus/nautilus_mat2.py ~/.local/share/nautilus-python/extensions/
+$ cp ./nautilus/mat2.py ~/.local/share/nautilus-python/extensions/
 $ PYTHONPATH=/home/$USER/mat2 PYTHON=/usr/bin/python3 nautilus
 ```
 
