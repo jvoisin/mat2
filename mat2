@@ -68,7 +68,7 @@ def show_meta(filename: str):
             print("  %s: harmful content" % k)
 
 def clean_meta(params: Tuple[str, bool]) -> bool:
-    filename, is_lightweigth = params
+    filename, is_lightweight = params
     if not __check_file(filename, os.R_OK|os.W_OK):
         return False
 
@@ -76,7 +76,7 @@ def clean_meta(params: Tuple[str, bool]) -> bool:
     if p is None:
         print("[-] %s's format (%s) is not supported" % (filename, mtype))
         return False
-    if is_lightweigth:
+    if is_lightweight:
         return p.remove_all_lightweight()
     return p.remove_all()
 

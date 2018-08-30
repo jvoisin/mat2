@@ -6,8 +6,8 @@ assert Set  # make pyflakes happy
 
 
 class AbstractParser(abc.ABC):
-    """ This is the base classe of every parser.
-    It might yield `ValueError` on instanciation on invalid files.
+    """ This is the base class of every parser.
+    It might yield `ValueError` on instantiation on invalid files.
     """
     meta_list = set()  # type: Set[str]
     mimetypes = set()  # type: Set[str]

@@ -6,7 +6,7 @@ Lightweight cleaning mode
 
 Due to *popular* request, MAT2 is providing a *lightweight* cleaning mode,
 that only cleans the superficial metadata of your file, but not
-the ones that might be in **embeded** resources. Like for example,
+the ones that might be in **embedded** resources. Like for example,
 images in a PDF or an office document.
 
 Revisions handling
