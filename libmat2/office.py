@@ -40,6 +40,10 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
     # no matter if they are supported or not.
     files_to_omit = set() # type: Set[Pattern]
 
+    # what should the parser do if it encounters an unknown file in
+    # the archive?  valid policies are 'abort', 'omit', 'keep'
+    unknown_member_policy = 'abort' # type: str
+
     def __init__(self, filename):
         super().__init__(filename)
         try:  # better fail here than later
@@ -79,6 +83,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
         return metadata
 
     def remove_all(self) -> bool:
+        # pylint: disable=too-many-branches
         with zipfile.ZipFile(self.filename) as zin,\
              zipfile.ZipFile(self.output_filename, 'w') as zout:
 
@@ -107,14 +112,26 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                     # supported files that we want to clean then add
                     tmp_parser, mtype = parser_factory.get_parser(full_path)  # type: ignore
                     if not tmp_parser:
-                        shutil.rmtree(temp_folder)
-                        os.remove(self.output_filename)
-                        logging.error("In file %s, element %s's format (%s) " +
-                                      "isn't supported",
-                                      self.filename, item.filename, mtype)
-                        return False
-                    tmp_parser.remove_all()
-                    os.rename(tmp_parser.output_filename, full_path)
+                        if self.unknown_member_policy == 'omit':
+                            logging.warning("In file %s, omitting unknown element %s (format: %s)",
+                                            self.filename, item.filename, mtype)
+                            continue
+                        elif self.unknown_member_policy == 'keep':
+                            logging.warning("In file %s, keeping unknown element %s (format: %s)",
+                                            self.filename, item.filename, mtype)
+                        else:
+                            if self.unknown_member_policy != 'abort':
+                                logging.warning("Invalid unknown_member_policy %s, " +
+                                                "treating as 'abort'", self.unknown_member_policy)
+                            shutil.rmtree(temp_folder)
+                            os.remove(self.output_filename)
+                            logging.error("In file %s, element %s's format (%s) " +
+                                          "isn't supported",
+                                          self.filename, item.filename, mtype)
+                            return False
+                    if tmp_parser:
+                        tmp_parser.remove_all()
+                        os.rename(tmp_parser.output_filename, full_path)
 
                 zinfo = zipfile.ZipInfo(item.filename)  # type: ignore
                 clean_zinfo = self._clean_zipinfo(zinfo)
