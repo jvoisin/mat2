@@ -1,3 +1,13 @@
+# 0.3.1 - 2018-09-01
+
+- Document how to install MAT2 for various distributions
+- Fix various typos in the documentation/comments
+- Add ArchLinux to the CI to ensure that MAT2 is running on it
+- Fix the handling of files with a name ending in `.JPG`
+- Improve the detection of unsupported extensions in upper-case
+- Streamline MAT2's logging
+
+
 # 0.3.0 - 2018-08-03
 
 - Add a check for missing dependencies
