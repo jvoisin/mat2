@@ -81,8 +81,9 @@ be cleaned or not.
 
 # Contact
 
-If possible, use the [issues system](https://0xacab.org/jvoisin/mat2/issues).
-If you think that a more private contact is needed (eg. for reporting security issues),
+If possible, use the [issues system](https://0xacab.org/jvoisin/mat2/issues)
+or the [mailing list](https://mailman.boum.org/listinfo/mat-dev)
+Should a more private contact be needed (eg. for reporting security issues),
 you can email Julien (jvoisin) Voisin at `julien.voisin+mat@dustri.org`,
 using the gpg key `9FCDEE9E1A381F311EA62A7404D041E8171901CC`.
 
