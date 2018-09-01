@@ -3,7 +3,7 @@
 import os
 import collections
 import importlib
-from typing import Dict
+from typing import Dict, Optional
 
 # make pyflakes happy
 assert Dict
@@ -35,13 +35,24 @@ DEPENDENCIES = {
     'mutagen': 'Mutagen',
     }
 
+def _get_exiftool_path() -> Optional[str]:
+    exiftool_path = '/usr/bin/exiftool'
+    if os.path.isfile(exiftool_path):
+        if os.access(exiftool_path, os.X_OK):  # pragma: no cover
+            return exiftool_path
+
+    # ArchLinux
+    exiftool_path = '/usr/bin/vendor_perl/exiftool'
+    if os.path.isfile(exiftool_path):
+        if os.access(exiftool_path, os.X_OK):  # pragma: no cover
+            return exiftool_path
+
+    return None
+
 def check_dependencies() -> dict:
     ret = collections.defaultdict(bool)  # type: Dict[str, bool]
 
-    exiftool = '/usr/bin/exiftool'
-    ret['Exiftool'] = False
-    if os.path.isfile(exiftool) and os.access(exiftool, os.X_OK):  # pragma: no cover
-        ret['Exiftool'] = True
+    ret['Exiftool'] = True if _get_exiftool_path() else False
 
     for key, value in DEPENDENCIES.items():
         ret[value] = True

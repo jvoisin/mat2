@@ -13,7 +13,7 @@ import gi
 gi.require_version('GdkPixbuf', '2.0')
 from gi.repository import GdkPixbuf
 
-from . import abstract
+from . import abstract, _get_exiftool_path
 
 # Make pyflakes happy
 assert Set
@@ -40,7 +40,7 @@ class _ImageParser(abstract.AbstractParser):
         self.filename to prevent parameter injections, so we need to take care
         of this.
         """
-        fun = lambda f: subprocess.check_output(['/usr/bin/exiftool', '-json', f])
+        fun = lambda f: subprocess.check_output([_get_exiftool_path(), '-json', f])
         if re.search('^[a-z0-9/]', self.filename) is None:
             out = self.__handle_problematic_filename(self.filename, fun)
         else:
