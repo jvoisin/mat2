@@ -35,16 +35,16 @@ DEPENDENCIES = {
     'mutagen': 'Mutagen',
     }
 
-def _get_exiftool_path() -> Optional[str]:
+def _get_exiftool_path() -> Optional[str]:  # pragma: no cover
     exiftool_path = '/usr/bin/exiftool'
     if os.path.isfile(exiftool_path):
-        if os.access(exiftool_path, os.X_OK):  # pragma: no cover
+        if os.access(exiftool_path, os.X_OK):
             return exiftool_path
 
     # ArchLinux
     exiftool_path = '/usr/bin/vendor_perl/exiftool'
     if os.path.isfile(exiftool_path):
-        if os.access(exiftool_path, os.X_OK):  # pragma: no cover
+        if os.access(exiftool_path, os.X_OK):
             return exiftool_path
 
     return None
