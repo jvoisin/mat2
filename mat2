@@ -41,6 +41,9 @@ def create_arg_parser():
                         help='check if MAT2 has all the dependencies it needs')
     parser.add_argument('-V', '--verbose', action='store_true',
                         help='show more verbose status information')
+    parser.add_argument('-u', '--unknown-members', metavar='POLICY', default='abort',
+                        help='how to handle unknown members of archive-style files ' +
+                        '(POLICY should be abort, omit, or keep)')
 
 
     info = parser.add_mutually_exclusive_group()
@@ -67,8 +70,8 @@ def show_meta(filename: str):
         except UnicodeEncodeError:
             print("  %s: harmful content" % k)
 
-def clean_meta(params: Tuple[str, bool]) -> bool:
-    filename, is_lightweight = params
+def clean_meta(params: Tuple[str, bool, str]) -> bool:
+    filename, is_lightweight, unknown_member_policy = params
     if not __check_file(filename, os.R_OK|os.W_OK):
         return False
 
@@ -76,6 +79,7 @@ def clean_meta(params: Tuple[str, bool]) -> bool:
     if p is None:
         print("[-] %s's format (%s) is not supported" % (filename, mtype))
         return False
+    p.unknown_member_policy = unknown_member_policy
     if is_lightweight:
         return p.remove_all_lightweight()
     return p.remove_all()
@@ -133,9 +137,15 @@ def main():
         return 0
 
     else:
+        if args.unknown_members == 'keep':
+            logging.warning('Keeping unknown member files may leak metadata in the resulting file!')
+        elif args.unknown_members not in ['omit', 'abort']:
+            logging.warning('Undefined policy for handling unknown member files: "%s"',
+                            args.unknown_members)
         p = multiprocessing.Pool()
         mode = (args.lightweight is True)
-        l = zip(__get_files_recursively(args.files), itertools.repeat(mode))
+        l = zip(__get_files_recursively(args.files), itertools.repeat(mode),
+                itertools.repeat(args.unknown_members))
 
         ret = list(p.imap_unordered(clean_meta, list(l)))
         return 0 if all(ret) else -1
