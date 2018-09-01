@@ -16,8 +16,6 @@ from gi.repository import Poppler, GLib
 
 from . import abstract
 
-logging.basicConfig(level=logging.ERROR)
-
 poppler_version = Poppler.get_version()
 if LooseVersion(poppler_version) < LooseVersion('0.46'): # pragma: no cover
     raise ValueError("MAT2 needs at least Poppler version 0.46 to work. \

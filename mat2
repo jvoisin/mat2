@@ -7,6 +7,7 @@ import itertools
 import mimetypes
 import argparse
 import multiprocessing
+import logging
 
 try:
     from libmat2 import parser_factory, UNSUPPORTED_EXTENSIONS, check_dependencies
@@ -38,6 +39,8 @@ def create_arg_parser():
                         help='list all supported fileformats')
     parser.add_argument('-c', '--check-dependencies', action='store_true',
                         help='check if MAT2 has all the dependencies it needs')
+    parser.add_argument('-V', '--verbose', action='store_true',
+                        help='show more verbose status information')
 
 
     info = parser.add_mutually_exclusive_group()
@@ -109,6 +112,9 @@ def __get_files_recursively(files):
 def main():
     arg_parser = create_arg_parser()
     args = arg_parser.parse_args()
+
+    if args.verbose:
+        logging.basicConfig(level=logging.INFO)
 
     if not args.files:
         if args.list:

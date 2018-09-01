@@ -3,9 +3,6 @@ from typing import Union, Tuple, Dict
 
 from . import abstract
 
-logging.basicConfig(level=logging.ERROR)
-
-
 class TorrentParser(abstract.AbstractParser):
     mimetypes = {'application/x-bittorrent', }
     whitelist = {b'announce', b'announce-list', b'info'}
@@ -123,9 +120,9 @@ class _BencodeHandler(object):
         try:
             ret, trail = self.__decode_func[s[0]](s)
         except (IndexError, KeyError, ValueError) as e:
-            logging.debug("Not a valid bencoded string: %s", e)
+            logging.warning("Not a valid bencoded string: %s", e)
             return None
         if trail != b'':
-            logging.debug("Invalid bencoded value (data after valid prefix)")
+            logging.warning("Invalid bencoded value (data after valid prefix)")
             return None
         return ret

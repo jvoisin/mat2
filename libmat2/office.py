@@ -19,8 +19,6 @@ from . import abstract, parser_factory
 assert Set
 assert Pattern
 
-logging.basicConfig(level=logging.ERROR)
-
 def _parse_xml(full_path: str):
     """ This function parse XML, with namespace support. """
 
@@ -96,7 +94,8 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                 if self._specific_cleanup(full_path) is False:
                     shutil.rmtree(temp_folder)
                     os.remove(self.output_filename)
-                    logging.info("Something went wrong during deep cleaning of %s", item.filename)
+                    logging.warning("Something went wrong during deep cleaning of %s",
+                                    item.filename)
                     return False
 
                 if item.filename in self.files_to_keep:
@@ -110,7 +109,9 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                     if not tmp_parser:
                         shutil.rmtree(temp_folder)
                         os.remove(self.output_filename)
-                        logging.info("%s's format (%s) isn't supported", item.filename, mtype)
+                        logging.error("in file %s, element %s's format (%s) " +
+                                      "isn't supported",
+                                      self.filename, item.filename, mtype)
                         return False
                     tmp_parser.remove_all()
                     os.rename(tmp_parser.output_filename, full_path)
