@@ -109,7 +109,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                     if not tmp_parser:
                         shutil.rmtree(temp_folder)
                         os.remove(self.output_filename)
-                        logging.error("in file %s, element %s's format (%s) " +
+                        logging.error("In file %s, element %s's format (%s) " +
                                       "isn't supported",
                                       self.filename, item.filename, mtype)
                         return False
