@@ -88,6 +88,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
              zipfile.ZipFile(self.output_filename, 'w') as zout:
 
             temp_folder = tempfile.mkdtemp()
+            abort = False
 
             for item in zin.infolist():
                 if item.filename[-1] == '/':  # `is_dir` is added in Python3.6
@@ -123,12 +124,11 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                             if self.unknown_member_policy != 'abort':
                                 logging.warning("Invalid unknown_member_policy %s, " +
                                                 "treating as 'abort'", self.unknown_member_policy)
-                            shutil.rmtree(temp_folder)
-                            os.remove(self.output_filename)
                             logging.error("In file %s, element %s's format (%s) " +
                                           "isn't supported",
                                           self.filename, item.filename, mtype)
-                            return False
+                            abort = True
+                            continue
                     if tmp_parser:
                         tmp_parser.remove_all()
                         os.rename(tmp_parser.output_filename, full_path)
@@ -139,6 +139,9 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                     zout.writestr(clean_zinfo, f.read())
 
         shutil.rmtree(temp_folder)
+        if abort:
+            os.remove(self.output_filename)
+            return False
         return True
 
 
