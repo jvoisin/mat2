@@ -29,5 +29,8 @@ Since MAT2 is written in Python3, please conform as much as possible to the
 6. Create a tag with `git tag -s $VERSION`
 7. Push the commit with `git push origin master`
 8. Push the tag with `git push --tags`
-9. Tell the [downstreams](https://0xacab.org/jvoisin/mat2/blob/master/INSTALL.md) about it
-10. Do the secret release dance
+9. Create the signed tarball with `git archive --format=tar.xz --prefix=mat-$VERSION/ $VERSION > mat-$VERSION.tar.xz`
+10. Sign the tarball with `gpg --armor --detach-sign mat-$VERSION.tar.xz`
+11. Upload the result on Gitlab's [tag page](https://0xacab.org/jvoisin/mat2/tags) and add the changelog there
+12. Tell the [downstreams](https://0xacab.org/jvoisin/mat2/blob/master/INSTALL.md) about it
+13. Do the secret release dance
