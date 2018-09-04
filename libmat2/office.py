@@ -98,11 +98,10 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                 full_path = os.path.join(temp_folder, item.filename)
 
                 if self._specific_cleanup(full_path) is False:
-                    shutil.rmtree(temp_folder)
-                    os.remove(self.output_filename)
                     logging.warning("Something went wrong during deep cleaning of %s",
                                     item.filename)
-                    return False
+                    abort = True
+                    continue
 
                 if item.filename in self.files_to_keep:
                     # those files aren't supported, but we want to add them anyway
