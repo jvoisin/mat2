@@ -64,7 +64,7 @@ to the filesystem. This ensures that every metadata is removed.
 XML attacks
 -----------
 
-Since our thread model conveniently excludes files crafted to specifically
+Since our threat model conveniently excludes files crafted to specifically
 bypass MAT2, fileformats containing harmful XML are out of our scope.
 But since MAT2 is using [etree](https://docs.python.org/3/library/xml.html#xml-vulnerabilities)
 to process XML, it's "only" vulnerable to DoS, and not memory corruption:
