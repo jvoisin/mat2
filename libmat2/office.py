@@ -84,6 +84,11 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
     def remove_all(self) -> bool:
         # pylint: disable=too-many-branches
+
+        if self.unknown_member_policy not in ['omit', 'keep', 'abort']:
+            logging.error("The policy %s is invalid.", self.unknown_member_policy)
+            raise ValueError
+
         with zipfile.ZipFile(self.filename) as zin,\
              zipfile.ZipFile(self.output_filename, 'w') as zout:
 
@@ -120,9 +125,6 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                             logging.warning("In file %s, keeping unknown element %s (format: %s)",
                                             self.filename, item.filename, mtype)
                         else:
-                            if self.unknown_member_policy != 'abort':
-                                logging.warning("Invalid unknown_member_policy %s, " +
-                                                "treating as 'abort'", self.unknown_member_policy)
                             logging.error("In file %s, element %s's format (%s) " +
                                           "isn't supported",
                                           self.filename, item.filename, mtype)

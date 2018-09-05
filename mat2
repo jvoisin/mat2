@@ -41,9 +41,9 @@ def create_arg_parser():
                         help='check if MAT2 has all the dependencies it needs')
     parser.add_argument('-V', '--verbose', action='store_true',
                         help='show more verbose status information')
-    parser.add_argument('-u', '--unknown-members', metavar='POLICY', default='abort',
+    parser.add_argument('-u', '--unknown-members', metavar='policy', default='abort',
                         help='how to handle unknown members of archive-style files ' +
-                        '(POLICY should be abort, omit, or keep)')
+                        '(policy should be abort, omit, or keep)')
 
 
     info = parser.add_mutually_exclusive_group()

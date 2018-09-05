@@ -8,13 +8,13 @@ class TestHelp(unittest.TestCase):
     def test_help(self):
         proc = subprocess.Popen(['./mat2', '--help'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'usage: mat2 [-h] [-v] [-l] [-c] [-V] [-u POLICY] [-s | -L] [files [files ...]]',
+        self.assertIn(b'usage: mat2 [-h] [-v] [-l] [-c] [-V] [-u policy] [-s | -L] [files [files ...]]',
                       stdout)
 
     def test_no_arg(self):
         proc = subprocess.Popen(['./mat2'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'usage: mat2 [-h] [-v] [-l] [-c] [-V] [-u POLICY] [-s | -L] [files [files ...]]',
+        self.assertIn(b'usage: mat2 [-h] [-v] [-l] [-c] [-V] [-u policy] [-s | -L] [files [files ...]]',
                       stdout)
 
 
