@@ -8,14 +8,16 @@ class TestHelp(unittest.TestCase):
     def test_help(self):
         proc = subprocess.Popen(['./mat2', '--help'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'usage: mat2 [-h] [-v] [-l] [-c] [-V] [-u policy] [-s | -L] [files [files ...]]',
+        self.assertIn(b'usage: mat2 [-h] [-v] [-l] [--check-dependencies] [-V]',
                       stdout)
+        self.assertIn(b'[--unknown-members policy] [-s | -L]', stdout)
 
     def test_no_arg(self):
         proc = subprocess.Popen(['./mat2'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'usage: mat2 [-h] [-v] [-l] [-c] [-V] [-u policy] [-s | -L] [files [files ...]]',
+        self.assertIn(b'usage: mat2 [-h] [-v] [-l] [--check-dependencies] [-V]',
                       stdout)
+        self.assertIn(b'[--unknown-members policy] [-s | -L]', stdout)
 
 
 class TestVersion(unittest.TestCase):

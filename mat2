@@ -37,11 +37,11 @@ def create_arg_parser():
                         version='MAT2 %s' % __version__)
     parser.add_argument('-l', '--list', action='store_true',
                         help='list all supported fileformats')
-    parser.add_argument('-c', '--check-dependencies', action='store_true',
+    parser.add_argument('--check-dependencies', action='store_true',
                         help='check if MAT2 has all the dependencies it needs')
     parser.add_argument('-V', '--verbose', action='store_true',
                         help='show more verbose status information')
-    parser.add_argument('-u', '--unknown-members', metavar='policy', default='abort',
+    parser.add_argument('--unknown-members', metavar='policy', default='abort',
                         help='how to handle unknown members of archive-style files ' +
                         '(policy should be abort, omit, or keep)')
 
