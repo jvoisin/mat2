@@ -38,7 +38,7 @@ $ ./mat2
 and if you want to install the über-fancy Nautilus extension:
 
 ```
-# apt install python-gi-dev
+# apt install gnome-common gtk-doc-tools libnautilus-extension-dev python-gi-dev
 $ git clone https://github.com/GNOME/nautilus-python
 $ cd nautilus-python
 $ PYTHON=/usr/bin/python3 ./autogen.sh
