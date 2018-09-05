@@ -7,11 +7,7 @@ import zipfile
 import logging
 from typing import Dict, Set, Pattern
 
-try:  # protect against DoS
-    from defusedxml import ElementTree as ET  # type: ignore
-except ImportError:
-    import xml.etree.ElementTree as ET  # type: ignore
-
+import xml.etree.ElementTree as ET  # type: ignore
 
 from . import abstract, parser_factory
 

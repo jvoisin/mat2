@@ -61,3 +61,11 @@ Images handling
 When possible, images are handled like PDF: rendered on a surface, then saved
 to the filesystem. This ensures that every metadata is removed.
 
+XML attacks
+-----------
+
+Since our thread model conveniently excludes files crafted to specifically
+bypass MAT2, fileformats containing harmful XML are out of our scope.
+But since MAT2 is using [etree](https://docs.python.org/3/library/xml.html#xml-vulnerabilities)
+to process XML, it's "only" vulnerable to DoS, and not memory corruption:
+odds are that the user will notice that the cleaning didn't succeed.
