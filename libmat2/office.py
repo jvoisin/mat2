@@ -9,7 +9,7 @@ from typing import Dict, Set, Pattern
 
 import xml.etree.ElementTree as ET  # type: ignore
 
-from . import abstract, parser_factory
+from . import abstract, parser_factory, UnknownMemberPolicy
 
 # Make pyflakes happy
 assert Set
@@ -37,8 +37,8 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
     files_to_omit = set() # type: Set[Pattern]
 
     # what should the parser do if it encounters an unknown file in
-    # the archive?  valid policies are 'abort', 'omit', 'keep'
-    unknown_member_policy = 'abort' # type: str
+    # the archive?
+    unknown_member_policy = UnknownMemberPolicy.ABORT # type: UnknownMemberPolicy
 
     def __init__(self, filename):
         super().__init__(filename)
@@ -81,10 +81,6 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
     def remove_all(self) -> bool:
         # pylint: disable=too-many-branches
 
-        if self.unknown_member_policy not in ['omit', 'keep', 'abort']:
-            logging.error("The policy %s is invalid.", self.unknown_member_policy)
-            raise ValueError
-
         with zipfile.ZipFile(self.filename) as zin,\
              zipfile.ZipFile(self.output_filename, 'w') as zout:
 
@@ -113,11 +109,11 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                     # supported files that we want to clean then add
                     tmp_parser, mtype = parser_factory.get_parser(full_path)  # type: ignore
                     if not tmp_parser:
-                        if self.unknown_member_policy == 'omit':
+                        if self.unknown_member_policy == UnknownMemberPolicy.OMIT:
                             logging.warning("In file %s, omitting unknown element %s (format: %s)",
                                             self.filename, item.filename, mtype)
                             continue
-                        elif self.unknown_member_policy == 'keep':
+                        elif self.unknown_member_policy == UnknownMemberPolicy.KEEP:
                             logging.warning("In file %s, keeping unknown element %s (format: %s)",
                                             self.filename, item.filename, mtype)
                         else:

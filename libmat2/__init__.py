@@ -2,6 +2,7 @@
 
 import os
 import collections
+from enum import Enum
 import importlib
 from typing import Dict, Optional
 
@@ -62,3 +63,8 @@ def check_dependencies() -> dict:
             ret[value] = False  # pragma: no cover
 
     return ret
+
+class UnknownMemberPolicy(Enum):
+    ABORT = 'abort'
+    OMIT = 'omit'
+    KEEP = 'keep'
