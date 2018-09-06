@@ -20,7 +20,7 @@ setuptools.setup(
         'pycairo',
     ],
     packages=setuptools.find_packages(exclude=('tests', )),
-    classifiers=(
+    classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
         "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
@@ -28,7 +28,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3 :: Only",
         "Topic :: Security",
         "Intended Audience :: End Users/Desktop",
-    ),
+    ],
     project_urls={
         'bugtacker': 'https://0xacab.org/jvoisin/mat2/issues',
     },
