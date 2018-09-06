@@ -50,7 +50,10 @@ class TestReturnValue(unittest.TestCase):
 
 class TestCleanFolder(unittest.TestCase):
     def test_jpg(self):
-        os.mkdir('./tests/data/folder/')
+        try:
+            os.mkdir('./tests/data/folder/')
+        except FileExistsError:
+            pass
         shutil.copy('./tests/data/dirty.jpg', './tests/data/folder/clean1.jpg')
         shutil.copy('./tests/data/dirty.jpg', './tests/data/folder/clean2.jpg')
 
