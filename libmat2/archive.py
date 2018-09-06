@@ -123,5 +123,3 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
             os.remove(self.output_filename)
             return False
         return True
-
-
