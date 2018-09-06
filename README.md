@@ -78,6 +78,8 @@ be cleaned or not.
 	tries to deal with *printer dots* too.
 - [pdfparanoia](https://github.com/kanzure/pdfparanoia), that removes
 	watermarks from PDF.
+- [Scrambled Exif](https://f-droid.org/packages/com.jarsilio.android.scrambledeggsif/),
+	an open-source Android application to remove metadata from pictures.
 
 # Contact
 
