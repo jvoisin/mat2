@@ -10,8 +10,8 @@ import multiprocessing
 import logging
 
 try:
-    from libmat2 import (parser_factory, UNSUPPORTED_EXTENSIONS, check_dependencies,
-                         UnknownMemberPolicy)
+    from libmat2 import parser_factory, UNSUPPORTED_EXTENSIONS
+    from libmat2 import check_dependencies, UnknownMemberPolicy
 except ValueError as e:
     print(e)
     sys.exit(1)
@@ -44,7 +44,7 @@ def create_arg_parser():
                         help='show more verbose status information')
     parser.add_argument('--unknown-members', metavar='policy', default='abort',
                         help='how to handle unknown members of archive-style files (policy should' +
-                        ' be one of: ' + ', '.join([x.value for x in UnknownMemberPolicy]) + ')')
+                        ' be one of: %s)' % ', '.join(p.value for p in UnknownMemberPolicy))
 
 
     info = parser.add_mutually_exclusive_group()
@@ -141,11 +141,12 @@ def main():
         unknown_member_policy = UnknownMemberPolicy(args.unknown_members)
         if unknown_member_policy == UnknownMemberPolicy.KEEP:
             logging.warning('Keeping unknown member files may leak metadata in the resulting file!')
-        p = multiprocessing.Pool()
-        mode = (args.lightweight is True)
-        l = zip(__get_files_recursively(args.files), itertools.repeat(mode),
-                itertools.repeat(unknown_member_policy))
 
+        rep_mode = itertools.repeat(args.lightweight is True)
+        rep_policy = itertools.repeat(unknown_member_policy)
+        l = zip(__get_files_recursively(args.files), rep_mode, rep_policy)
+
+        p = multiprocessing.Pool()
         ret = list(p.imap_unordered(clean_meta, list(l)))
         return 0 if all(ret) else -1
 

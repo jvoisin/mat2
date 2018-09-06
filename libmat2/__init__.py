@@ -2,7 +2,7 @@
 
 import os
 import collections
-from enum import Enum
+import enum
 import importlib
 from typing import Dict, Optional
 
@@ -64,7 +64,8 @@ def check_dependencies() -> dict:
 
     return ret
 
-class UnknownMemberPolicy(Enum):
+@enum.unique
+class UnknownMemberPolicy(enum.Enum):
     ABORT = 'abort'
     OMIT = 'omit'
     KEEP = 'keep'
