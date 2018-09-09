@@ -62,6 +62,10 @@ class PNGParser(_ImageParser):
 
     def __init__(self, filename):
         super().__init__(filename)
+
+        if imghdr.what(filename) != 'png':
+            raise ValueError
+
         try:  # better fail here than later
             cairo.ImageSurface.create_from_png(self.filename)
         except MemoryError:
