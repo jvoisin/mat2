@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 import zipfile
@@ -12,14 +13,36 @@ assert Set
 assert Pattern
 
 def _parse_xml(full_path: str):
-    """ This function parse XML, with namespace support. """
+    """ This function parses XML, with namespace support. """
 
+    cpt = 0
     namespace_map = dict()
     for _, (key, value) in ET.iterparse(full_path, ("start-ns", )):
+        # The ns[0-9]+ namespaces are reserved for interal usage, so
+        # we have to use an other nomenclature.
+        if re.match('^ns[0-9]+$', key):
+            key = 'mat%d' % cpt
+            cpt += 1
+
         namespace_map[key] = value
         ET.register_namespace(key, value)
 
     return ET.parse(full_path), namespace_map
+
+
+def _sort_xml_attributes(full_path: str) -> bool:
+    """ Sort xml attributes lexicographically,
+    because it's possible to fingerprint producers (MS Office, Libreoffice, …)
+    since they are all using different orders.
+    """
+    tree = ET.parse(full_path)
+    root = tree.getroot()
+
+    for c in root:
+        c[:] = sorted(c, key=lambda child: (child.tag, child.get('desc')))
+
+    tree.write(full_path, xml_declaration=True)
+    return True
 
 
 class MSOfficeParser(ArchiveBasedAbstractParser):
@@ -49,7 +72,8 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
         """
         try:
             tree, namespace = _parse_xml(full_path)
-        except ET.ParseError:
+        except ET.ParseError as e:
+            logging.error("Unable to parse %s: %s", full_path, e)
             return False
 
         # Revisions are either deletions (`w:del`) or
@@ -83,6 +107,9 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
         return True
 
     def _specific_cleanup(self, full_path: str) -> bool:
+        if os.stat(full_path).st_size == 0:  # Don't process empty files
+            return True
+
         if full_path.endswith('/word/document.xml'):
             # this file contains the revisions
             return self.__remove_revisions(full_path)
@@ -139,7 +166,8 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
     def __remove_revisions(full_path: str) -> bool:
         try:
             tree, namespace = _parse_xml(full_path)
-        except ET.ParseError:
+        except ET.ParseError as e:
+            logging.error("Unable to parse %s: %s", full_path, e)
             return False
 
         if 'office' not in namespace.keys():  # no revisions in the current file
@@ -154,8 +182,19 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
         return True
 
     def _specific_cleanup(self, full_path: str) -> bool:
-        if os.path.basename(full_path) == 'content.xml':
-            return self.__remove_revisions(full_path)
+        if os.stat(full_path).st_size == 0:  # Don't process empty files
+            return True
+
+        if os.path.basename(full_path).endswith('.xml'):
+            if os.path.basename(full_path) == 'content.xml':
+                if self.__remove_revisions(full_path) is False:
+                    return False
+
+            try:
+                _sort_xml_attributes(full_path)
+            except ET.ParseError as e:
+                logging.error("Unable to parse %s: %s", full_path, e)
+                return False
         return True
 
     def get_meta(self) -> Dict[str, str]:
