@@ -68,7 +68,7 @@ class PNGParser(_ImageParser):
 
         try:  # better fail here than later
             cairo.ImageSurface.create_from_png(self.filename)
-        except MemoryError:
+        except MemoryError:  # pragma: no cover
             raise ValueError
 
     def remove_all(self):
