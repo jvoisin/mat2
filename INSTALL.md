@@ -53,3 +53,7 @@ $ PYTHONPATH=/home/$USER/mat2 PYTHON=/usr/bin/python3 nautilus
 
 Thanks to [Francois_B](https://www.sciunto.org/), there is an package available on
 [Arch linux's AUR](https://aur.archlinux.org/packages/mat2/).
+
+## Gentoo
+
+MAT2 is available in the [torbrowser overlay](https://github.com/MeisterP/torbrowser-overlay).
