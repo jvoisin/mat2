@@ -74,7 +74,9 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
             temp_folder = tempfile.mkdtemp()
             abort = False
 
-            for item in zin.infolist():
+            # Since files order is a fingerprint factor,
+            # we're iterating (and thus inserting) them in lexicographic order.
+            for item in sorted(zin.infolist(), key=lambda z: z.filename):
                 if item.filename[-1] == '/':  # `is_dir` is added in Python3.6
                     continue  # don't keep empty folders
 
@@ -92,8 +94,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                     pass
                 elif any(map(lambda r: r.search(item.filename), self.files_to_omit)):
                     continue
-                else:
-                    # supported files that we want to clean then add
+                else: # supported files that we want to first clean, then add
                     tmp_parser, mtype = parser_factory.get_parser(full_path)  # type: ignore
                     if not tmp_parser:
                         if self.unknown_member_policy == UnknownMemberPolicy.OMIT:
