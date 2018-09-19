@@ -4,7 +4,6 @@ import unittest
 import shutil
 import os
 import zipfile
-import tempfile
 
 from libmat2 import pdf, images, audio, office, parser_factory, torrent, harmless
 from libmat2 import check_dependencies
