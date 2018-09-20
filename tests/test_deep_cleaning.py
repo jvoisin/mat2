@@ -70,3 +70,38 @@ class TestZipMetadata(unittest.TestCase):
 
         os.remove('./tests/data/clean.odt')
         os.remove('./tests/data/clean.cleaned.odt')
+
+
+class TestZipOrder(unittest.TestCase):
+    def test_libreoffice(self):
+        shutil.copy('./tests/data/dirty.odt', './tests/data/clean.odt')
+        p = office.LibreOfficeParser('./tests/data/clean.odt')
+
+        meta = p.get_meta()
+        self.assertIsNotNone(meta)
+
+        is_unordered = False
+        with zipfile.ZipFile('./tests/data/clean.odt') as zin:
+            previous_name = ''
+            for item in zin.infolist():
+                if previous_name == '':
+                    previous_name = item.filename
+                    continue
+                elif item.filename < previous_name:
+                    is_unordered = True
+                    break
+        self.assertTrue(is_unordered)
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        with zipfile.ZipFile('./tests/data/clean.cleaned.odt') as zin:
+            previous_name = ''
+            for item in zin.infolist():
+                if previous_name == '':
+                    previous_name = item.filename
+                    continue
+                self.assertGreaterEqual(item.filename, previous_name)
+
+        os.remove('./tests/data/clean.odt')
+        os.remove('./tests/data/clean.cleaned.odt')
