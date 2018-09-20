@@ -105,3 +105,34 @@ class TestZipOrder(unittest.TestCase):
 
         os.remove('./tests/data/clean.odt')
         os.remove('./tests/data/clean.cleaned.odt')
+
+class TestRsidRemoval(unittest.TestCase):
+    def test_office(self):
+        shutil.copy('./tests/data/office_revision_session_ids.docx', './tests/data/clean.docx')
+        p = office.MSOfficeParser('./tests/data/clean.docx')
+
+        meta = p.get_meta()
+        self.assertIsNotNone(meta)
+
+        how_many_rsid = False
+        with zipfile.ZipFile('./tests/data/clean.docx') as zin:
+            for item in zin.infolist():
+                if not item.filename.endswith('.xml'):
+                    continue
+                num = zin.read(item).decode('utf-8').lower().count('w:rsid')
+                how_many_rsid += num
+        self.assertEqual(how_many_rsid, 11)
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        with zipfile.ZipFile('./tests/data/clean.cleaned.docx') as zin:
+            for item in zin.infolist():
+                if not item.filename.endswith('.xml'):
+                    continue
+                num = zin.read(item).decode('utf-8').lower().count('w:rsid')
+                self.assertEqual(num, 0)
+
+        os.remove('./tests/data/clean.docx')
+        os.remove('./tests/data/clean.cleaned.docx')
+

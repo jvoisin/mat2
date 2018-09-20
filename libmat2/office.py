@@ -8,6 +8,8 @@ import xml.etree.ElementTree as ET  # type: ignore
 
 from .archive import ArchiveBasedAbstractParser
 
+# pylint: disable=line-too-long
+
 # Make pyflakes happy
 assert Set
 assert Pattern
@@ -15,14 +17,12 @@ assert Pattern
 def _parse_xml(full_path: str):
     """ This function parses XML, with namespace support. """
 
-    cpt = 0
     namespace_map = dict()
     for _, (key, value) in ET.iterparse(full_path, ("start-ns", )):
         # The ns[0-9]+ namespaces are reserved for interal usage, so
         # we have to use an other nomenclature.
-        if re.match('^ns[0-9]+$', key):
-            key = 'mat%d' % cpt
-            cpt += 1
+        if re.match('^ns[0-9]+$', key, re.I):  #pragma: no cover
+            key = 'mat' + key[2:]
 
         namespace_map[key] = value
         ET.register_namespace(key, value)
@@ -59,10 +59,55 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
         'word/fontTable.xml',
         'word/settings.xml',
         'word/styles.xml',
+
+        # https://msdn.microsoft.com/en-us/library/dd908153(v=office.12).aspx
+        'word/stylesWithEffects.xml',
     }
     files_to_omit = set(map(re.compile, {  # type: ignore
+        'word/webSettings.xml',
+        'word/theme',
         '^docProps/',
     }))
+
+    @staticmethod
+    def __remove_rsid(full_path: str) -> bool:
+        """ The method will remove "revision session ID".  We're '}rsid'
+        instead of proper parsing, since rsid can have multiple forms, like
+        `rsidRDefault`, `rsidR`, `rsids`, …
+
+        We're removing rsid tags in two times, because we can't modify
+        the xml while we're iterating on it.
+
+        For more details, see
+        - https://msdn.microsoft.com/en-us/library/office/documentformat.openxml.wordprocessing.previoussectionproperties.rsidrpr.aspx
+        - https://blogs.msdn.microsoft.com/brian_jones/2006/12/11/whats-up-with-all-those-rsids/
+        """
+        try:
+            tree, namespace = _parse_xml(full_path)
+        except ET.ParseError:
+            return False
+
+        # rsid, tags or attributes, are always under the `w` namespace
+        if 'w' not in namespace.keys():
+            return True
+
+        parent_map = {c:p for p in tree.iter() for c in p}
+
+        elements_to_remove = list()
+        for item in tree.iterfind('.//', namespace):
+            if '}rsid' in item.tag.strip().lower():  # resi as tag
+                elements_to_remove.append(item)
+                continue
+            for key in list(item.attrib.keys()):  # rsid as attribute
+                if '}rsid' in key.lower():
+                    del item.attrib[key]
+
+        for element in elements_to_remove:
+            parent_map[element].remove(element)
+
+        tree.write(full_path, xml_declaration=True)
+
+        return True
 
     @staticmethod
     def __remove_revisions(full_path: str) -> bool:
@@ -112,7 +157,13 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
 
         if full_path.endswith('/word/document.xml'):
             # this file contains the revisions
-            return self.__remove_revisions(full_path)
+            if self.__remove_revisions(full_path) is False:
+                return False
+
+        if full_path.endswith('.xml'):
+            if self.__remove_rsid(full_path) is False:
+                return False
+
         return True
 
     def get_meta(self) -> Dict[str, str]:
