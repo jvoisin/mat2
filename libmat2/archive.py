@@ -25,7 +25,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
     # what should the parser do if it encounters an unknown file in
     # the archive?
-    unknown_member_policy = UnknownMemberPolicy.ABORT # type: UnknownMemberPolicy
+    unknown_member_policy = UnknownMemberPolicy.ABORT  # type: UnknownMemberPolicy
 
     def __init__(self, filename):
         super().__init__(filename)
@@ -94,7 +94,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                     pass
                 elif any(map(lambda r: r.search(item.filename), self.files_to_omit)):
                     continue
-                else: # supported files that we want to first clean, then add
+                else:  # supported files that we want to first clean, then add
                     tmp_parser, mtype = parser_factory.get_parser(full_path)  # type: ignore
                     if not tmp_parser:
                         if self.unknown_member_policy == UnknownMemberPolicy.OMIT:

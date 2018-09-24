@@ -104,7 +104,6 @@ class ColumnExtension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationW
         box.add(self.__create_treeview())
         window.show_all()
 
-
     @staticmethod
     def __validate(fileinfo) -> Tuple[bool, str]:
         """ Validate if a given file FileInfo `fileinfo` can be processed.
@@ -114,7 +113,6 @@ class ColumnExtension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationW
         elif not fileinfo.can_write():
             return False, "Not writeable"
         return True, ""
-
 
     def __create_treeview(self) -> Gtk.TreeView:
         liststore = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str)
@@ -147,7 +145,6 @@ class ColumnExtension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationW
 
         treeview.show_all()
         return treeview
-
 
     def __create_progressbar(self) -> Gtk.ProgressBar:
         """ Create the progressbar used to notify that files are currently
@@ -211,7 +208,6 @@ class ColumnExtension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationW
         processing_queue.put(None)  # signal that we processed all the files
         return True
 
-
     def __cb_menu_activate(self, menu, files):
         """ This method is called when the user clicked the "clean metadata"
         menu item.
@@ -227,7 +223,6 @@ class ColumnExtension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationW
         thread = threading.Thread(target=self.__clean_files, args=(files, processing_queue))
         thread.daemon = True
         thread.start()
-
 
     def get_background_items(self, window, file):
         """ https://bugzilla.gnome.org/show_bug.cgi?id=784278 """

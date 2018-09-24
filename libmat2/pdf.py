@@ -118,7 +118,6 @@ class PDFParser(abstract.AbstractParser):
         document.save('file://' + os.path.abspath(out_file))
         return True
 
-
     @staticmethod
     def __parse_metadata_field(data: str) -> dict:
         metadata = {}

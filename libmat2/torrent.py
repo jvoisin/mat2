@@ -21,7 +21,6 @@ class TorrentParser(abstract.AbstractParser):
                 metadata[key.decode('utf-8')] = value
         return metadata
 
-
     def remove_all(self) -> bool:
         cleaned = dict()
         for key, value in self.dict_repr.items():

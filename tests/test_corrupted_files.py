@@ -146,19 +146,19 @@ class TestCorruptedFiles(unittest.TestCase):
     def test_docx(self):
         shutil.copy('./tests/data/dirty.png', './tests/data/clean.docx')
         with self.assertRaises(ValueError):
-             office.MSOfficeParser('./tests/data/clean.docx')
+            office.MSOfficeParser('./tests/data/clean.docx')
         os.remove('./tests/data/clean.docx')
 
     def test_flac(self):
         shutil.copy('./tests/data/dirty.png', './tests/data/clean.flac')
         with self.assertRaises(ValueError):
-             audio.FLACParser('./tests/data/clean.flac')
+            audio.FLACParser('./tests/data/clean.flac')
         os.remove('./tests/data/clean.flac')
 
     def test_mp3(self):
         shutil.copy('./tests/data/dirty.png', './tests/data/clean.mp3')
         with self.assertRaises(ValueError):
-             audio.MP3Parser('./tests/data/clean.mp3')
+            audio.MP3Parser('./tests/data/clean.mp3')
         os.remove('./tests/data/clean.mp3')
 
     def test_jpg(self):

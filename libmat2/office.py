@@ -138,7 +138,7 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
 
         elements = list()
         for element in tree.iterfind('.//w:ins', namespace):
-            for position, item in enumerate(tree.iter()):  #pragma: no cover
+            for position, item in enumerate(tree.iter()):  # pragma: no cover
                 if item == element:
                     for children in element.iterfind('./*'):
                         elements.append((element, position, children))
@@ -211,7 +211,6 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
         '^Configurations2/',
         '^Thumbnails/',
     }))
-
 
     @staticmethod
     def __remove_revisions(full_path: str) -> bool:

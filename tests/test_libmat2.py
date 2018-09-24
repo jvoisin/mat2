@@ -55,8 +55,8 @@ class TestGetMeta(unittest.TestCase):
         self.assertEqual(meta['producer'], 'pdfTeX-1.40.14')
         self.assertEqual(meta['creator'], "'Certified by IEEE PDFeXpress at 03/19/2016 2:56:07 AM'")
         self.assertEqual(meta['DocumentID'], "uuid:4a1a79c8-404e-4d38-9580-5bc081036e61")
-        self.assertEqual(meta['PTEX.Fullbanner'], "This is pdfTeX, Version " \
-                "3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) kpathsea " \
+        self.assertEqual(meta['PTEX.Fullbanner'], "This is pdfTeX, Version "
+                "3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) kpathsea "
                 "version 6.1.1")
 
     def test_torrent(self):
@@ -329,7 +329,6 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/clean.docx')
         os.remove('./tests/data/clean.cleaned.docx')
 
-
     def test_libreoffice(self):
         shutil.copy('./tests/data/dirty.odt', './tests/data/clean.odt')
         p = office.LibreOfficeParser('./tests/data/clean.odt')
@@ -409,7 +408,6 @@ class TestCleaning(unittest.TestCase):
 
         os.remove('./tests/data/clean.odf')
         os.remove('./tests/data/clean.cleaned.odf')
-
 
     def test_odg(self):
         shutil.copy('./tests/data/dirty.odg', './tests/data/clean.odg')

@@ -30,7 +30,6 @@ class TestZipMetadata(unittest.TestCase):
             self.assertEqual(item.date_time, (1980, 1, 1, 0, 0, 0))
             self.assertEqual(item.create_system, 3)  # 3 is UNIX
 
-
     def test_office(self):
         shutil.copy('./tests/data/dirty.docx', './tests/data/clean.docx')
         p = office.MSOfficeParser('./tests/data/clean.docx')
@@ -49,7 +48,6 @@ class TestZipMetadata(unittest.TestCase):
 
         os.remove('./tests/data/clean.docx')
         os.remove('./tests/data/clean.cleaned.docx')
-
 
     def test_libreoffice(self):
         shutil.copy('./tests/data/dirty.odt', './tests/data/clean.odt')
