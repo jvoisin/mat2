@@ -53,16 +53,21 @@ class TestUnsupportedFiles(unittest.TestCase):
 class TestCorruptedEmbedded(unittest.TestCase):
     def test_docx(self):
         shutil.copy('./tests/data/embedded_corrupted.docx', './tests/data/clean.docx')
-        parser, mimetype = parser_factory.get_parser('./tests/data/clean.docx')
+        parser, _ = parser_factory.get_parser('./tests/data/clean.docx')
         self.assertFalse(parser.remove_all())
         self.assertIsNotNone(parser.get_meta())
         os.remove('./tests/data/clean.docx')
 
     def test_odt(self):
+        expected = {
+                'create_system': 'Weird',
+                'date_time': '2018-06-10 17:18:18',
+                'meta.xml': 'harmful content'
+                }
         shutil.copy('./tests/data/embedded_corrupted.odt', './tests/data/clean.odt')
-        parser, mimetype = parser_factory.get_parser('./tests/data/clean.odt')
+        parser, _ = parser_factory.get_parser('./tests/data/clean.odt')
         self.assertFalse(parser.remove_all())
-        self.assertEqual(parser.get_meta(), {'create_system': 'Weird', 'date_time': '2018-06-10 17:18:18', 'meta.xml': 'harmful content'})
+        self.assertEqual(parser.get_meta(), expected)
         os.remove('./tests/data/clean.odt')
 
 
@@ -90,7 +95,7 @@ class TestCorruptedFiles(unittest.TestCase):
 
     def test_png2(self):
         shutil.copy('./tests/test_libmat2.py', './tests/clean.png')
-        parser, mimetype = parser_factory.get_parser('./tests/clean.png')
+        parser, _ = parser_factory.get_parser('./tests/clean.png')
         self.assertIsNone(parser)
         os.remove('./tests/clean.png')
 
@@ -134,7 +139,8 @@ class TestCorruptedFiles(unittest.TestCase):
 
     def test_bmp(self):
         shutil.copy('./tests/data/dirty.png', './tests/data/clean.bmp')
-        harmless.HarmlessParser('./tests/data/clean.bmp')
+        ret = harmless.HarmlessParser('./tests/data/clean.bmp')
+        self.assertIsNotNone(ret)
         os.remove('./tests/data/clean.bmp')
 
     def test_docx(self):

@@ -12,7 +12,7 @@ from libmat2 import check_dependencies
 class TestCheckDependencies(unittest.TestCase):
     def test_deps(self):
         ret = check_dependencies()
-        for key, value in ret.items():
+        for value in ret.values():
             self.assertTrue(value)
 
 

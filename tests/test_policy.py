@@ -29,4 +29,3 @@ class TestPolicy(unittest.TestCase):
         with self.assertRaises(ValueError):
             p.unknown_member_policy = UnknownMemberPolicy('unknown_policy_name_totally_invalid')
         os.remove('./tests/data/clean.docx')
-

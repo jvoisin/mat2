@@ -77,7 +77,6 @@ class TestCleanFolder(unittest.TestCase):
         shutil.rmtree('./tests/data/folder/')
 
 
-
 class TestCleanMeta(unittest.TestCase):
     def test_jpg(self):
         shutil.copy('./tests/data/dirty.jpg', './tests/data/clean.jpg')

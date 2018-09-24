@@ -21,7 +21,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
     # Those are the files that we _do not_ want to keep,
     # no matter if they are supported or not.
-    files_to_omit = set() # type: Set[Pattern]
+    files_to_omit = set()  # type: Set[Pattern]
 
     # what should the parser do if it encounters an unknown file in
     # the archive?

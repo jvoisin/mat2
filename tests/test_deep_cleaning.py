@@ -23,7 +23,6 @@ class TestZipMetadata(unittest.TestCase):
                 self.assertEqual(inside_p.get_meta(), {})
         shutil.rmtree(tempdir)
 
-
     def __check_zip_meta(self, p):
         zipin = zipfile.ZipFile(p.filename)
         for item in zipin.infolist():
@@ -135,4 +134,3 @@ class TestRsidRemoval(unittest.TestCase):
 
         os.remove('./tests/data/clean.docx')
         os.remove('./tests/data/clean.cleaned.docx')
-
