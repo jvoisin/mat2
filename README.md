@@ -60,6 +60,10 @@ optional arguments:
   -L, --lightweight  remove SOME metadata
 ```
 
+Note that MAT2 **will not** clean files in-place, but will produce, for
+example, with a file named "myfile.png" a cleaned version named
+"myfile.cleaned.png".
+
 # Notes about detecting metadata
 
 While MAT2 is doing its very best to display metadata when the `--show` flag is
