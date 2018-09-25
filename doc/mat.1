@@ -11,6 +11,10 @@ mat2 [\-h] [\-v] [\-l] [\-c] [\-s | \-L]\fR [files [files ...]]
 removes metadata from various fileformats. It supports a wide variety of file 
 formats, audio, office, images, …
 
+Careful, mat2 does not clean files in-place, instead, it will produce a file with the word
+"cleaned" between the filename and its extension, for example "filename.cleaned.png"
+for a file named "filename.png".
+
 .SH OPTIONS
 .SS "positional arguments:"
 .TP
@@ -27,7 +31,7 @@ show program's version number and exit
 \fB\-l\fR, \fB\-\-list\fR
 list all supported fileformats
 .TP
-\fB\-c\fR, \fB\-\-check\-dependencies\fR
+fB\-c\fR, \fB\-\-check\-dependencies\fR
 check if MAT2 has all the dependencies it needs
 .TP
 \fB\-s\fR, \fB\-\-show\fR
