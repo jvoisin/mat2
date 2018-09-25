@@ -49,6 +49,8 @@ tests:debian:
 tests:fedora:
   image: fedora
   stage: test
+  tags:
+    - whitewhale
   script:
   - dnf install -y python3 python3-mutagen python3-gobject gdk-pixbuf2 poppler-glib gdk-pixbuf2 gdk-pixbuf2-modules cairo-gobject cairo python3-cairo perl-Image-ExifTool mailcap
   - gdk-pixbuf-query-loaders-64 > /usr/lib64/gdk-pixbuf-2.0/2.10.0/loaders.cache
@@ -57,6 +59,8 @@ tests:fedora:
 tests:archlinux:
   image: archlinux/base
   stage: test
+  tags:
+    - whitewhale
   script:
   - pacman -Sy --noconfirm python-mutagen python-gobject gdk-pixbuf2 poppler-glib gdk-pixbuf2 python-cairo perl-image-exiftool python-setuptools mailcap
   - python3 setup.py test
