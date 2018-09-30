@@ -166,7 +166,7 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
         removed_fnames = set()
         with zipfile.ZipFile(self.filename) as zin:
             for fname in [item.filename for item in zin.infolist()]:
-                if any(map(lambda r: r.search(fname), self.files_to_omit)):
+                if any(map(lambda r: r.search(fname), self.files_to_omit)):  # type: ignore
                     removed_fnames.add(fname)
 
         root = tree.getroot()
