@@ -80,6 +80,14 @@ class TestExplicitelyUnsupportedFiles(unittest.TestCase):
         os.remove('./tests/data/clean.py')
 
 
+class TestCorruptedContentTypesOffice(unittest.TestCase):
+    def test_office(self):
+        shutil.copy('./tests/data/malformed_content_types.docx', './tests/data/clean.docx')
+        p = office.MSOfficeParser('./tests/data/clean.docx')
+        self.assertIsNotNone(p)
+        self.assertFalse(p.remove_all())
+        os.remove('./tests/data/clean.docx')
+
 class TestCorruptedFiles(unittest.TestCase):
     def test_pdf(self):
         shutil.copy('./tests/data/dirty.png', './tests/data/clean.png')

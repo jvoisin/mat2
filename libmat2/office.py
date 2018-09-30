@@ -151,9 +151,43 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
 
         return True
 
+    def __remove_content_type_members(self, full_path: str) -> bool:
+        """ The method will remove the dangling references
+        form the [Content_Types].xml file, since MS office doesn't like them
+        """
+        try:
+            tree, namespace = _parse_xml(full_path)
+        except ET.ParseError:  # pragma: no cover
+            return False
+
+        if len(namespace.items()) != 1:
+            return False  # there should be only one namespace for Types
+
+        removed_fnames = set()
+        with zipfile.ZipFile(self.filename) as zin:
+            for fname in [item.filename for item in zin.infolist()]:
+                if any(map(lambda r: r.search(fname), self.files_to_omit)):
+                    removed_fnames.add(fname)
+
+        root = tree.getroot()
+        for item in root.findall('{%s}Override' % namespace['']):
+            name = item.attrib['PartName'][1:]  # remove the leading '/'
+            if name in removed_fnames:
+                root.remove(item)
+
+        tree.write(full_path, xml_declaration=True)
+
+        return True
+
     def _specific_cleanup(self, full_path: str) -> bool:
         if os.stat(full_path).st_size == 0:  # Don't process empty files
             return True
+
+        if full_path.endswith('/[Content_Types].xml'):
+            # this file contains references to files that we might
+            # remove, and MS Office doesn't like dangling references
+            if self.__remove_content_type_members(full_path) is False:
+                return False
 
         if full_path.endswith('/word/document.xml'):
             # this file contains the revisions
