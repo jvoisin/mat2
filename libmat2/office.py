@@ -36,9 +36,8 @@ def _sort_xml_attributes(full_path: str) -> bool:
     since they are all using different orders.
     """
     tree = ET.parse(full_path)
-    root = tree.getroot()
 
-    for c in root:
+    for c in tree.getroot():
         c[:] = sorted(c, key=lambda child: (child.tag, child.get('desc')))
 
     tree.write(full_path, xml_declaration=True)
@@ -59,6 +58,8 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
         'word/fontTable.xml',
         'word/settings.xml',
         'word/styles.xml',
+        'docProps/app.xml',
+        'docProps/core.xml',
 
         # https://msdn.microsoft.com/en-us/library/dd908153(v=office.12).aspx
         'word/stylesWithEffects.xml',
@@ -66,7 +67,6 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
     files_to_omit = set(map(re.compile, {  # type: ignore
         'word/webSettings.xml',
         'word/theme',
-        '^docProps/',
     }))
 
     @staticmethod
@@ -95,7 +95,7 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
 
         elements_to_remove = list()
         for item in tree.iterfind('.//', namespace):
-            if '}rsid' in item.tag.strip().lower():  # resi as tag
+            if '}rsid' in item.tag.strip().lower():  # rsid as tag
                 elements_to_remove.append(item)
                 continue
             for key in list(item.attrib.keys()):  # rsid as attribute
@@ -106,7 +106,6 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
             parent_map[element].remove(element)
 
         tree.write(full_path, xml_declaration=True)
-
         return True
 
     @staticmethod
@@ -148,7 +147,6 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
             parent_map[element].remove(element)
 
         tree.write(full_path, xml_declaration=True)
-
         return True
 
     def __remove_content_type_members(self, full_path: str) -> bool:
@@ -176,11 +174,14 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
                 root.remove(item)
 
         tree.write(full_path, xml_declaration=True)
-
         return True
 
     def _specific_cleanup(self, full_path: str) -> bool:
+        # pylint: disable=too-many-return-statements
         if os.stat(full_path).st_size == 0:  # Don't process empty files
+            return True
+
+        if not full_path.endswith('.xml'):
             return True
 
         if full_path.endswith('/[Content_Types].xml'):
@@ -188,15 +189,52 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
             # remove, and MS Office doesn't like dangling references
             if self.__remove_content_type_members(full_path) is False:
                 return False
-
-        if full_path.endswith('/word/document.xml'):
+        elif full_path.endswith('/word/document.xml'):
             # this file contains the revisions
             if self.__remove_revisions(full_path) is False:
                 return False
+        elif full_path.endswith('/docProps/app.xml'):
+            # This file must be present and valid,
+            # so we're removing as much as we can.
+            with open(full_path, 'wb') as f:
+                f.write(b'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>')
+                f.write(b'<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">')
+                f.write(b'</Properties>')
+        elif full_path.endswith('/docProps/core.xml'):
+            # This file must be present and valid,
+            # so we're removing as much as we can.
+            with open(full_path, 'wb') as f:
+                f.write(b'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>')
+                f.write(b'<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">')
+                f.write(b'</cp:coreProperties>')
 
-        if full_path.endswith('.xml'):
-            if self.__remove_rsid(full_path) is False:
-                return False
+
+        if self.__remove_rsid(full_path) is False:
+            return False
+
+        try:
+            _sort_xml_attributes(full_path)
+        except ET.ParseError as e:  # pragma: no cover
+            logging.error("Unable to parse %s: %s", full_path, e)
+            return False
+
+        # This is awful, I'm sorry.
+        #
+        # Microsoft Office isn't happy when we have the `mc:Ignorable`
+        # tag containing namespaces that aren't present in the xml file,
+        # so instead of trying to remove this specific tag with etree,
+        # we're removing it, with a regexp.
+        #
+        # Since we're the ones producing this file, via the call to
+        # _sort_xml_attributes, there won't be any "funny tricks".
+        # Worst case, the tag isn't present, and everything is fine.
+        #
+        # see: https://docs.microsoft.com/en-us/dotnet/framework/wpf/advanced/mc-ignorable-attribute
+        with open(full_path, 'rb') as f:
+            text = f.read()
+            out = re.sub(b'mc:Ignorable="[^"]*"', b'', text, 1)
+        with open(full_path, 'wb') as f:
+            f.write(out)
 
         return True
 
@@ -262,7 +300,6 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
                 text.remove(changes)
 
         tree.write(full_path, xml_declaration=True)
-
         return True
 
     def _specific_cleanup(self, full_path: str) -> bool:
