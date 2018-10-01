@@ -86,12 +86,24 @@ class TestExplicitelyUnsupportedFiles(unittest.TestCase):
         os.remove('./tests/data/clean.py')
 
 
-class TestCorruptedContentTypesOffice(unittest.TestCase):
-    def test_office(self):
+class TestWrongContentTypesFileOffice(unittest.TestCase):
+    def test_office_incomplete(self):
         shutil.copy('./tests/data/malformed_content_types.docx', './tests/data/clean.docx')
         p = office.MSOfficeParser('./tests/data/clean.docx')
         self.assertIsNotNone(p)
         self.assertFalse(p.remove_all())
+        os.remove('./tests/data/clean.docx')
+
+    def test_office_broken(self):
+        shutil.copy('./tests/data/broken_xml_content_types.docx', './tests/data/clean.docx')
+        with self.assertRaises(ValueError):
+            office.MSOfficeParser('./tests/data/clean.docx')
+        os.remove('./tests/data/clean.docx')
+
+    def test_office_absent(self):
+        shutil.copy('./tests/data/no_content_types.docx', './tests/data/clean.docx')
+        with self.assertRaises(ValueError):
+            office.MSOfficeParser('./tests/data/clean.docx')
         os.remove('./tests/data/clean.docx')
 
 class TestCorruptedFiles(unittest.TestCase):

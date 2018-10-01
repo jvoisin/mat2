@@ -17,7 +17,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
     """ Office files (.docx, .odt, …) are zipped files. """
     # Those are the files that have a format that _isn't_
     # supported by MAT2, but that we want to keep anyway.
-    files_to_keep = set()  # type: Set[str]
+    files_to_keep = set()  # type: Set[Pattern]
 
     # Those are the files that we _do not_ want to keep,
     # no matter if they are supported or not.
@@ -89,7 +89,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                     abort = True
                     continue
 
-                if item.filename in self.files_to_keep:
+                if any(map(lambda r: r.search(item.filename), self.files_to_keep)):
                     # those files aren't supported, but we want to add them anyway
                     pass
                 elif any(map(lambda r: r.search(item.filename), self.files_to_omit)):

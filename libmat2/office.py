@@ -50,24 +50,74 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'application/vnd.openxmlformats-officedocument.presentationml.presentation'
     }
-    files_to_keep = {
-        '[Content_Types].xml',
-        '_rels/.rels',
-        'word/_rels/document.xml.rels',
-        'word/document.xml',
-        'word/fontTable.xml',
-        'word/settings.xml',
-        'word/styles.xml',
-        'docProps/app.xml',
-        'docProps/core.xml',
+    content_types_to_keep = {
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.endnotes+xml',  # /word/endnotes.xml
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml',  # /word/footnotes.xml
+        'application/vnd.openxmlformats-officedocument.extended-properties+xml',  # /docProps/app.xml
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml',  # /word/document.xml
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml',  # /word/fontTable.xml
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml',  # /word/footer.xml
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml',  # /word/header.xml
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml',  # /word/styles.xml
+        'application/vnd.openxmlformats-package.core-properties+xml',  # /docProps/core.xml
+
+        # Do we want to keep the following ones?
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml',
+
+        # See https://0xacab.org/jvoisin/mat2/issues/71
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml',  # /word/numbering.xml
+    }
+    files_to_keep = set(map(re.compile, {  # type: ignore
+        r'^\[Content_Types\]\.xml$',
+        r'^_rels/\.rels$',
+        r'^word/_rels/document\.xml\.rels$',
+        r'^word/_rels/footer[0-9]*\.xml\.rels$',
+        r'^word/_rels/header[0-9]*\.xml\.rels$',
 
         # https://msdn.microsoft.com/en-us/library/dd908153(v=office.12).aspx
-        'word/stylesWithEffects.xml',
-    }
-    files_to_omit = set(map(re.compile, {  # type: ignore
-        'word/webSettings.xml',
-        'word/theme',
+        r'^word/stylesWithEffects\.xml$',
     }))
+    files_to_omit = set(map(re.compile, {  # type: ignore
+        r'^customXml/',
+        r'webSettings\.xml$',
+        r'^docProps/custom\.xml$',
+        r'^word/printerSettings/',
+        r'^word/theme',
+
+        # we have a whitelist in self.files_to_keep,
+        # so we can trash everything else
+        r'^word/_rels/',
+    }))
+
+    def __init__(self, filename):
+        super().__init__(filename)
+        if self.__fill_files_to_keep_via_content_types() is False:
+            raise ValueError
+
+    def __fill_files_to_keep_via_content_types(self) -> bool:
+        """ There is a suer-handy `[Content_Types].xml` file
+        in MS Office archives, describing what each other file contains.
+        The self.content_types_to_keep member contains a type whitelist,
+        so we're using it to fill the self.files_to_keep one.
+        """
+        with zipfile.ZipFile(self.filename) as zin:
+            if '[Content_Types].xml' not in zin.namelist():
+                return False
+            xml_data = zin.read('[Content_Types].xml')
+
+        self.content_types = dict()  # type: Dict[str, str]
+        try:
+            tree = ET.fromstring(xml_data)
+        except ET.ParseError:
+            return False
+        for c in tree:
+            if 'PartName' not in c.attrib or 'ContentType' not in c.attrib:
+                continue
+            elif c.attrib['ContentType'] in self.content_types_to_keep:
+                fname = c.attrib['PartName'][1:]  # remove leading `/`
+                re_fname = re.compile('^' + re.escape(fname) + '$')
+                self.files_to_keep.add(re_fname)  # type: ignore
+        return True
 
     @staticmethod
     def __remove_rsid(full_path: str) -> bool:
@@ -270,18 +320,18 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
         'application/vnd.oasis.opendocument.formula',
         'application/vnd.oasis.opendocument.image',
     }
-    files_to_keep = {
-        'META-INF/manifest.xml',
-        'content.xml',
-        'manifest.rdf',
-        'mimetype',
-        'settings.xml',
-        'styles.xml',
-    }
+    files_to_keep = set(map(re.compile, {  # type: ignore
+        r'^META-INF/manifest\.xml$',
+        r'^content\.xml$',
+        r'^manifest\.rdf$',
+        r'^mimetype$',
+        r'^settings\.xml$',
+        r'^styles\.xml$',
+    }))
     files_to_omit = set(map(re.compile, {  # type: ignore
         r'^meta\.xml$',
-        '^Configurations2/',
-        '^Thumbnails/',
+        r'^Configurations2/',
+        r'^Thumbnails/',
     }))
 
     @staticmethod
