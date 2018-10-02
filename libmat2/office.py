@@ -19,7 +19,7 @@ def _parse_xml(full_path: str):
 
     namespace_map = dict()
     for _, (key, value) in ET.iterparse(full_path, ("start-ns", )):
-        # The ns[0-9]+ namespaces are reserved for interal usage, so
+        # The ns[0-9]+ namespaces are reserved for internal usage, so
         # we have to use an other nomenclature.
         if re.match('^ns[0-9]+$', key, re.I):  # pragma: no cover
             key = 'mat' + key[2:]
