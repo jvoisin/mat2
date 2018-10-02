@@ -3,8 +3,14 @@
 import unittest
 import shutil
 import os
+import logging
 
 from libmat2 import pdf, images, audio, office, parser_factory, torrent, harmless
+
+# No need to logging messages, should something go wrong,
+# the testsuite _will_ fail.
+logger = logging.getLogger()
+logger.setLevel(logging.FATAL)
 
 
 class TestInexistentFiles(unittest.TestCase):
