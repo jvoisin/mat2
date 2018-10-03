@@ -67,30 +67,33 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
         # See https://0xacab.org/jvoisin/mat2/issues/71
         'application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml',  # /word/numbering.xml
     }
-    files_to_keep = set(map(re.compile, {  # type: ignore
-        r'^\[Content_Types\]\.xml$',
-        r'^_rels/\.rels$',
-        r'^word/_rels/document\.xml\.rels$',
-        r'^word/_rels/footer[0-9]*\.xml\.rels$',
-        r'^word/_rels/header[0-9]*\.xml\.rels$',
 
-        # https://msdn.microsoft.com/en-us/library/dd908153(v=office.12).aspx
-        r'^word/stylesWithEffects\.xml$',
-    }))
-    files_to_omit = set(map(re.compile, {  # type: ignore
-        r'^customXml/',
-        r'webSettings\.xml$',
-        r'^docProps/custom\.xml$',
-        r'^word/printerSettings/',
-        r'^word/theme',
-
-        # we have a whitelist in self.files_to_keep,
-        # so we can trash everything else
-        r'^word/_rels/',
-    }))
 
     def __init__(self, filename):
         super().__init__(filename)
+
+        self.files_to_keep = set(map(re.compile, {  # type: ignore
+            r'^\[Content_Types\]\.xml$',
+            r'^_rels/\.rels$',
+            r'^word/_rels/document\.xml\.rels$',
+            r'^word/_rels/footer[0-9]*\.xml\.rels$',
+            r'^word/_rels/header[0-9]*\.xml\.rels$',
+
+            # https://msdn.microsoft.com/en-us/library/dd908153(v=office.12).aspx
+            r'^word/stylesWithEffects\.xml$',
+        }))
+        self.files_to_omit = set(map(re.compile, {  # type: ignore
+            r'^customXml/',
+            r'webSettings\.xml$',
+            r'^docProps/custom\.xml$',
+            r'^word/printerSettings/',
+            r'^word/theme',
+
+            # we have a whitelist in self.files_to_keep,
+            # so we can trash everything else
+            r'^word/_rels/',
+        }))
+
         if self.__fill_files_to_keep_via_content_types() is False:
             raise ValueError
 
@@ -320,19 +323,24 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
         'application/vnd.oasis.opendocument.formula',
         'application/vnd.oasis.opendocument.image',
     }
-    files_to_keep = set(map(re.compile, {  # type: ignore
-        r'^META-INF/manifest\.xml$',
-        r'^content\.xml$',
-        r'^manifest\.rdf$',
-        r'^mimetype$',
-        r'^settings\.xml$',
-        r'^styles\.xml$',
-    }))
-    files_to_omit = set(map(re.compile, {  # type: ignore
-        r'^meta\.xml$',
-        r'^Configurations2/',
-        r'^Thumbnails/',
-    }))
+
+
+    def __init__(self, filename):
+        super().__init__(filename)
+
+        self.files_to_keep = set(map(re.compile, {  # type: ignore
+            r'^META-INF/manifest\.xml$',
+            r'^content\.xml$',
+            r'^manifest\.rdf$',
+            r'^mimetype$',
+            r'^settings\.xml$',
+            r'^styles\.xml$',
+        }))
+        self.files_to_omit = set(map(re.compile, {  # type: ignore
+            r'^meta\.xml$',
+            r'^Configurations2/',
+            r'^Thumbnails/',
+        }))
 
     @staticmethod
     def __remove_revisions(full_path: str) -> bool:

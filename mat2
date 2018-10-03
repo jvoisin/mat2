@@ -3,10 +3,8 @@
 import os
 from typing import Tuple
 import sys
-import itertools
 import mimetypes
 import argparse
-import multiprocessing
 import logging
 
 try:
@@ -142,13 +140,12 @@ def main():
         if unknown_member_policy == UnknownMemberPolicy.KEEP:
             logging.warning('Keeping unknown member files may leak metadata in the resulting file!')
 
-        rep_mode = itertools.repeat(args.lightweight is True)
-        rep_policy = itertools.repeat(unknown_member_policy)
-        l = zip(__get_files_recursively(args.files), rep_mode, rep_policy)
+        success = True
+        for f in __get_files_recursively(args.files):
+            if clean_meta([f, args.lightweight, unknown_member_policy]) is False:
+                success = False
+        return success
 
-        p = multiprocessing.Pool()
-        ret = list(p.imap_unordered(clean_meta, list(l)))
-        return 0 if all(ret) else -1
 
 if __name__ == '__main__':
     sys.exit(main())

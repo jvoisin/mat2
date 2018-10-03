@@ -15,20 +15,21 @@ assert Pattern
 
 class ArchiveBasedAbstractParser(abstract.AbstractParser):
     """ Office files (.docx, .odt, …) are zipped files. """
-    # Those are the files that have a format that _isn't_
-    # supported by MAT2, but that we want to keep anyway.
-    files_to_keep = set()  # type: Set[Pattern]
-
-    # Those are the files that we _do not_ want to keep,
-    # no matter if they are supported or not.
-    files_to_omit = set()  # type: Set[Pattern]
-
-    # what should the parser do if it encounters an unknown file in
-    # the archive?
-    unknown_member_policy = UnknownMemberPolicy.ABORT  # type: UnknownMemberPolicy
-
     def __init__(self, filename):
         super().__init__(filename)
+
+        # Those are the files that have a format that _isn't_
+        # supported by MAT2, but that we want to keep anyway.
+        self.files_to_keep = set()  # type: Set[Pattern]
+
+        # Those are the files that we _do not_ want to keep,
+        # no matter if they are supported or not.
+        self.files_to_omit = set()  # type: Set[Pattern]
+
+        # what should the parser do if it encounters an unknown file in
+        # the archive?
+        self.unknown_member_policy = UnknownMemberPolicy.ABORT  # type: UnknownMemberPolicy
+
         try:  # better fail here than later
             zipfile.ZipFile(self.filename)
         except zipfile.BadZipFile:
