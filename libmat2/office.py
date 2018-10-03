@@ -217,8 +217,13 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
         removed_fnames = set()
         with zipfile.ZipFile(self.filename) as zin:
             for fname in [item.filename for item in zin.infolist()]:
-                if any(map(lambda r: r.search(fname), self.files_to_omit)):  # type: ignore
-                    removed_fnames.add(fname)
+                for file_to_omit in self.files_to_omit:
+                    if file_to_omit.search(fname):
+                        matches = map(lambda r: r.search(fname), self.files_to_keep)
+                        if any(matches):  # the file is whitelisted
+                            continue
+                        removed_fnames.add(fname)
+                        break
 
         root = tree.getroot()
         for item in root.findall('{%s}Override' % namespace['']):
