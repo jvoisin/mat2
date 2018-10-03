@@ -140,11 +140,11 @@ def main():
         if unknown_member_policy == UnknownMemberPolicy.KEEP:
             logging.warning('Keeping unknown member files may leak metadata in the resulting file!')
 
-        success = True
+        no_failure = True
         for f in __get_files_recursively(args.files):
             if clean_meta([f, args.lightweight, unknown_member_policy]) is False:
-                success = False
-        return success
+                no_failure = False
+        return 0 if no_failure is True else -1
 
 
 if __name__ == '__main__':
