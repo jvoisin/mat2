@@ -1,3 +1,20 @@
+# 0.4.0 - 2018-10-03
+
+- There is now a policy, for advanced users, to deal with unknown embedded fileformats
+- Improve the documentation
+- Various minor refactoring
+- Improve how corrupted PNG are handled
+- Dangerous/advanced cli's options no longer have short versions
+- Significant improvements to office files anonymisation
+	- Archive members are sorted lexicographically
+	- XML attributes are sorted lexicographically too
+	- RSID are now stripped
+	- Dangling references in [Content_types].xml are now removed
+- Significant improvements to office files support
+- Anonimysed office files can now be opened by MS Office without warnings
+- The CLI isn't threaded anymore, for it was causing issues
+- Various misc typo fix
+
 # 0.3.1 - 2018-09-01
 
 - Document how to install MAT2 for various distributions

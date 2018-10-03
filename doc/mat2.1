@@ -1,10 +1,10 @@
-.TH MAT2 "1" "September 2018" "MAT2 0.3.1" "User Commands"
+.TH MAT2 "1" "October 2018" "MAT2 0.4.0" "User Commands"
 
 .SH NAME
 mat2 \- the metadata anonymisation toolkit 2
 
 .SH SYNOPSIS
-mat2 [\-h] [\-v] [\-l] [\-c] [\-s | \-L]\fR [files [files ...]]
+\fBmat2\fR [\-h] [\-v] [\-l] [\-V] [-s | -L] [\fIfiles\fR [\fIfiles ...\fR]]
 
 .SH DESCRIPTION
 .B mat2
@@ -31,8 +31,14 @@ show program's version number and exit
 \fB\-l\fR, \fB\-\-list\fR
 list all supported fileformats
 .TP
-fB\-c\fR, \fB\-\-check\-dependencies\fR
+\fB\-\-check\-dependencies\fR
 check if MAT2 has all the dependencies it needs
+.TP
+\fB\-V\fR, \fB\-\-verbose\fR
+show more verbose status information
+.TP
+\fB\-\-unknown-members\fR \fIpolicy\fR
+how to handle unknown members of archive-style files (policy should be one of: abort, omit, keep)
 .TP
 \fB\-s\fR, \fB\-\-show\fR
 list harmful metadata detectable by MAT2 without

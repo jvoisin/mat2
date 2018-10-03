@@ -44,20 +44,27 @@ $ python3 -m unittest discover -v
 # How to use MAT2
 
 ```bash
-usage: mat2 [-h] [-v] [-l] [-s | -L] [files [files ...]]
+usage: mat2 [-h] [-v] [-l] [--check-dependencies] [-V]
+            [--unknown-members policy] [-s | -L]
+            [files [files ...]]
 
 Metadata anonymisation toolkit 2
 
 positional arguments:
-  files
+  files                 the files to process
 
 optional arguments:
-  -h, --help         show this help message and exit
-  -v, --version      show program's version number and exit
-  -l, --list         list all supported fileformats
-  -s, --show         list all the harmful metadata of a file without removing
-                     them
-  -L, --lightweight  remove SOME metadata
+  -h, --help            show this help message and exit
+  -v, --version         show program's version number and exit
+  -l, --list            list all supported fileformats
+  --check-dependencies  check if MAT2 has all the dependencies it needs
+  -V, --verbose         show more verbose status information
+  --unknown-members policy
+                        how to handle unknown members of archive-style files
+                        (policy should be one of: abort, omit, keep)
+  -s, --show            list harmful metadata detectable by MAT2 without
+                        removing them
+  -L, --lightweight     remove SOME metadata
 ```
 
 Note that MAT2 **will not** clean files in-place, but will produce, for
