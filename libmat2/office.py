@@ -88,6 +88,7 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
             r'^docProps/custom\.xml$',
             r'^word/printerSettings/',
             r'^word/theme',
+            r'^word/people\.xml$',
 
             # we have a whitelist in self.files_to_keep,
             # so we can trash everything else
