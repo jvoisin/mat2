@@ -2,7 +2,7 @@ import logging
 import os
 import re
 import zipfile
-from typing import Dict, Set, Pattern
+from typing import Dict, Set, Pattern, Tuple
 
 import xml.etree.ElementTree as ET  # type: ignore
 
@@ -14,9 +14,8 @@ from .archive import ArchiveBasedAbstractParser
 assert Set
 assert Pattern
 
-def _parse_xml(full_path: str):
+def _parse_xml(full_path: str) -> Tuple[ET.ElementTree, Dict[str, str]]:
     """ This function parses XML, with namespace support. """
-
     namespace_map = dict()
     for _, (key, value) in ET.iterparse(full_path, ("start-ns", )):
         # The ns[0-9]+ namespaces are reserved for internal usage, so
@@ -183,20 +182,20 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
 
         parent_map = {c:p for p in tree.iter() for c in p}
 
-        elements = list()
+        elements_del = list()
         for element in tree.iterfind('.//w:del', namespace):
-            elements.append(element)
-        for element in elements:
+            elements_del.append(element)
+        for element in elements_del:
             parent_map[element].remove(element)
 
-        elements = list()
+        elements_ins = list()
         for element in tree.iterfind('.//w:ins', namespace):
             for position, item in enumerate(tree.iter()):  # pragma: no cover
                 if item == element:
                     for children in element.iterfind('./*'):
-                        elements.append((element, position, children))
+                        elements_ins.append((element, position, children))
                     break
-        for (element, position, children) in elements:
+        for (element, position, children) in elements_ins:
             parent_map[element].insert(position, children)
             parent_map[element].remove(element)
 

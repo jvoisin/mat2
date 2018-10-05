@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-from typing import Tuple
+from typing import Tuple, Generator, List
 import sys
 import mimetypes
 import argparse
@@ -16,6 +16,10 @@ except ValueError as e:
 
 __version__ = '0.4.0'
 
+# Make pyflakes happy
+assert Tuple
+
+
 def __check_file(filename: str, mode: int=os.R_OK) -> bool:
     if not os.path.exists(filename):
         print("[-] %s is doesn't exist." % filename)
@@ -29,7 +33,7 @@ def __check_file(filename: str, mode: int=os.R_OK) -> bool:
     return True
 
 
-def create_arg_parser():
+def create_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Metadata anonymisation toolkit 2')
     parser.add_argument('files', nargs='*', help='the files to process')
     parser.add_argument('-v', '--version', action='version',
@@ -63,19 +67,18 @@ def show_meta(filename: str):
         return
 
     print("[+] Metadata for %s:" % filename)
-    meta = p.get_meta().items()
-    if not meta:
+    metadata = p.get_meta().items()
+    if not metadata:
         print("  No metadata found")
         return
 
-    for k, v in meta:
+    for k, v in metadata:
         try:  # FIXME this is ugly.
             print("  %s: %s" % (k, v))
         except UnicodeEncodeError:
             print("  %s: harmful content" % k)
 
-def clean_meta(params: Tuple[str, bool, UnknownMemberPolicy]) -> bool:
-    filename, is_lightweight, unknown_member_policy = params
+def clean_meta(filename: str, is_lightweight: bool, policy: UnknownMemberPolicy) -> bool:
     if not __check_file(filename, os.R_OK|os.W_OK):
         return False
 
@@ -83,7 +86,7 @@ def clean_meta(params: Tuple[str, bool, UnknownMemberPolicy]) -> bool:
     if p is None:
         print("[-] %s's format (%s) is not supported" % (filename, mtype))
         return False
-    p.unknown_member_policy = unknown_member_policy
+    p.unknown_member_policy = policy
     if is_lightweight:
         return p.remove_all_lightweight()
     return p.remove_all()
@@ -91,7 +94,7 @@ def clean_meta(params: Tuple[str, bool, UnknownMemberPolicy]) -> bool:
 
 def show_parsers():
     print('[+] Supported formats:')
-    formats = list()
+    formats = set()
     for parser in parser_factory._get_parsers():
         for mtype in parser.mimetypes:
             extensions = set()
@@ -102,11 +105,11 @@ def show_parsers():
                 # we're not supporting a single extension in the current
                 # mimetype, so there is not point in showing the mimetype at all
                 continue
-            formats.append('  - %s (%s)' % (mtype, ', '.join(extensions)))
+            formats.add('  - %s (%s)' % (mtype, ', '.join(extensions)))
     print('\n'.join(sorted(formats)))
 
 
-def __get_files_recursively(files):
+def __get_files_recursively(files: List[str]) -> Generator[str, None, None]:
     for f in files:
         if os.path.isdir(f):
             for path, _, _files in os.walk(f):
@@ -141,13 +144,13 @@ def main():
         return 0
 
     else:
-        unknown_member_policy = UnknownMemberPolicy(args.unknown_members)
-        if unknown_member_policy == UnknownMemberPolicy.KEEP:
+        policy = UnknownMemberPolicy(args.unknown_members)
+        if policy == UnknownMemberPolicy.KEEP:
             logging.warning('Keeping unknown member files may leak metadata in the resulting file!')
 
         no_failure = True
         for f in __get_files_recursively(args.files):
-            if clean_meta([f, args.lightweight, unknown_member_policy]) is False:
+            if clean_meta(f, args.lightweight, policy) is False:
                 no_failure = False
         return 0 if no_failure is True else -1
 
