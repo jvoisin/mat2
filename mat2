@@ -96,7 +96,7 @@ def show_parsers():
         for mtype in parser.mimetypes:
             extensions = set()
             for extension in mimetypes.guess_all_extensions(mtype):
-                if extension[1:] not in UNSUPPORTED_EXTENSIONS:  # skip the dot
+                if extension not in UNSUPPORTED_EXTENSIONS:
                     extensions.add(extension)
             if not extensions:
                 # we're not supporting a single extension in the current

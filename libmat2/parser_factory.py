@@ -33,6 +33,7 @@ def _get_parsers() -> List[T]:
 
 
 def get_parser(filename: str) -> Tuple[Optional[T], Optional[str]]:
+    """ Return the appropriate parser for a giver filename. """
     mtype, _ = mimetypes.guess_type(filename)
 
     _, extension = os.path.splitext(filename)
