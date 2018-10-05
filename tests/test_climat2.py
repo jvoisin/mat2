@@ -81,6 +81,7 @@ class TestCleanFolder(unittest.TestCase):
                 stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
         self.assertNotIn(b'Comment: Created with GIMP', stdout)
+        self.assertIn(b'No metadata found', stdout)
 
         shutil.rmtree('./tests/data/folder/')
 

@@ -63,7 +63,12 @@ def show_meta(filename: str):
         return
 
     print("[+] Metadata for %s:" % filename)
-    for k, v in p.get_meta().items():
+    meta = p.get_meta().items()
+    if not meta:
+        print("  No metadata found")
+        return
+
+    for k, v in meta:
         try:  # FIXME this is ugly.
             print("  %s: %s" % (k, v))
         except UnicodeEncodeError:
