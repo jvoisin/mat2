@@ -1,8 +1,11 @@
+import mimetypes
+import os
 import shutil
+import tempfile
 
 import mutagen
 
-from . import abstract
+from . import abstract, parser_factory
 
 
 class MutagenParser(abstract.AbstractParser):
@@ -55,6 +58,14 @@ class FLACParser(MutagenParser):
 
     def get_meta(self):
         meta = super().get_meta()
-        if mutagen.File(self.filename).pictures:
-            meta['Picture'] = 'Cover'
+        for num, picture in enumerate(mutagen.File(self.filename).pictures):
+            name = picture.desc if picture.desc else 'Cover %d' % num
+            _, fname = tempfile.mkstemp()
+            with open(fname, 'wb') as f:
+                f.write(picture.data)
+            extension = mimetypes.guess_extension(picture.mime)
+            shutil.move(fname, fname + extension)
+            p, _ = parser_factory.get_parser(fname+extension)
+            meta[name] = p.get_meta() if p else 'harmful data'
+            os.remove(fname + extension)
         return meta

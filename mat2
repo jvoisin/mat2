@@ -65,25 +65,24 @@ def show_meta(filename: str):
     if p is None:
         print("[-] %s's format (%s) is not supported" % (filename, mtype))
         return
-    print("[+] Metadata for %s:" % filename)
-    metadata = p.get_meta().items() # type: dict
-    __print_meta(metadata)
+    __print_meta(filename, p.get_meta())
 
 
-def __print_meta(metadata: dict):
+def __print_meta(filename:str, metadata: dict, depth:int=1):
+    padding = " " * depth*2
     if not metadata:
-        print("  No metadata found")
+        print(padding + "No metadata found")
         return
 
-    for k, v in metadata:
+    print("[%s] Metadata for %s:" % ('+'*depth, filename))
+
+    for k, v in metadata.items():
         if isinstance(v, dict):
-            __print_meta(v)
-        else:
-            try:  # FIXME this is ugly.
-                print("  %s: %s" % (k, v))
-            except UnicodeEncodeError:
-                print("  %s: harmful content" % k)
-    return
+            return __print_meta(k, v, depth+1)
+        try:  # FIXME this is ugly.
+            print(padding + "  %s: %s" % (k, v))
+        except UnicodeEncodeError:
+            print(padding + "  %s: harmful content" % k)
 
 
 def clean_meta(filename: str, is_lightweight: bool, policy: UnknownMemberPolicy) -> bool:
