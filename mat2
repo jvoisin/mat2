@@ -68,7 +68,7 @@ def show_meta(filename: str):
     __print_meta(filename, p.get_meta())
 
 
-def __print_meta(filename:str, metadata: dict, depth:int=1):
+def __print_meta(filename: str, metadata: dict, depth: int=1):
     padding = " " * depth*2
     if not metadata:
         print(padding + "No metadata found")
