@@ -33,7 +33,7 @@ metadata.
 - `libimage-exiftool-perl` for everything else
 
 Please note that MAT2 requires at least Python3.5, meaning that it
-doesn't run on [Debian Jessie](https://packages.debian.org/jessie/python3),
+doesn't run on [Debian Jessie](https://packages.debian.org/jessie/python3).
 
 # Running the test suite
 
