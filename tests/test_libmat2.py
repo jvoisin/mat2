@@ -96,6 +96,7 @@ class TestGetMeta(unittest.TestCase):
         p = audio.FLACParser('./tests/data/dirty.flac')
         meta = p.get_meta()
         self.assertEqual(meta['title'], 'I am so')
+        self.assertEqual(meta['Picture'], 'Cover')
 
     def test_docx(self):
         p = office.MSOfficeParser('./tests/data/dirty.docx')

@@ -44,3 +44,17 @@ class OGGParser(MutagenParser):
 
 class FLACParser(MutagenParser):
     mimetypes = {'audio/flac', 'audio/x-flac'}
+
+    def remove_all(self):
+        shutil.copy(self.filename, self.output_filename)
+        f = mutagen.File(self.output_filename)
+        f.clear_pictures()
+        f.delete()
+        f.save(deleteid3=True)
+        return True
+
+    def get_meta(self):
+        meta = super().get_meta()
+        if mutagen.File(self.filename).pictures:
+            meta['Picture'] = 'Cover'
+        return meta
