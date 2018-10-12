@@ -19,6 +19,7 @@ class AbstractParser(abc.ABC):
         self.filename = filename
         fname, extension = os.path.splitext(filename)
         self.output_filename = fname + '.cleaned' + extension
+        self.lightweight_cleaning = False
 
     @abc.abstractmethod
     def get_meta(self) -> Dict[str, str]:
@@ -27,10 +28,3 @@ class AbstractParser(abc.ABC):
     @abc.abstractmethod
     def remove_all(self) -> bool:
         pass  # pragma: no cover
-
-    def remove_all_lightweight(self) -> bool:
-        """ This method removes _SOME_ metadata.
-        It might be useful to implement it for fileformats that do
-        not support non-destructive cleaning.
-        """
-        return self.remove_all()

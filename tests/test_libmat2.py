@@ -190,7 +190,8 @@ class TestLightWeightCleaning(unittest.TestCase):
         meta = p.get_meta()
         self.assertEqual(meta['producer'], 'pdfTeX-1.40.14')
 
-        ret = p.remove_all_lightweight()
+        p.lightweight_cleaning = True
+        ret = p.remove_all()
         self.assertTrue(ret)
 
         p = pdf.PDFParser('./tests/data/clean.cleaned.pdf')
@@ -207,7 +208,8 @@ class TestLightWeightCleaning(unittest.TestCase):
         meta = p.get_meta()
         self.assertEqual(meta['Comment'], 'This is a comment, be careful!')
 
-        ret = p.remove_all_lightweight()
+        p.lightweight_cleaning = True
+        ret = p.remove_all()
         self.assertTrue(ret)
 
         p = images.PNGParser('./tests/data/clean.cleaned.png')
