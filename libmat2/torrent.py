@@ -14,7 +14,7 @@ class TorrentParser(abstract.AbstractParser):
         if self.dict_repr is None:
             raise ValueError
 
-    def get_meta(self) -> Dict[str, str]:
+    def get_meta(self) -> Dict[str, Union[str, dict]]:
         metadata = {}
         for key, value in self.dict_repr.items():
             if key not in self.whitelist:

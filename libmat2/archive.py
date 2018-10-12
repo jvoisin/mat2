@@ -4,13 +4,14 @@ import tempfile
 import os
 import logging
 import shutil
-from typing import Dict, Set, Pattern
+from typing import Dict, Set, Pattern, Union
 
 from . import abstract, UnknownMemberPolicy, parser_factory
 
 # Make pyflakes happy
 assert Set
 assert Pattern
+assert Union
 
 
 class ArchiveBasedAbstractParser(abstract.AbstractParser):

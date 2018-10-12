@@ -7,6 +7,7 @@ import re
 import logging
 import tempfile
 import io
+from typing import Dict, Union
 from distutils.version import LooseVersion
 
 import cairo
@@ -130,7 +131,7 @@ class PDFParser(abstract.AbstractParser):
             metadata[key] = value
         return metadata
 
-    def get_meta(self):
+    def get_meta(self) -> Dict[str, Union[str, dict]]:
         """ Return a dict with all the meta of the file
         """
         metadata = {}

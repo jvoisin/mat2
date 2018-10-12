@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-from typing import Tuple, Generator, List
+from typing import Tuple, Generator, List, Union
 import sys
 import mimetypes
 import argparse
@@ -18,6 +18,7 @@ __version__ = '0.4.0'
 
 # Make pyflakes happy
 assert Tuple
+assert Union
 
 
 def __check_file(filename: str, mode: int=os.R_OK) -> bool:
@@ -98,12 +99,12 @@ def clean_meta(filename: str, is_lightweight: bool, policy: UnknownMemberPolicy)
     return p.remove_all()
 
 
-def show_parsers():
+def show_parsers() -> bool:
     print('[+] Supported formats:')
-    formats = set()
-    for parser in parser_factory._get_parsers():
+    formats = set()  # Set[str]
+    for parser in parser_factory._get_parsers():  # type: ignore
         for mtype in parser.mimetypes:
-            extensions = set()
+            extensions = set()  # Set[str]
             for extension in mimetypes.guess_all_extensions(mtype):
                 if extension not in UNSUPPORTED_EXTENSIONS:
                     extensions.add(extension)
@@ -113,6 +114,7 @@ def show_parsers():
                 continue
             formats.add('  - %s (%s)' % (mtype, ', '.join(extensions)))
     print('\n'.join(sorted(formats)))
+    return True
 
 
 def __get_files_recursively(files: List[str]) -> Generator[str, None, None]:
@@ -126,7 +128,7 @@ def __get_files_recursively(files: List[str]) -> Generator[str, None, None]:
         elif __check_file(f):
             yield f
 
-def main():
+def main() -> int:
     arg_parser = create_arg_parser()
     args = arg_parser.parse_args()
 
@@ -135,13 +137,13 @@ def main():
 
     if not args.files:
         if args.list:
-            show_parsers()
+            return show_parsers()
         elif args.check_dependencies:
             print("Dependencies required for MAT2 %s:" % __version__)
             for key, value in sorted(check_dependencies().items()):
                 print('- %s: %s' % (key, 'yes' if value else 'no'))
         else:
-            return arg_parser.print_help()
+            arg_parser.print_help()
         return 0
 
     elif args.show:

@@ -5,7 +5,7 @@ import os
 import shutil
 import tempfile
 import re
-from typing import Set
+from typing import Set, Dict, Union
 
 import cairo
 
@@ -25,7 +25,7 @@ class _ImageParser(abstract.AbstractParser):
     meta_whitelist = set()  # type: Set[str]
 
     @staticmethod
-    def __handle_problematic_filename(filename: str, callback) -> str:
+    def __handle_problematic_filename(filename: str, callback) -> bytes:
         """ This method takes a filename with a problematic name,
         and safely applies it a `callback`."""
         tmpdirname = tempfile.mkdtemp()
@@ -35,7 +35,7 @@ class _ImageParser(abstract.AbstractParser):
         shutil.rmtree(tmpdirname)
         return out
 
-    def get_meta(self):
+    def get_meta(self) -> Dict[str, Union[str, dict]]:
         """ There is no way to escape the leading(s) dash(es) of the current
         self.filename to prevent parameter injections, so we need to take care
         of this.
@@ -71,7 +71,7 @@ class PNGParser(_ImageParser):
         except MemoryError:  # pragma: no cover
             raise ValueError
 
-    def remove_all(self):
+    def remove_all(self) -> bool:
         surface = cairo.ImageSurface.create_from_png(self.filename)
         surface.write_to_png(self.output_filename)
         return True
@@ -83,18 +83,18 @@ class GdkPixbufAbstractParser(_ImageParser):
     """
     _type = ''
 
-    def remove_all(self):
+    def __init__(self, filename):
+        super().__init__(filename)
+        if imghdr.what(filename) != self._type:  # better safe than sorry
+            raise ValueError
+
+    def remove_all(self) -> bool:
         _, extension = os.path.splitext(self.filename)
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.filename)
         if extension.lower() == '.jpg':
             extension = '.jpeg'  # gdk is picky
         pixbuf.savev(self.output_filename, extension[1:], [], [])
         return True
-
-    def __init__(self, filename):
-        super().__init__(filename)
-        if imghdr.what(filename) != self._type:  # better safe than sorry
-            raise ValueError
 
 
 class JPGParser(GdkPixbufAbstractParser):

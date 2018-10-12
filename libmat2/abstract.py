@@ -1,6 +1,6 @@
 import abc
 import os
-from typing import Set, Dict
+from typing import Set, Dict, Union
 
 assert Set  # make pyflakes happy
 
@@ -22,7 +22,7 @@ class AbstractParser(abc.ABC):
         self.lightweight_cleaning = False
 
     @abc.abstractmethod
-    def get_meta(self) -> Dict[str, str]:
+    def get_meta(self) -> Dict[str, Union[str, dict]]:
         pass  # pragma: no cover
 
     @abc.abstractmethod

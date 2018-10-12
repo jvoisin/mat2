@@ -2,7 +2,7 @@ import logging
 import os
 import re
 import zipfile
-from typing import Dict, Set, Pattern, Tuple
+from typing import Dict, Set, Pattern, Tuple, Union
 
 import xml.etree.ElementTree as ET  # type: ignore
 
@@ -296,7 +296,7 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
 
         return True
 
-    def get_meta(self) -> Dict[str, str]:
+    def get_meta(self) -> Dict[str, Union[str, dict]]:
         """
         Yes, I know that parsing xml with regexp ain't pretty,
         be my guest and fix it if you want.
@@ -381,7 +381,7 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
                 return False
         return True
 
-    def get_meta(self) -> Dict[str, str]:
+    def get_meta(self) -> Dict[str, Union[str, dict]]:
         """
         Yes, I know that parsing xml with regexp ain't pretty,
         be my guest and fix it if you want.

@@ -8,6 +8,7 @@ from typing import Dict, Optional
 
 # make pyflakes happy
 assert Dict
+assert Optional
 
 # A set of extension that aren't supported, despite matching a supported mimetype
 UNSUPPORTED_EXTENSIONS = {
@@ -36,7 +37,7 @@ DEPENDENCIES = {
     'mutagen': 'Mutagen',
     }
 
-def _get_exiftool_path() -> Optional[str]:  # pragma: no cover
+def _get_exiftool_path() -> str:  # pragma: no cover
     exiftool_path = '/usr/bin/exiftool'
     if os.path.isfile(exiftool_path):
         if os.access(exiftool_path, os.X_OK):
@@ -48,7 +49,7 @@ def _get_exiftool_path() -> Optional[str]:  # pragma: no cover
         if os.access(exiftool_path, os.X_OK):
             return exiftool_path
 
-    return None
+    raise ValueError
 
 def check_dependencies() -> dict:
     ret = collections.defaultdict(bool)  # type: Dict[str, bool]

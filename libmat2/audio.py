@@ -2,6 +2,7 @@ import mimetypes
 import os
 import shutil
 import tempfile
+from typing import Dict, Union
 
 import mutagen
 
@@ -16,13 +17,13 @@ class MutagenParser(abstract.AbstractParser):
         except mutagen.MutagenError:
             raise ValueError
 
-    def get_meta(self):
+    def get_meta(self) -> Dict[str, Union[str, dict]]:
         f = mutagen.File(self.filename)
         if f.tags:
             return {k:', '.join(v) for k, v in f.tags.items()}
         return {}
 
-    def remove_all(self):
+    def remove_all(self) -> bool:
         shutil.copy(self.filename, self.output_filename)
         f = mutagen.File(self.output_filename)
         f.delete()
@@ -33,8 +34,8 @@ class MutagenParser(abstract.AbstractParser):
 class MP3Parser(MutagenParser):
     mimetypes = {'audio/mpeg', }
 
-    def get_meta(self):
-        metadata = {}
+    def get_meta(self) -> Dict[str, Union[str, dict]]:
+        metadata = {}  # type: Dict[str, Union[str, dict]]
         meta = mutagen.File(self.filename).tags
         for key in meta:
             metadata[key.rstrip(' \t\r\n\0')] = ', '.join(map(str, meta[key].text))
@@ -48,7 +49,7 @@ class OGGParser(MutagenParser):
 class FLACParser(MutagenParser):
     mimetypes = {'audio/flac', 'audio/x-flac'}
 
-    def remove_all(self):
+    def remove_all(self) -> bool:
         shutil.copy(self.filename, self.output_filename)
         f = mutagen.File(self.output_filename)
         f.clear_pictures()
@@ -56,16 +57,21 @@ class FLACParser(MutagenParser):
         f.save(deleteid3=True)
         return True
 
-    def get_meta(self):
+    def get_meta(self) -> Dict[str, Union[str, dict]]:
         meta = super().get_meta()
         for num, picture in enumerate(mutagen.File(self.filename).pictures):
             name = picture.desc if picture.desc else 'Cover %d' % num
+            extension = mimetypes.guess_extension(picture.mime)
+            if extension is None:  #  pragma: no cover
+                meta[name] = 'harmful data'
+                continue
+
             _, fname = tempfile.mkstemp()
+            fname = fname + extension
             with open(fname, 'wb') as f:
                 f.write(picture.data)
-            extension = mimetypes.guess_extension(picture.mime)
-            shutil.move(fname, fname + extension)
-            p, _ = parser_factory.get_parser(fname+extension)
-            meta[name] = p.get_meta() if p else 'harmful data'
-            os.remove(fname + extension)
+            p, _ = parser_factory.get_parser(fname)  # type: ignore
+            # Mypy chokes on ternaries :/
+            meta[name] = p.get_meta() if p else 'harmful data'  # type: ignore
+            os.remove(fname)
         return meta
