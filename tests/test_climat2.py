@@ -160,7 +160,6 @@ class TestGetMeta(unittest.TestCase):
         proc = subprocess.Popen(mat2_binary + ['--show', './tests/data/dirty.flac'],
                 stdout=subprocess.PIPE, bufsize=0)
         stdout, _ = proc.communicate()
-        self.assertIn(b'comments: Thank you for using MAT !', stdout)
         self.assertIn(b'genre: Python', stdout)
         self.assertIn(b'title: I am so', stdout)
 
