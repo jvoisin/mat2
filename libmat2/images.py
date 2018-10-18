@@ -1,11 +1,6 @@
-import subprocess
 import imghdr
-import json
 import os
-import shutil
-import tempfile
-import re
-from typing import Set, Dict, Union
+from typing import Set
 
 import cairo
 
@@ -13,44 +8,12 @@ import gi
 gi.require_version('GdkPixbuf', '2.0')
 from gi.repository import GdkPixbuf
 
-from . import abstract, _get_exiftool_path
+from . import exiftool
 
 # Make pyflakes happy
 assert Set
 
-class _ImageParser(abstract.AbstractParser):
-    """ Since we use `exiftool` to get metadata from
-    all images fileformat, `get_meta` is implemented in this class,
-    and all the image-handling ones are inheriting from it."""
-    meta_whitelist = set()  # type: Set[str]
-
-    @staticmethod
-    def __handle_problematic_filename(filename: str, callback) -> bytes:
-        """ This method takes a filename with a problematic name,
-        and safely applies it a `callback`."""
-        tmpdirname = tempfile.mkdtemp()
-        fname = os.path.join(tmpdirname, "temp_file")
-        shutil.copy(filename, fname)
-        out = callback(fname)
-        shutil.rmtree(tmpdirname)
-        return out
-
-    def get_meta(self) -> Dict[str, Union[str, dict]]:
-        """ There is no way to escape the leading(s) dash(es) of the current
-        self.filename to prevent parameter injections, so we need to take care
-        of this.
-        """
-        fun = lambda f: subprocess.check_output([_get_exiftool_path(), '-json', f])
-        if re.search('^[a-z0-9/]', self.filename) is None:
-            out = self.__handle_problematic_filename(self.filename, fun)
-        else:
-            out = fun(self.filename)
-        meta = json.loads(out.decode('utf-8'))[0]
-        for key in self.meta_whitelist:
-            meta.pop(key, None)
-        return meta
-
-class PNGParser(_ImageParser):
+class PNGParser(exiftool.ExiftoolParser):
     mimetypes = {'image/png', }
     meta_whitelist = {'SourceFile', 'ExifToolVersion', 'FileName',
                       'Directory', 'FileSize', 'FileModifyDate',
@@ -77,7 +40,7 @@ class PNGParser(_ImageParser):
         return True
 
 
-class GdkPixbufAbstractParser(_ImageParser):
+class GdkPixbufAbstractParser(exiftool.ExiftoolParser):
     """ GdkPixbuf can handle a lot of surfaces, so we're rending images on it,
         this has the side-effect of completely removing metadata.
     """

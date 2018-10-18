@@ -6,12 +6,16 @@ import os
 import zipfile
 
 from libmat2 import pdf, images, audio, office, parser_factory, torrent, harmless
-from libmat2 import check_dependencies
+from libmat2 import check_dependencies, video
 
 
 class TestCheckDependencies(unittest.TestCase):
     def test_deps(self):
-        ret = check_dependencies()
+        try:
+            ret = check_dependencies()
+        except RuntimeError:
+            return   # this happens if not every dependency is installed
+
         for value in ret.values():
             self.assertTrue(value)
 
@@ -471,3 +475,24 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/clean.txt')
         os.remove('./tests/data/clean.cleaned.txt')
         os.remove('./tests/data/clean.cleaned.cleaned.txt')
+
+    def test_avi(self):
+        shutil.copy('./tests/data/dirty.avi', './tests/data/clean.avi')
+        p = video.AVIParser('./tests/data/clean.avi')
+
+        meta = p.get_meta()
+        self.assertEqual(meta['Software'], 'MEncoder SVN-r33148-4.0.1')
+
+        try:
+            ret = p.remove_all()
+        except RuntimeError:
+            return  # this happens if ffmepg is not installed
+        self.assertTrue(ret)
+
+        p = video.AVIParser('./tests/data/clean.cleaned.avi')
+        self.assertEqual(p.get_meta(), {})
+        self.assertTrue(p.remove_all())
+
+        os.remove('./tests/data/clean.avi')
+        os.remove('./tests/data/clean.cleaned.avi')
+        os.remove('./tests/data/clean.cleaned.cleaned.avi')

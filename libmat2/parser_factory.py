@@ -18,6 +18,8 @@ def __load_all_parsers():
             continue
         elif fname.endswith('__init__.py'):
             continue
+        elif fname.endswith('exiftool.py'):
+            continue
         basename = os.path.basename(fname)
         name, _ = os.path.splitext(basename)
         importlib.import_module('.' + name, package='libmat2')

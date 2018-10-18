@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
-import os
 import collections
 import enum
 import importlib
 from typing import Dict, Optional
+
+from . import exiftool, video
 
 # make pyflakes happy
 assert Dict
@@ -37,24 +38,13 @@ DEPENDENCIES = {
     'mutagen': 'Mutagen',
     }
 
-def _get_exiftool_path() -> str:  # pragma: no cover
-    exiftool_path = '/usr/bin/exiftool'
-    if os.path.isfile(exiftool_path):
-        if os.access(exiftool_path, os.X_OK):
-            return exiftool_path
 
-    # ArchLinux
-    exiftool_path = '/usr/bin/vendor_perl/exiftool'
-    if os.path.isfile(exiftool_path):
-        if os.access(exiftool_path, os.X_OK):
-            return exiftool_path
-
-    raise ValueError
 
 def check_dependencies() -> dict:
     ret = collections.defaultdict(bool)  # type: Dict[str, bool]
 
-    ret['Exiftool'] = True if _get_exiftool_path() else False
+    ret['Exiftool'] = True if exiftool._get_exiftool_path() else False
+    ret['Ffmpeg'] = True if video._get_ffmpeg_path() else False
 
     for key, value in DEPENDENCIES.items():
         ret[value] = True

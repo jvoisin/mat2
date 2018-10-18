@@ -7,7 +7,8 @@ assert Set  # make pyflakes happy
 
 class AbstractParser(abc.ABC):
     """ This is the base class of every parser.
-    It might yield `ValueError` on instantiation on invalid files.
+    It might yield `ValueError` on instantiation on invalid files,
+    and `RuntimeError` when something went wrong in `remove_all`.
     """
     meta_list = set()  # type: Set[str]
     mimetypes = set()  # type: Set[str]
@@ -27,4 +28,7 @@ class AbstractParser(abc.ABC):
 
     @abc.abstractmethod
     def remove_all(self) -> bool:
+        """
+        :raises RuntimeError: Raised if the cleaning process went wrong.
+        """
         pass  # pragma: no cover

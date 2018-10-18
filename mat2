@@ -97,7 +97,13 @@ def clean_meta(filename: str, is_lightweight: bool, policy: UnknownMemberPolicy)
         return False
     p.unknown_member_policy = policy
     p.lightweight_cleaning = is_lightweight
-    return p.remove_all()
+
+    try:
+        return p.remove_all()
+    except RuntimeError as e:
+        print("[-] %s can't be cleaned: %s" % (filename, e))
+    return False
+
 
 
 def show_parsers() -> bool:
