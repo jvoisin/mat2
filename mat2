@@ -77,7 +77,7 @@ def __print_meta(filename: str, metadata: dict, depth: int=1):
 
     print("[%s] Metadata for %s:" % ('+'*depth, filename))
 
-    for (k,v) in sorted(metadata.items()):
+    for (k, v) in sorted(metadata.items()):
         if isinstance(v, dict):
             __print_meta(k, v, depth+1)
             continue
