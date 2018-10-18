@@ -77,9 +77,10 @@ def __print_meta(filename: str, metadata: dict, depth: int=1):
 
     print("[%s] Metadata for %s:" % ('+'*depth, filename))
 
-    for k, v in metadata.items():
+    for (k,v) in sorted(metadata.items()):
         if isinstance(v, dict):
-            return __print_meta(k, v, depth+1)
+            __print_meta(k, v, depth+1)
+            continue
         try:  # FIXME this is ugly.
             print(padding + "  %s: %s" % (k, v))
         except UnicodeEncodeError:
