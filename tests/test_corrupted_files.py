@@ -5,7 +5,8 @@ import shutil
 import os
 import logging
 
-from libmat2 import pdf, images, audio, office, parser_factory, torrent, harmless
+from libmat2 import pdf, images, audio, office, parser_factory, torrent
+from libmat2 import harmless, video
 
 # No need to logging messages, should something go wrong,
 # the testsuite _will_ fail.
@@ -192,3 +193,9 @@ class TestCorruptedFiles(unittest.TestCase):
         with self.assertRaises(ValueError):
              images.JPGParser('./tests/data/clean.jpg')
         os.remove('./tests/data/clean.jpg')
+
+    def test_avi(self):
+        shutil.copy('./tests/data/dirty.torrent', './tests/data/clean.avi')
+        p = video.AVIParser('./tests/data/clean.avi')
+        self.assertFalse(p.remove_all())
+        os.remove('./tests/data/clean.avi')

@@ -43,9 +43,8 @@ class AVIParser(exiftool.ExiftoolParser):
 
         try:
             subprocess.check_call(cmd)
-        except subprocess.CalledProcessError:  # pragma: no cover
+        except subprocess.CalledProcessError:
             return False
-
         return True
 
 

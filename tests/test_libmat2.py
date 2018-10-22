@@ -477,16 +477,18 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/clean.cleaned.cleaned.txt')
 
     def test_avi(self):
+        try:
+            video._get_ffmpeg_path()
+        except RuntimeError:
+            raise unittest.SkipTest
+
         shutil.copy('./tests/data/dirty.avi', './tests/data/clean.avi')
         p = video.AVIParser('./tests/data/clean.avi')
 
         meta = p.get_meta()
         self.assertEqual(meta['Software'], 'MEncoder SVN-r33148-4.0.1')
 
-        try:
-            ret = p.remove_all()
-        except RuntimeError:
-            return  # this happens if ffmepg is not installed
+        ret = p.remove_all()
         self.assertTrue(ret)
 
         p = video.AVIParser('./tests/data/clean.cleaned.avi')
