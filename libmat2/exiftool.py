@@ -1,11 +1,7 @@
 import json
 import os
-import re
-import shutil
 import subprocess
-import tempfile
-
-from typing import Dict, Union, Set, Callable, Any
+from typing import Dict, Union, Set
 
 from . import abstract
 
@@ -20,23 +16,8 @@ class ExiftoolParser(abstract.AbstractParser):
     """
     meta_whitelist = set()  # type: Set[str]
 
-    def _handle_problematic_filename(self, callback: Callable[[str], Any]) -> bytes:
-        """ This method takes a filename with a potentially problematic name,
-        and safely applies a `callback` to it.
-        """
-        if re.search('^[a-z0-9/]', self.filename) is not None:
-            return callback(self.filename)
-
-        tmpdirname = tempfile.mkdtemp()
-        fname = os.path.join(tmpdirname, "temp_file")
-        shutil.copy(self.filename, fname)
-        out = callback(fname)
-        shutil.rmtree(tmpdirname)
-        return out
-
     def get_meta(self) -> Dict[str, Union[str, dict]]:
-        fun = lambda f: subprocess.check_output([_get_exiftool_path(), '-json', f])
-        out = self._handle_problematic_filename(fun)
+        out = subprocess.check_output([_get_exiftool_path(), '-json', self.filename])
         meta = json.loads(out.decode('utf-8'))[0]
         for key in self.meta_whitelist:
             meta.pop(key, None)

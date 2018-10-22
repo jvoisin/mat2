@@ -1,5 +1,6 @@
 import abc
 import os
+import re
 from typing import Set, Dict, Union
 
 assert Set  # make pyflakes happy
@@ -17,6 +18,11 @@ class AbstractParser(abc.ABC):
         """
         :raises ValueError: Raised upon an invalid file
         """
+        if re.search('^[a-z0-9./]', filename) is None:
+            # Some parsers are calling external binaries,
+            # this prevents shell command injections
+            filename = os.path.join('.', filename)
+
         self.filename = filename
         fname, extension = os.path.splitext(filename)
         self.output_filename = fname + '.cleaned' + extension

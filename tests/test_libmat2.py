@@ -46,9 +46,22 @@ class TestParameterInjection(unittest.TestCase):
         shutil.copy('./tests/data/dirty.avi', './--output')
         p = video.AVIParser('--output')
         meta = p.get_meta()
-        print(meta)
         self.assertEqual(meta['Software'], 'MEncoder SVN-r33148-4.0.1')
         os.remove('--output')
+
+    def test_ffmpeg_injection_complete_path(self):
+        try:
+            video._get_ffmpeg_path()
+        except RuntimeError:
+            raise unittest.SkipTest
+
+        shutil.copy('./tests/data/dirty.avi', './tests/data/ --output.avi')
+        p = video.AVIParser('./tests/data/ --output.avi')
+        meta = p.get_meta()
+        self.assertEqual(meta['Software'], 'MEncoder SVN-r33148-4.0.1')
+        self.assertTrue(p.remove_all())
+        os.remove('./tests/data/ --output.avi')
+        os.remove('./tests/data/ --output.cleaned.avi')
 
 
 class TestUnsupportedEmbeddedFiles(unittest.TestCase):

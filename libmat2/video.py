@@ -24,10 +24,9 @@ class AVIParser(exiftool.ExiftoolParser):
                       'SampleRate', 'AvgBytesPerSec', 'BitsPerSample',
                       'Duration', 'ImageSize', 'Megapixels'}
 
-
-    def __remove_all_internal(self, filename: str):
+    def remove_all(self):
         cmd = [_get_ffmpeg_path(),
-               '-i', filename,           # input file
+               '-i', self.filename,           # input file
                '-y',                     # overwrite existing output file
                '-loglevel', 'panic',     # Don't show log
                '-hide_banner',           # hide the banner
@@ -38,11 +37,8 @@ class AVIParser(exiftool.ExiftoolParser):
                '-flags:v', '+bitexact',  # don't add any metadata
                '-flags:a', '+bitexact',  # don't add any metadata
                self.output_filename]
-        subprocess.check_call(cmd)
-
-    def remove_all(self) -> bool:
         try:
-            self._handle_problematic_filename(self.__remove_all_internal)
+            subprocess.check_call(cmd)
         except subprocess.CalledProcessError as e:
             logging.error("Something went wrong during the processing of %s: %s", self.filename, e)
             return False

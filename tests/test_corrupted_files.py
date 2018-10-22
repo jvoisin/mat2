@@ -204,3 +204,14 @@ class TestCorruptedFiles(unittest.TestCase):
         p = video.AVIParser('./tests/data/clean.avi')
         self.assertFalse(p.remove_all())
         os.remove('./tests/data/clean.avi')
+
+    def test_avi_injection(self):
+        try:
+            video._get_ffmpeg_path()
+        except RuntimeError:
+            raise unittest.SkipTest
+
+        shutil.copy('./tests/data/dirty.torrent', './tests/data/--output.avi')
+        p = video.AVIParser('./tests/data/--output.avi')
+        self.assertFalse(p.remove_all())
+        os.remove('./tests/data/--output.avi')
