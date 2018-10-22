@@ -5,7 +5,7 @@ import shutil
 import subprocess
 import tempfile
 
-from typing import Dict, Union, Set
+from typing import Dict, Union, Set, Callable, Any
 
 from . import abstract
 
@@ -20,27 +20,23 @@ class ExiftoolParser(abstract.AbstractParser):
     """
     meta_whitelist = set()  # type: Set[str]
 
-    @staticmethod
-    def __handle_problematic_filename(filename: str, callback) -> bytes:
-        """ This method takes a filename with a problematic name,
-        and safely applies it a `callback`."""
+    def _handle_problematic_filename(self, callback: Callable[[str], Any]) -> bytes:
+        """ This method takes a filename with a potentially problematic name,
+        and safely applies a `callback` to it.
+        """
+        if re.search('^[a-z0-9/]', self.filename) is not None:
+            return callback(self.filename)
+
         tmpdirname = tempfile.mkdtemp()
         fname = os.path.join(tmpdirname, "temp_file")
-        shutil.copy(filename, fname)
+        shutil.copy(self.filename, fname)
         out = callback(fname)
         shutil.rmtree(tmpdirname)
         return out
 
     def get_meta(self) -> Dict[str, Union[str, dict]]:
-        """ There is no way to escape the leading(s) dash(es) of the current
-        self.filename to prevent parameter injections, so we need to take care
-        of this.
-        """
         fun = lambda f: subprocess.check_output([_get_exiftool_path(), '-json', f])
-        if re.search('^[a-z0-9/]', self.filename) is None:
-            out = self.__handle_problematic_filename(self.filename, fun)
-        else:
-            out = fun(self.filename)
+        out = self._handle_problematic_filename(fun)
         meta = json.loads(out.decode('utf-8'))[0]
         for key in self.meta_whitelist:
             meta.pop(key, None)

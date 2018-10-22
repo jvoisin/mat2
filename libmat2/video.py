@@ -1,5 +1,6 @@
 import os
 import subprocess
+import logging
 
 from . import exiftool
 
@@ -23,13 +24,10 @@ class AVIParser(exiftool.ExiftoolParser):
                       'SampleRate', 'AvgBytesPerSec', 'BitsPerSample',
                       'Duration', 'ImageSize', 'Megapixels'}
 
-    def remove_all(self) -> bool:
-        """
-            TODO: handle problematic filenames starting with `-` and `--`,
-            check exiftool.py
-        """
+
+    def __remove_all_internal(self, filename: str):
         cmd = [_get_ffmpeg_path(),
-               '-i', self.filename,      # input file
+               '-i', filename,           # input file
                '-y',                     # overwrite existing output file
                '-loglevel', 'panic',     # Don't show log
                '-hide_banner',           # hide the banner
@@ -40,10 +38,13 @@ class AVIParser(exiftool.ExiftoolParser):
                '-flags:v', '+bitexact',  # don't add any metadata
                '-flags:a', '+bitexact',  # don't add any metadata
                self.output_filename]
+        subprocess.check_call(cmd)
 
+    def remove_all(self) -> bool:
         try:
-            subprocess.check_call(cmd)
-        except subprocess.CalledProcessError:
+            self._handle_problematic_filename(self.__remove_all_internal)
+        except subprocess.CalledProcessError as e:
+            logging.error("Something went wrong during the processing of %s: %s", self.filename, e)
             return False
         return True
 

@@ -37,6 +37,19 @@ class TestParameterInjection(unittest.TestCase):
         self.assertEqual(meta['ModifyDate'], "2018:03:20 21:59:25")
         os.remove('-ver')
 
+    def test_ffmpeg_injection(self):
+        try:
+            video._get_ffmpeg_path()
+        except RuntimeError:
+            raise unittest.SkipTest
+
+        shutil.copy('./tests/data/dirty.avi', './--output')
+        p = video.AVIParser('--output')
+        meta = p.get_meta()
+        print(meta)
+        self.assertEqual(meta['Software'], 'MEncoder SVN-r33148-4.0.1')
+        os.remove('--output')
+
 
 class TestUnsupportedEmbeddedFiles(unittest.TestCase):
     def test_odt_with_svg(self):
