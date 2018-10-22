@@ -195,6 +195,11 @@ class TestCorruptedFiles(unittest.TestCase):
         os.remove('./tests/data/clean.jpg')
 
     def test_avi(self):
+        try:
+            video._get_ffmpeg_path()
+        except RuntimeError:
+            raise unittest.SkipTest
+
         shutil.copy('./tests/data/dirty.torrent', './tests/data/clean.avi')
         p = video.AVIParser('./tests/data/clean.avi')
         self.assertFalse(p.remove_all())
