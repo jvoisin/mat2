@@ -6,11 +6,12 @@ max-locals=20
 disable=
     fixme,
     invalid-name,
+    duplicate-code,
     missing-docstring,
     protected-access,
-		abstract-method,
-		wrong-import-position,
-		catching-non-exception,
-		cell-var-from-loop,
-		locally-disabled,
-		invalid-sequence-index,  # pylint doesn't like things like `Tuple[int, bytes]` in type annotation
+    abstract-method,
+    wrong-import-position,
+    catching-non-exception,
+    cell-var-from-loop,
+    locally-disabled,
+    invalid-sequence-index,  # pylint doesn't like things like `Tuple[int, bytes]` in type annotation

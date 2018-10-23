@@ -194,6 +194,13 @@ class TestCorruptedFiles(unittest.TestCase):
              images.JPGParser('./tests/data/clean.jpg')
         os.remove('./tests/data/clean.jpg')
 
+    def test_png_lightweight(self):
+        return
+        shutil.copy('./tests/data/dirty.torrent', './tests/data/clean.png')
+        p = images.PNGParser('./tests/data/clean.png')
+        self.assertTrue(p.remove_all())
+        os.remove('./tests/data/clean.png')
+
     def test_avi(self):
         try:
             video._get_ffmpeg_path()

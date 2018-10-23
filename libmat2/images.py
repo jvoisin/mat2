@@ -35,6 +35,8 @@ class PNGParser(exiftool.ExiftoolParser):
             raise ValueError
 
     def remove_all(self) -> bool:
+        if self.lightweight_cleaning:
+            return self._lightweight_cleanup()
         surface = cairo.ImageSurface.create_from_png(self.filename)
         surface.write_to_png(self.output_filename)
         return True

@@ -26,7 +26,7 @@ class AVIParser(exiftool.ExiftoolParser):
 
     def remove_all(self):
         cmd = [_get_ffmpeg_path(),
-               '-i', self.filename,           # input file
+               '-i', self.filename,      # input file
                '-y',                     # overwrite existing output file
                '-loglevel', 'panic',     # Don't show log
                '-hide_banner',           # hide the banner
