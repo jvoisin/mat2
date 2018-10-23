@@ -5,7 +5,7 @@
 - Processing files starting with a dash is now quicker
 - Metadata are now displayed sorted
 - Recursive metadata support for FLAC files
-- Unsupported extensions aren't displayed in `/.mat -l` anymore
+- Unsupported extensions aren't displayed in `./mat2 -l` anymore
 - Improve the display when no metadata are found
 - Update the logo according to the GNOME guidelines
 - The testsuite is now runnable on the installed version of mat2
