@@ -1,3 +1,16 @@
+# 0.5.0 - 2018-10-23
+
+- Video (.avi files for now) support, via FFmpeg, optionally
+- Lightweight cleaning for png and tiff files
+- Processing files starting with a dash is now quicker
+- Metadata are now displayed sorted
+- Recursive metadata support for FLAC files
+- Unsupported extensions aren't displayed in `/.mat -l` anymore
+- Improve the display when no metadata are found
+- Update the logo according to the GNOME guidelines
+- The testsuite is now runnable on the installed version of mat2
+- Various internal cleanup/improvements
+
 # 0.4.0 - 2018-10-03
 
 - There is now a policy, for advanced users, to deal with unknown embedded fileformats
