@@ -24,7 +24,7 @@ class ExiftoolParser(abstract.AbstractParser):
             meta.pop(key, None)
         return meta
 
-    def _lightweight_cleanup(self):
+    def _lightweight_cleanup(self) -> bool:
         if os.path.exists(self.output_filename):
             try:
                 # exiftool can't force output to existing files

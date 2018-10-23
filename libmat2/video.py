@@ -24,7 +24,7 @@ class AVIParser(exiftool.ExiftoolParser):
                       'SampleRate', 'AvgBytesPerSec', 'BitsPerSample',
                       'Duration', 'ImageSize', 'Megapixels'}
 
-    def remove_all(self):
+    def remove_all(self) -> bool:
         cmd = [_get_ffmpeg_path(),
                '-i', self.filename,      # input file
                '-y',                     # overwrite existing output file

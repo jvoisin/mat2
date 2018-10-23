@@ -40,7 +40,7 @@ DEPENDENCIES = {
 
 
 
-def check_dependencies() -> dict:
+def check_dependencies() -> Dict[str, bool]:
     ret = collections.defaultdict(bool)  # type: Dict[str, bool]
 
     ret['Exiftool'] = True if exiftool._get_exiftool_path() else False
