@@ -4,7 +4,7 @@ import unittest
 import shutil
 import os
 
-from libmat2 import pdf, images
+from libmat2 import pdf, images, torrent
 
 class TestLightWeightCleaning(unittest.TestCase):
     def test_pdf(self):
@@ -63,3 +63,20 @@ class TestLightWeightCleaning(unittest.TestCase):
 
         os.remove('./tests/data/clean.jpg')
         os.remove('./tests/data/clean.cleaned.jpg')
+
+    def test_torrent(self):
+        shutil.copy('./tests/data/dirty.torrent', './tests/data/clean.torrent')
+        p = torrent.TorrentParser('./tests/data/clean.torrent')
+
+        meta = p.get_meta()
+        self.assertEqual(meta['created by'], b'mktorrent 1.0')
+
+        p.lightweight_cleaning = True
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = torrent.TorrentParser('./tests/data/clean.cleaned.torrent')
+        self.assertEqual(p.get_meta(), {})
+
+        os.remove('./tests/data/clean.torrent')
+        os.remove('./tests/data/clean.cleaned.torrent')

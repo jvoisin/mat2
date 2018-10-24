@@ -6,7 +6,7 @@ import cairo
 
 import gi
 gi.require_version('GdkPixbuf', '2.0')
-from gi.repository import GdkPixbuf
+from gi.repository import GdkPixbuf, GLib
 
 from . import exiftool
 
@@ -50,15 +50,21 @@ class GdkPixbufAbstractParser(exiftool.ExiftoolParser):
 
     def __init__(self, filename):
         super().__init__(filename)
-        if imghdr.what(filename) != self._type:  # better safe than sorry
+        # we can't use imghdr here because of https://bugs.python.org/issue28591
+        try:
+            GdkPixbuf.Pixbuf.new_from_file(self.filename)
+        except GLib.GError:
             raise ValueError
 
     def remove_all(self) -> bool:
+        if self.lightweight_cleaning:
+            return self._lightweight_cleanup()
+
         _, extension = os.path.splitext(self.filename)
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.filename)
         if extension.lower() == '.jpg':
             extension = '.jpeg'  # gdk is picky
-        pixbuf.savev(self.output_filename, extension[1:], [], [])
+        pixbuf.savev(self.output_filename, type=extension[1:], option_keys=[], option_values=[])
         return True
 
 
