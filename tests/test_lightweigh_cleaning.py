@@ -80,3 +80,27 @@ class TestLightWeightCleaning(unittest.TestCase):
 
         os.remove('./tests/data/clean.torrent')
         os.remove('./tests/data/clean.cleaned.torrent')
+
+    def test_tiff(self):
+        shutil.copy('./tests/data/dirty.tiff', './tests/data/clean.tiff')
+        p = images.TiffParser('./tests/data/clean.tiff')
+
+        meta = p.get_meta()
+        self.assertEqual(meta['ImageDescription'], 'OLYMPUS DIGITAL CAMERA         ')
+
+        p.lightweight_cleaning = True
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = images.TiffParser('./tests/data/clean.cleaned.tiff')
+        self.assertEqual(p.get_meta(),
+                {
+                    'Orientation': 'Horizontal (normal)',
+                    'ResolutionUnit': 'inches',
+                    'XResolution': 72,
+                    'YResolution': 72
+                    }
+                )
+
+        os.remove('./tests/data/clean.tiff')
+        os.remove('./tests/data/clean.cleaned.tiff')
