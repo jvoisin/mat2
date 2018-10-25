@@ -4,6 +4,7 @@ import unittest
 import shutil
 import os
 import logging
+import zipfile
 
 from libmat2 import pdf, images, audio, office, parser_factory, torrent
 from libmat2 import harmless, video
@@ -222,3 +223,17 @@ class TestCorruptedFiles(unittest.TestCase):
         p = video.AVIParser('./tests/data/--output.avi')
         self.assertFalse(p.remove_all())
         os.remove('./tests/data/--output.avi')
+
+    def test_zip(self):
+        with zipfile.ZipFile('./tests/data/dirty.zip', 'w') as zout:
+            zout.write('./tests/data/dirty.flac')
+            zout.write('./tests/data/dirty.docx')
+            zout.write('./tests/data/dirty.jpg')
+            zout.write('./tests/data/embedded_corrupted.docx')
+        p, mimetype = parser_factory.get_parser('./tests/data/dirty.zip')
+        self.assertEqual(mimetype, 'application/zip')
+        meta = p.get_meta()
+        self.assertEqual(meta['tests/data/dirty.flac']['comments'], 'Thank you for using MAT !')
+        self.assertEqual(meta['tests/data/dirty.docx']['word/media/image1.png']['Comment'], 'This is a comment, be careful!')
+        self.assertFalse(p.remove_all())
+        os.remove('./tests/data/dirty.zip')

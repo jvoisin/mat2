@@ -6,7 +6,7 @@ import os
 import zipfile
 
 from libmat2 import pdf, images, audio, office, parser_factory, torrent, harmless
-from libmat2 import check_dependencies, video
+from libmat2 import check_dependencies, video, archive
 
 
 class TestCheckDependencies(unittest.TestCase):
@@ -152,6 +152,18 @@ class TestGetMeta(unittest.TestCase):
         self.assertEqual(mimetype, 'text/plain')
         meta = p.get_meta()
         self.assertEqual(meta, {})
+
+    def test_zip(self):
+        with zipfile.ZipFile('./tests/data/dirty.zip', 'w') as zout:
+            zout.write('./tests/data/dirty.flac')
+            zout.write('./tests/data/dirty.docx')
+            zout.write('./tests/data/dirty.jpg')
+        p, mimetype = parser_factory.get_parser('./tests/data/dirty.zip')
+        self.assertEqual(mimetype, 'application/zip')
+        meta = p.get_meta()
+        self.assertEqual(meta['tests/data/dirty.flac']['comments'], 'Thank you for using MAT !')
+        self.assertEqual(meta['tests/data/dirty.docx']['word/media/image1.png']['Comment'], 'This is a comment, be careful!')
+        os.remove('./tests/data/dirty.zip')
 
 
 class TestRemovingThumbnails(unittest.TestCase):
@@ -488,3 +500,24 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/clean.avi')
         os.remove('./tests/data/clean.cleaned.avi')
         os.remove('./tests/data/clean.cleaned.cleaned.avi')
+
+    def test_zip(self):
+        with zipfile.ZipFile('./tests/data/dirty.zip', 'w') as zout:
+            zout.write('./tests/data/dirty.flac')
+            zout.write('./tests/data/dirty.docx')
+            zout.write('./tests/data/dirty.jpg')
+        p = archive.ZipParser('./tests/data/dirty.zip')
+        meta = p.get_meta()
+        self.assertEqual(meta['tests/data/dirty.docx']['word/media/image1.png']['Comment'], 'This is a comment, be careful!')
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = archive.ZipParser('./tests/data/dirty.cleaned.zip')
+        self.assertEqual(p.get_meta(), {})
+        self.assertTrue(p.remove_all())
+
+        os.remove('./tests/data/dirty.zip')
+        os.remove('./tests/data/dirty.cleaned.zip')
+        os.remove('./tests/data/dirty.cleaned.cleaned.zip')
+
