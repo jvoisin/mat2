@@ -138,7 +138,13 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                             abort = True
                             continue
                     if tmp_parser:
-                        tmp_parser.remove_all()
+                        if tmp_parser.remove_all() is False:
+                            logging.warning("In file %s, something went wrong \
+                                             with the cleaning of %s \
+                                             (format: %s)",
+                                            self.filename, item.filename, mtype)
+                            abort = True
+                            continue
                         os.rename(tmp_parser.output_filename, full_path)
 
                 zinfo = zipfile.ZipInfo(item.filename)  # type: ignore
