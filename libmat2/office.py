@@ -301,7 +301,7 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
         Yes, I know that parsing xml with regexp ain't pretty,
         be my guest and fix it if you want.
         """
-        metadata = {}
+        metadata = super().get_meta()
         zipin = zipfile.ZipFile(self.filename)
         for item in zipin.infolist():
             if item.filename.startswith('docProps/') and item.filename.endswith('.xml'):

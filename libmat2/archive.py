@@ -67,6 +67,31 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
         return metadata
 
+    def get_meta(self) -> Dict[str, Union[str, dict]]:
+        meta = dict()  # type: Dict[str, Union[str, dict]]
+
+        with zipfile.ZipFile(self.filename) as zin:
+            temp_folder = tempfile.mkdtemp()
+
+            for item in zin.infolist():
+                if item.filename[-1] == '/':  # pragma: no cover
+                    # `is_dir` is added in Python3.6
+                    continue  # don't keep empty folders
+
+                zin.extract(member=item, path=temp_folder)
+                full_path = os.path.join(temp_folder, item.filename)
+
+                tmp_parser, _ = parser_factory.get_parser(full_path)  # type: ignore
+                if not tmp_parser:
+                    continue
+
+                local_meta = tmp_parser.get_meta()
+                if local_meta:
+                    meta[item.filename] = local_meta
+
+        shutil.rmtree(temp_folder)
+        return meta
+
     def remove_all(self) -> bool:
         # pylint: disable=too-many-branches
 

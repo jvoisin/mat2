@@ -36,6 +36,7 @@ class TestZipMetadata(unittest.TestCase):
 
         meta = p.get_meta()
         self.assertIsNotNone(meta)
+        self.assertEqual(meta['word/media/image1.png']['Comment'], 'This is a comment, be careful!')
 
         ret = p.remove_all()
         self.assertTrue(ret)
