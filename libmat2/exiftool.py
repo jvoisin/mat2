@@ -53,15 +53,14 @@ class ExiftoolParser(abstract.AbstractParser):
         return True
 
 def _get_exiftool_path() -> str:  # pragma: no cover
-    exiftool_path = '/usr/bin/exiftool'
-    if os.path.isfile(exiftool_path):
-        if os.access(exiftool_path, os.X_OK):
-            return exiftool_path
+    possible_pathes = {
+        '/usr/bin/exiftool',              # debian/fedora
+        '/usr/bin/vendor_perl/exiftool',  # archlinux
+    }
 
-    # ArchLinux
-    exiftool_path = '/usr/bin/vendor_perl/exiftool'
-    if os.path.isfile(exiftool_path):
-        if os.access(exiftool_path, os.X_OK):
-            return exiftool_path
+    for possible_path in possible_pathes:
+        if os.path.isfile(possible_path):
+            if os.access(possible_path, os.X_OK):
+                return possible_path
 
     raise RuntimeError("Unable to find exiftool")
