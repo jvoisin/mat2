@@ -521,3 +521,26 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/dirty.cleaned.zip')
         os.remove('./tests/data/dirty.cleaned.cleaned.zip')
 
+
+    def test_mp4(self):
+        try:
+            video._get_ffmpeg_path()
+        except RuntimeError:
+            raise unittest.SkipTest
+
+        shutil.copy('./tests/data/dirty.mp4', './tests/data/clean.mp4')
+        p = video.MP4Parser('./tests/data/clean.mp4')
+
+        meta = p.get_meta()
+        self.assertEqual(meta['Encoder'], 'HandBrake 0.9.4 2009112300')
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = video.MP4Parser('./tests/data/clean.cleaned.mp4')
+        self.assertNotIn('Encoder', p.get_meta())
+        self.assertTrue(p.remove_all())
+
+        os.remove('./tests/data/clean.mp4')
+        os.remove('./tests/data/clean.cleaned.mp4')
+        os.remove('./tests/data/clean.cleaned.cleaned.mp4')

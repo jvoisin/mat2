@@ -20,6 +20,8 @@ __version__ = '0.5.0'
 assert Tuple
 assert Union
 
+logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.WARNING)
+
 
 def __check_file(filename: str, mode: int=os.R_OK) -> bool:
     if not os.path.exists(filename):
