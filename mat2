@@ -6,6 +6,7 @@ import sys
 import mimetypes
 import argparse
 import logging
+import unicodedata
 
 try:
     from libmat2 import parser_factory, UNSUPPORTED_EXTENSIONS
@@ -83,6 +84,15 @@ def __print_meta(filename: str, metadata: dict, depth: int=1):
         if isinstance(v, dict):
             __print_meta(k, v, depth+1)
             continue
+
+        # Remove control characters
+        # We might use 'Cc' instead of 'C', but better safe than sorry
+        # https://www.unicode.org/reports/tr44/#GC_Values_Table
+        try:
+            v = ''.join(ch for ch in v if not unicodedata.category(ch).startswith('C'))
+        except TypeError:
+            pass  # for things that aren't iterable
+
         try:  # FIXME this is ugly.
             print(padding + "  %s: %s" % (k, v))
         except UnicodeEncodeError:

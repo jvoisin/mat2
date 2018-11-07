@@ -121,7 +121,7 @@ class TestGetMeta(unittest.TestCase):
         proc = subprocess.Popen(mat2_binary + ['--show', './tests/data/dirty.pdf'],
                 stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'producer: pdfTeX-1.40.14', stdout)
+        self.assertIn(b'Producer: pdfTeX-1.40.14', stdout)
 
     def test_png(self):
         proc = subprocess.Popen(mat2_binary + ['--show', './tests/data/dirty.png'],
