@@ -174,3 +174,10 @@ class TestGetMeta(unittest.TestCase):
         self.assertIn(b'genre: Python', stdout)
         self.assertIn(b'i am a : various comment', stdout)
         self.assertIn(b'artist: jvoisin', stdout)
+
+class TestControlCharInjection(unittest.TestCase):
+    def test_jpg(self):
+        proc = subprocess.Popen(mat2_binary + ['--show', './tests/data/control_chars.jpg'],
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+        self.assertIn(b'Comment: GQ\n', stdout)
