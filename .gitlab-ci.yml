@@ -35,8 +35,7 @@ mypy:
   - apt-get -qqy update
   - apt-get -qqy install --no-install-recommends python3-pip
   - pip3 install mypy
-  - mypy mat2 libmat2/*.py --ignore-missing-imports
-  - mypy --ignore-missing-imports ./nautilus/mat2.py
+  - mypy --ignore-missing-imports mat2 libmat2/*.py ./nautilus/mat2.py
 
 tests:debian:
   stage: test

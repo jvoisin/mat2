@@ -14,7 +14,7 @@ thread, so we'll have to resort to using a `queue` to pass "messages" around.
 
 import queue
 import threading
-from typing import Tuple
+from typing import Tuple, Optional, List
 from urllib.parse import unquote
 
 import gi
@@ -25,10 +25,8 @@ from gi.repository import Nautilus, GObject, Gtk, Gio, GLib, GdkPixbuf
 
 from libmat2 import parser_factory
 
-# make pyflakes happy
-assert Tuple
 
-def _remove_metadata(fpath):
+def _remove_metadata(fpath) -> Tuple[bool, Optional[str]]:
     """ This is a simple wrapper around libmat2, because it's
     easier and cleaner this way.
     """
@@ -63,7 +61,7 @@ class ColumnExtension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationW
         self.infobar.get_content_area().pack_start(self.infobar_hbox, True, True, 0)
         self.infobar.show_all()
 
-    def get_widget(self, uri, window):
+    def get_widget(self, uri, window) -> Gtk.Widget:
         """ This is the method that we have to implement (because we're
         a LocationWidgetProvider) in order to show our infobar.
         """
@@ -228,7 +226,7 @@ class ColumnExtension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationW
         """ https://bugzilla.gnome.org/show_bug.cgi?id=784278 """
         return None
 
-    def get_file_items(self, window, files):
+    def get_file_items(self, window, files) -> Optional[List[Nautilus.MenuItem]]:
         """ This method is the one allowing us to create a menu item.
         """
         # Do not show the menu item if not a single file has a chance to be
