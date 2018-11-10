@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="mat2",
-    version='0.5.0',
+    version='0.6.0',
     author="Julien (jvoisin) Voisin",
     author_email="julien.voisin+mat2@dustri.org",
     description="A handy tool to trash your metadata",

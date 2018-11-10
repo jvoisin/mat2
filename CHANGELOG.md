@@ -1,3 +1,14 @@
+# 0.6.0 - 2018-11-10
+
+- Add lightweight cleaning for jpeg
+- Add support for zip files
+- Add support for mp4 files
+- Improve metadata extraction for archives
+- Improve robustness against corrupted embedded files
+- Fix a possible security issue on some terminals (control character
+	injection via --show)
+- Various internal cleanup/improvements
+
 # 0.5.0 - 2018-10-23
 
 - Video (.avi files for now) support, via FFmpeg, optionally
