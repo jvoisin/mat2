@@ -33,5 +33,5 @@ Since MAT2 is written in Python3, please conform as much as possible to the
 10. Sign the tarball with `gpg --armor --detach-sign mat-$VERSION.tar.xz`
 11. Upload the result on Gitlab's [tag page](https://0xacab.org/jvoisin/mat2/tags) and add the changelog there
 12. Announce the release on the [mailing list](https://mailman.boum.org/listinfo/mat-dev)
-13. Tell the [downstreams](https://0xacab.org/jvoisin/mat2/blob/master/INSTALL.md) about it
+13. Upload the new version on pypi with `python3 setup.py sdist bdist_wheel` then `twine upload -s dist/*`
 14. Do the secret release dance

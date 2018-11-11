@@ -1,3 +1,15 @@
+# Python ecosystem
+
+If you feel like running arbitrary code downloaded over the
+internet (pypi doesn't support gpg signatures [anymore](https://github.com/pypa/python-packaging-user-guide/pull/466)),
+mat2 is [available on pypi](https://pypi.org/project/mat2/), and can be
+installed like this:
+
+```
+pip3 install mat2
+```
+
+
 # GNU/Linux
 
 ## Fedora
