@@ -82,6 +82,15 @@ complex file formats.
 This is why you shouldn't rely on metadata's presence to decide if your file must
 be cleaned or not.
 
+# Notes about the lightweight mode
+
+By default, mat2 might alter a bit the data of your files, in order to remove
+as much metadata as possible. For example, texts in PDF might not be selectable anymore,
+compressed images might get compressed again, …
+Since some users might be willing to trade some metadata's presence in exchange
+of the guarantee that mat2 won't modify the data of their files, there is the
+`-L` flag that precisely does that.
+
 # Related software
 
 - The first iteration of [MAT](https://mat.boum.org)
