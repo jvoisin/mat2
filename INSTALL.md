@@ -35,10 +35,10 @@ dnf -y install mat2 mat2-nautilus
 
 ## Debian
 
-There is currently no package for Debian. If you want to help to make this
-happen, there is an [issue](https://0xacab.org/jvoisin/mat2/issues/16) open.
+There a package available in Debian *buster/sid*. The package [doesn't include
+the Nautilus extension yet](https://bugs.debian.org/910491).
 
-But fear not, there is a way to install it *manually*:
+For Debian 9 *stretch*, there is a way to install it *manually*:
 
 ```
 # apt install python3-mutagen python3-gi-cairo gir1.2-gdkpixbuf-2.0 libimage-exiftool-perl gir1.2-glib-2.0 gir1.2-poppler-0.18
