@@ -35,7 +35,7 @@ def _remove_metadata(fpath) -> Tuple[bool, Optional[str]]:
         return False, mtype
     return parser.remove_all(), mtype
 
-class ColumnExtension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationWidgetProvider):
+class Mat2Extension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationWidgetProvider):
     """ This class adds an item to the right-clic menu in Nautilus. """
 
     def __init__(self):
