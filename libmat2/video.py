@@ -9,7 +9,14 @@ from . import exiftool
 
 class AbstractFFmpegParser(exiftool.ExiftoolParser):
     """ Abstract parser for all FFmpeg-based ones, mainly for video. """
+    # Some fileformats have mandatory metadata fields
+    meta_key_value_whitelist = {}  # type: Dict[str, Union[str, int]]
+
     def remove_all(self) -> bool:
+        if self.meta_key_value_whitelist:
+            logging.warning('The format of "%s" (video/mp4) has some mandatory '
+                            'metadata fields; mat2 filled them with standard '
+                            'data.', self.filename)
         cmd = [_get_ffmpeg_path(),
                '-i', self.filename,      # input file
                '-y',                     # overwrite existing output file
@@ -31,6 +38,41 @@ class AbstractFFmpegParser(exiftool.ExiftoolParser):
             return False
         return True
 
+    def get_meta(self) -> Dict[str, Union[str, dict]]:
+        meta = super().get_meta()
+
+        ret = dict()  # type: Dict[str, Union[str, dict]]
+        for key, value in meta.items():
+            if key in self.meta_key_value_whitelist.keys():
+                if value == self.meta_key_value_whitelist[key]:
+                    continue
+            ret[key] = value
+        return ret
+
+
+class WMVParser(AbstractFFmpegParser):
+    mimetypes = {'video/x-ms-wmv', }
+    meta_whitelist = {'AudioChannels', 'AudioCodecID', 'AudioCodecName',
+                      'ErrorCorrectionType', 'AudioSampleRate', 'DataPackets',
+                      'Directory', 'Duration', 'ExifToolVersion',
+                      'FileAccessDate', 'FileInodeChangeDate', 'FileLength',
+                      'FileModifyDate', 'FileName', 'FilePermissions',
+                      'FileSize', 'FileType', 'FileTypeExtension',
+                      'FrameCount', 'FrameRate', 'ImageHeight', 'ImageSize',
+                      'ImageWidth', 'MIMEType', 'MaxBitrate', 'MaxPacketSize',
+                      'Megapixels', 'MinPacketSize', 'Preroll', 'SendDuration',
+                      'SourceFile', 'StreamNumber', 'VideoCodecName', }
+    meta_key_value_whitelist = {  # some metadata are mandatory :/
+        'AudioCodecDescription': '',
+        'CreationDate': '0000:00:00 00:00:00Z',
+        'FileID': '00000000-0000-0000-0000-000000000000',
+        'Flags': 2,  # FIXME: What is this? Why 2?
+        'ModifyDate': '0000:00:00 00:00:00',
+        'TimeOffset': '0 s',
+        'VideoCodecDescription': '',
+        'StreamType': 'Audio',
+        }
+
 
 class AVIParser(AbstractFFmpegParser):
     mimetypes = {'video/x-msvideo', }
@@ -50,6 +92,7 @@ class AVIParser(AbstractFFmpegParser):
                       'AudioSampleRate', 'Encoding', 'NumChannels',
                       'SampleRate', 'AvgBytesPerSec', 'BitsPerSample',
                       'Duration', 'ImageSize', 'Megapixels'}
+
 
 class MP4Parser(AbstractFFmpegParser):
     mimetypes = {'video/mp4', }
@@ -83,23 +126,6 @@ class MP4Parser(AbstractFFmpegParser):
         'TrackModifyDate': '0000:00:00 00:00:00',
         'TrackVolume': '0.00%',
     }
-
-    def remove_all(self) -> bool:
-        logging.warning('The format of "%s" (video/mp4) has some mandatory '
-                        'metadata fields; mat2 filled them with standard data.',
-                        self.filename)
-        return super().remove_all()
-
-    def get_meta(self) -> Dict[str, Union[str, dict]]:
-        meta = super().get_meta()
-
-        ret = dict()  # type: Dict[str, Union[str, dict]]
-        for key, value in meta.items():
-            if key in self.meta_key_value_whitelist.keys():
-                if value == self.meta_key_value_whitelist[key]:
-                    continue
-            ret[key] = value
-        return ret
 
 
 def _get_ffmpeg_path() -> str:  # pragma: no cover

@@ -165,6 +165,11 @@ class TestGetMeta(unittest.TestCase):
         self.assertEqual(meta['tests/data/dirty.docx']['word/media/image1.png']['Comment'], 'This is a comment, be careful!')
         os.remove('./tests/data/dirty.zip')
 
+    def test_wmv(self):
+        p, mimetype = parser_factory.get_parser('./tests/data/dirty.wmv')
+        self.assertEqual(mimetype, 'video/x-ms-wmv')
+        meta = p.get_meta()
+        self.assertEqual(meta['EncodingSettings'], 'Lavf52.103.0')
 
 class TestRemovingThumbnails(unittest.TestCase):
     def test_odt(self):
@@ -544,3 +549,26 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/clean.mp4')
         os.remove('./tests/data/clean.cleaned.mp4')
         os.remove('./tests/data/clean.cleaned.cleaned.mp4')
+
+    def test_wmv(self):
+        try:
+            video._get_ffmpeg_path()
+        except RuntimeError:
+            raise unittest.SkipTest
+
+        shutil.copy('./tests/data/dirty.wmv', './tests/data/clean.wmv')
+        p = video.WMVParser('./tests/data/clean.wmv')
+
+        meta = p.get_meta()
+        self.assertEqual(meta['EncodingSettings'], 'Lavf52.103.0')
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = video.WMVParser('./tests/data/clean.cleaned.wmv')
+        self.assertNotIn('EncodingSettings', p.get_meta())
+        self.assertTrue(p.remove_all())
+
+        os.remove('./tests/data/clean.wmv')
+        os.remove('./tests/data/clean.cleaned.wmv')
+        os.remove('./tests/data/clean.cleaned.cleaned.wmv')
