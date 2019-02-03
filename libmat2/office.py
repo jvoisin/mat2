@@ -2,7 +2,7 @@ import logging
 import os
 import re
 import zipfile
-from typing import Dict, Set, Pattern, Tuple, Union
+from typing import Dict, Set, Pattern, Tuple, Union, Any
 
 import xml.etree.ElementTree as ET  # type: ignore
 
@@ -295,26 +295,21 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
 
         return True
 
-    def get_meta(self) -> Dict[str, Union[str, dict]]:
+    def _specific_get_meta(self, full_path: str, file_path: str) -> Dict[str, Any]:
         """
         Yes, I know that parsing xml with regexp ain't pretty,
         be my guest and fix it if you want.
         """
-        metadata = super().get_meta()
-        zipin = zipfile.ZipFile(self.filename)
-        for item in zipin.infolist():
-            if item.filename.startswith('docProps/') and item.filename.endswith('.xml'):
-                try:
-                    content = zipin.read(item).decode('utf-8')
-                    results = re.findall(r"<(.+)>(.+)</\1>", content, re.I|re.M)
-                    for (key, value) in results:
-                        metadata[key] = value
-                except (TypeError, UnicodeDecodeError):  # We didn't manage to parse the xml file
-                    metadata[item.filename] = 'harmful content'
-            for key, value in self._get_zipinfo_meta(item).items():
-                metadata[key] = value
-        zipin.close()
-        return metadata
+        if not file_path.startswith('docProps/') or not file_path.endswith('.xml'):
+            return {}
+
+        with open(full_path, encoding='utf-8') as f:
+            try:
+                results = re.findall(r"<(.+)>(.+)</\1>", f.read(), re.I|re.M)
+                return {k:v for (k, v) in results}
+            except (TypeError, UnicodeDecodeError):
+                # We didn't manage to parse the xml file
+                return {file_path: 'harmful content', }
 
 
 class LibreOfficeParser(ArchiveBasedAbstractParser):

@@ -4,7 +4,7 @@ import tempfile
 import os
 import logging
 import shutil
-from typing import Dict, Set, Pattern, Union
+from typing import Dict, Set, Pattern, Union, Any
 
 from . import abstract, UnknownMemberPolicy, parser_factory
 
@@ -42,6 +42,12 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
         # pylint: disable=unused-argument,no-self-use
         return True  # pragma: no cover
 
+    def _specific_get_meta(self, full_path: str, file_path: str) -> Dict[str, Any]:
+        """ This method can be used to extract specific metadata
+        from files present in the archive."""
+        # pylint: disable=unused-argument,no-self-use
+        return {}  # pragma: no cover
+
     @staticmethod
     def _clean_zipinfo(zipinfo: zipfile.ZipInfo) -> zipfile.ZipInfo:
         zipinfo.create_system = 3  # Linux
@@ -74,6 +80,10 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
             temp_folder = tempfile.mkdtemp()
 
             for item in zin.infolist():
+                local_meta = dict()  # type: Dict[str, Union[str, Dict]]
+                for k, v in self._get_zipinfo_meta(item).items():
+                    local_meta[k] = v
+
                 if item.filename[-1] == '/':  # pragma: no cover
                     # `is_dir` is added in Python3.6
                     continue  # don't keep empty folders
@@ -81,11 +91,15 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                 zin.extract(member=item, path=temp_folder)
                 full_path = os.path.join(temp_folder, item.filename)
 
-                tmp_parser, _ = parser_factory.get_parser(full_path)  # type: ignore
-                if not tmp_parser:
-                    continue
+                specific_meta = self._specific_get_meta(full_path, item.filename)
+                for (k, v) in specific_meta.items():
+                    local_meta[k] = v
 
-                local_meta = tmp_parser.get_meta()
+                tmp_parser, _ = parser_factory.get_parser(full_path)  # type: ignore
+                if tmp_parser:
+                    for k, v in tmp_parser.get_meta().items():
+                        local_meta[k] = v
+
                 if local_meta:
                     meta[item.filename] = local_meta
 

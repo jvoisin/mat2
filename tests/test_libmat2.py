@@ -131,9 +131,9 @@ class TestGetMeta(unittest.TestCase):
     def test_docx(self):
         p = office.MSOfficeParser('./tests/data/dirty.docx')
         meta = p.get_meta()
-        self.assertEqual(meta['cp:lastModifiedBy'], 'Julien Voisin')
-        self.assertEqual(meta['dc:creator'], 'julien voisin')
-        self.assertEqual(meta['Application'], 'LibreOffice/5.4.5.1$Linux_X86_64 LibreOffice_project/40m0$Build-1')
+        self.assertEqual(meta['docProps/core.xml']['cp:lastModifiedBy'], 'Julien Voisin')
+        self.assertEqual(meta['docProps/core.xml']['dc:creator'], 'julien voisin')
+        self.assertEqual(meta['docProps/app.xml']['Application'], 'LibreOffice/5.4.5.1$Linux_X86_64 LibreOffice_project/40m0$Build-1')
 
     def test_libreoffice(self):
         p = office.LibreOfficeParser('./tests/data/dirty.odt')
