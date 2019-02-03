@@ -10,6 +10,7 @@ assert Tuple  # make pyflakes happy
 
 T = TypeVar('T', bound='abstract.AbstractParser')
 
+
 def __load_all_parsers():
     """ Loads every parser in a dynamic way """
     current_dir = os.path.dirname(__file__)
@@ -24,7 +25,9 @@ def __load_all_parsers():
         name, _ = os.path.splitext(basename)
         importlib.import_module('.' + name, package='libmat2')
 
+
 __load_all_parsers()
+
 
 def _get_parsers() -> List[T]:
     """ Get all our parsers!"""

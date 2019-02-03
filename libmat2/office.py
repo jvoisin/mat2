@@ -266,7 +266,6 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
                 f.write(b'<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">')
                 f.write(b'</cp:coreProperties>')
 
-
         if self.__remove_rsid(full_path) is False:
             return False
 

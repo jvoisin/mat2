@@ -9,8 +9,12 @@ installed like this:
 pip3 install mat2
 ```
 
-
 # GNU/Linux
+
+## Optional dependencies
+
+When [bubblewrap](https://github.com/projectatomic/bubblewrap) is
+installed, MAT2 uses it to sandbox any external processes it invokes.
 
 ## Fedora
 

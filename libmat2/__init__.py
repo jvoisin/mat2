@@ -39,12 +39,11 @@ DEPENDENCIES = {
     }
 
 
-
 def check_dependencies() -> Dict[str, bool]:
     ret = collections.defaultdict(bool)  # type: Dict[str, bool]
 
-    ret['Exiftool'] = True if exiftool._get_exiftool_path() else False
-    ret['Ffmpeg'] = True if video._get_ffmpeg_path() else False
+    ret['Exiftool'] = bool(exiftool._get_exiftool_path())
+    ret['Ffmpeg'] = bool(video._get_ffmpeg_path())
 
     for key, value in DEPENDENCIES.items():
         ret[value] = True
@@ -54,6 +53,7 @@ def check_dependencies() -> Dict[str, bool]:
             ret[value] = False  # pragma: no cover
 
     return ret
+
 
 @enum.unique
 class UnknownMemberPolicy(enum.Enum):

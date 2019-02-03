@@ -3,6 +3,7 @@ from typing import Union, Tuple, Dict
 
 from . import abstract
 
+
 class TorrentParser(abstract.AbstractParser):
     mimetypes = {'application/x-bittorrent', }
     whitelist = {b'announce', b'announce-list', b'info'}
@@ -32,7 +33,7 @@ class TorrentParser(abstract.AbstractParser):
         return True
 
 
-class _BencodeHandler(object):
+class _BencodeHandler():
     """
     Since bencode isn't that hard to parse,
     MAT2 comes with its own parser, based on the spec

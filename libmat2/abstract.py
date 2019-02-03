@@ -37,4 +37,5 @@ class AbstractParser(abc.ABC):
         """
         :raises RuntimeError: Raised if the cleaning process went wrong.
         """
+        # pylint: disable=unnecessary-pass
         pass  # pragma: no cover
