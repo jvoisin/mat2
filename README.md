@@ -42,6 +42,13 @@ doesn't run on [Debian Jessie](https://packages.debian.org/jessie/python3).
 $ python3 -m unittest discover -v
 ```
 
+And if you want to see the coverage:
+
+```bash
+$ python3-coverage run --branch -m unittest discover -s tests/
+$ python3-coverage report --include -m --include /libmat2/*'
+```
+
 # How to use MAT2
 
 ```bash
