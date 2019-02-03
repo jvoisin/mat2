@@ -118,7 +118,7 @@ def clean_meta(filename: str, is_lightweight: bool, policy: UnknownMemberPolicy)
 
 
 
-def show_parsers() -> bool:
+def show_parsers():
     print('[+] Supported formats:')
     formats = set()  # Set[str]
     for parser in parser_factory._get_parsers():  # type: ignore
@@ -133,7 +133,6 @@ def show_parsers() -> bool:
                 continue
             formats.add('  - %s (%s)' % (mtype, ', '.join(extensions)))
     print('\n'.join(sorted(formats)))
-    return True
 
 
 def __get_files_recursively(files: List[str]) -> Generator[str, None, None]:
@@ -156,7 +155,8 @@ def main() -> int:
 
     if not args.files:
         if args.list:
-            return show_parsers()
+            show_parsers()
+            return 0
         elif args.check_dependencies:
             print("Dependencies required for MAT2 %s:" % __version__)
             for key, value in sorted(check_dependencies().items()):
