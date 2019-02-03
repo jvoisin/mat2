@@ -42,6 +42,21 @@ class PNGParser(exiftool.ExiftoolParser):
         return True
 
 
+class GIFParser(exiftool.ExiftoolParser):
+    mimetypes = {'image/gif'}
+    meta_whitelist = {'AnimationIterations', 'BackgroundColor', 'BitsPerPixel',
+                      'ColorResolutionDepth', 'Directory', 'Duration',
+                      'ExifToolVersion', 'FileAccessDate',
+                      'FileInodeChangeDate', 'FileModifyDate', 'FileName',
+                      'FilePermissions', 'FileSize', 'FileType',
+                      'FileTypeExtension', 'FrameCount', 'GIFVersion',
+                      'HasColorMap', 'ImageHeight', 'ImageSize', 'ImageWidth',
+                      'MIMEType', 'Megapixels', 'SourceFile',}
+
+    def remove_all(self) -> bool:
+        return self._lightweight_cleanup()
+
+
 class GdkPixbufAbstractParser(exiftool.ExiftoolParser):
     """ GdkPixbuf can handle a lot of surfaces, so we're rending images on it,
         this has the side-effect of completely removing metadata.

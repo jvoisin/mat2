@@ -171,6 +171,12 @@ class TestGetMeta(unittest.TestCase):
         meta = p.get_meta()
         self.assertEqual(meta['EncodingSettings'], 'Lavf52.103.0')
 
+    def test_gif(self):
+        p, mimetype = parser_factory.get_parser('./tests/data/dirty.gif')
+        self.assertEqual(mimetype, 'image/gif')
+        meta = p.get_meta()
+        self.assertEqual(meta['Comment'], 'this is a test comment')
+
 class TestRemovingThumbnails(unittest.TestCase):
     def test_odt(self):
         shutil.copy('./tests/data/revision.odt', './tests/data/clean.odt')
@@ -572,3 +578,21 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/clean.wmv')
         os.remove('./tests/data/clean.cleaned.wmv')
         os.remove('./tests/data/clean.cleaned.cleaned.wmv')
+
+    def test_gif(self):
+        shutil.copy('./tests/data/dirty.gif', './tests/data/clean.gif')
+        p = images.GIFParser('./tests/data/clean.gif')
+
+        meta = p.get_meta()
+        self.assertEqual(meta['Comment'], 'this is a test comment')
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = images.GIFParser('./tests/data/clean.cleaned.gif')
+        self.assertNotIn('EncodingSettings', p.get_meta())
+        self.assertTrue(p.remove_all())
+
+        os.remove('./tests/data/clean.gif')
+        os.remove('./tests/data/clean.cleaned.gif')
+        os.remove('./tests/data/clean.cleaned.cleaned.gif')
