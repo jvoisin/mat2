@@ -138,14 +138,14 @@ class TestGetMeta(unittest.TestCase):
     def test_libreoffice(self):
         p = office.LibreOfficeParser('./tests/data/dirty.odt')
         meta = p.get_meta()
-        self.assertEqual(meta['meta:initial-creator'], 'jvoisin ')
-        self.assertEqual(meta['meta:creation-date'], '2011-07-26T03:27:48')
-        self.assertEqual(meta['meta:generator'], 'LibreOffice/3.3$Unix LibreOffice_project/330m19$Build-202')
+        self.assertEqual(meta['meta.xml']['meta:initial-creator'], 'jvoisin ')
+        self.assertEqual(meta['meta.xml']['meta:creation-date'], '2011-07-26T03:27:48')
+        self.assertEqual(meta['meta.xml']['meta:generator'], 'LibreOffice/3.3$Unix LibreOffice_project/330m19$Build-202')
 
         p = office.LibreOfficeParser('./tests/data/weird_producer.odt')
         meta = p.get_meta()
-        self.assertEqual(meta['create_system'], 'Windows')
-        self.assertEqual(meta['comment'], b'YAY FOR COMMENTS')
+        self.assertEqual(meta['mimetype']['create_system'], 'Windows')
+        self.assertEqual(meta['mimetype']['comment'], b'YAY FOR COMMENTS')
 
     def test_txt(self):
         p, mimetype = parser_factory.get_parser('./tests/data/dirty.txt')
@@ -440,7 +440,7 @@ class TestCleaning(unittest.TestCase):
         p = office.LibreOfficeParser('./tests/data/clean.odf')
 
         meta = p.get_meta()
-        self.assertEqual(meta['meta:creation-date'], '2018-04-23T00:18:59.438231281')
+        self.assertEqual(meta['meta.xml']['meta:creation-date'], '2018-04-23T00:18:59.438231281')
 
         ret = p.remove_all()
         self.assertTrue(ret)
@@ -458,7 +458,7 @@ class TestCleaning(unittest.TestCase):
         p = office.LibreOfficeParser('./tests/data/clean.odg')
 
         meta = p.get_meta()
-        self.assertEqual(meta['dc:date'], '2018-04-23T00:26:59.385838550')
+        self.assertEqual(meta['meta.xml']['dc:date'], '2018-04-23T00:26:59.385838550')
 
         ret = p.remove_all()
         self.assertTrue(ret)
