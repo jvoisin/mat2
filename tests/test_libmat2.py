@@ -6,7 +6,7 @@ import os
 import zipfile
 
 from libmat2 import pdf, images, audio, office, parser_factory, torrent, harmless
-from libmat2 import check_dependencies, video, archive
+from libmat2 import check_dependencies, video, archive, html
 
 
 class TestCheckDependencies(unittest.TestCase):
@@ -596,3 +596,21 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/clean.gif')
         os.remove('./tests/data/clean.cleaned.gif')
         os.remove('./tests/data/clean.cleaned.cleaned.gif')
+
+    def test_html(self):
+        shutil.copy('./tests/data/dirty.html', './tests/data/clean.html')
+        p = html.HTMLParser('./tests/data/clean.html')
+
+        meta = p.get_meta()
+        self.assertEqual(meta['author'], 'jvoisin')
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = html.HTMLParser('./tests/data/clean.cleaned.html')
+        self.assertEqual(p.get_meta(), {})
+        self.assertTrue(p.remove_all())
+
+        os.remove('./tests/data/clean.html')
+        os.remove('./tests/data/clean.cleaned.html')
+        os.remove('./tests/data/clean.cleaned.cleaned.html')

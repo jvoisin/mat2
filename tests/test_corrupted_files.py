@@ -7,7 +7,7 @@ import logging
 import zipfile
 
 from libmat2 import pdf, images, audio, office, parser_factory, torrent
-from libmat2 import harmless, video
+from libmat2 import harmless, video, html
 
 # No need to logging messages, should something go wrong,
 # the testsuite _will_ fail.
@@ -232,3 +232,40 @@ class TestCorruptedFiles(unittest.TestCase):
         self.assertEqual(meta['tests/data/dirty.docx']['word/media/image1.png']['Comment'], 'This is a comment, be careful!')
         self.assertFalse(p.remove_all())
         os.remove('./tests/data/dirty.zip')
+
+    def test_html(self):
+        shutil.copy('./tests/data/dirty.html', './tests/data/clean.html')
+        with open('./tests/data/clean.html', 'a') as f:
+            f.write('<open>but not</closed>')
+        with self.assertRaises(ValueError):
+            html.HTMLParser('./tests/data/clean.html')
+        os.remove('./tests/data/clean.html')
+
+        # Yes, we're able to deal with malformed html :/
+        shutil.copy('./tests/data/dirty.html', './tests/data/clean.html')
+        with open('./tests/data/clean.html', 'a') as f:
+            f.write('<meta name=\'this" is="weird"/>')
+        p = html.HTMLParser('./tests/data/clean.html')
+        self.assertTrue(p.remove_all())
+        p = html.HTMLParser('./tests/data/clean.cleaned.html')
+        self.assertEqual(p.get_meta(), {})
+        os.remove('./tests/data/clean.html')
+        os.remove('./tests/data/clean.cleaned.html')
+
+        with open('./tests/data/clean.html', 'w') as f:
+            f.write('</close>')
+        with self.assertRaises(ValueError):
+            html.HTMLParser('./tests/data/clean.html')
+        os.remove('./tests/data/clean.html')
+
+        with open('./tests/data/clean.html', 'w') as f:
+            f.write('<notclosed>')
+        p = html.HTMLParser('./tests/data/clean.html')
+        with self.assertRaises(ValueError):
+            p.get_meta()
+        p = html.HTMLParser('./tests/data/clean.html')
+        with self.assertRaises(ValueError):
+            p.remove_all()
+        os.remove('./tests/data/clean.html')
+
+
