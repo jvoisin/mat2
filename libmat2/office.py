@@ -384,7 +384,7 @@ class LibreOfficeParser(ArchiveBasedAbstractParser):
             return {}
         with open(full_path, encoding='utf-8') as f:
             try:
-                results = re.findall(r"<((?:meta|dc|cp).+?)>(.+)</\1>", f.read(), re.I|re.M)
+                results = re.findall(r"<((?:meta|dc|cp).+?)[^>]*>(.+)</\1>", f.read(), re.I|re.M)
                 return {k:v for (k, v) in results}
             except (TypeError, UnicodeDecodeError):  # We didn't manage to parse the xml file
                 # We didn't manage to parse the xml file
