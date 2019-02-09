@@ -47,6 +47,7 @@ def _get_bwrap_args(tempdir: str,
          '--chdir', cwd,
          '--unshare-all',
          '--new-session',
+         '--ro-bind', '/etc/ld.so.cache', '/etc/ld.so.cache',
          # XXX: enable --die-with-parent once all supported platforms have
          # a bubblewrap recent enough to support it.
          # '--die-with-parent',
