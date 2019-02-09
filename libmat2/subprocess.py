@@ -32,22 +32,26 @@ def _get_bwrap_path() -> str:
 def _get_bwrap_args(tempdir: str,
                     input_filename: str,
                     output_filename: Optional[str] = None) -> List[str]:
+    ro_bind_args = []
     cwd = os.getcwd()
 
     # XXX: use --ro-bind-try once all supported platforms
     # have a bubblewrap recent enough to support it.
     ro_bind_dirs = ['/usr', '/lib', '/lib64', '/bin', '/sbin', cwd]
-    ro_bind_args = []
     for bind_dir in ro_bind_dirs:
         if os.path.isdir(bind_dir):  # pragma: no cover
             ro_bind_args.extend(['--ro-bind', bind_dir, bind_dir])
+
+    ro_bind_files = ['/etc/ld.so.cache']
+    for bind_file in ro_bind_files:
+        if os.path.isfile(bind_file):  # pragma: no cover
+            ro_bind_args.extend(['--ro-bind', bind_file, bind_file])
 
     args = ro_bind_args + \
         ['--dev', '/dev',
          '--chdir', cwd,
          '--unshare-all',
          '--new-session',
-         '--ro-bind', '/etc/ld.so.cache', '/etc/ld.so.cache',
          # XXX: enable --die-with-parent once all supported platforms have
          # a bubblewrap recent enough to support it.
          # '--die-with-parent',
