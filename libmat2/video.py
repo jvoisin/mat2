@@ -14,9 +14,9 @@ class AbstractFFmpegParser(exiftool.ExiftoolParser):
 
     def remove_all(self) -> bool:
         if self.meta_key_value_whitelist:
-            logging.warning('The format of "%s" (video/mp4) has some mandatory '
+            logging.warning('The format of "%s" (%s) has some mandatory '
                             'metadata fields; mat2 filled them with standard '
-                            'data.', self.filename)
+                            'data.', self.filename, ', '.join(self.mimetypes))
         cmd = [_get_ffmpeg_path(),
                '-i', self.filename,      # input file
                '-y',                     # overwrite existing output file
