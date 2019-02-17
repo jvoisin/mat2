@@ -45,7 +45,8 @@ the Nautilus extension yet](https://bugs.debian.org/910491).
 For Debian 9 *stretch*, there is a way to install it *manually*:
 
 ```
-# apt install python3-mutagen python3-gi-cairo gir1.2-gdkpixbuf-2.0 libimage-exiftool-perl gir1.2-glib-2.0 gir1.2-poppler-0.18
+# apt install python3-mutagen python3-gi-cairo gir1.2-gdkpixbuf-2.0 libimage-exiftool-perl gir1.2-glib-2.0 gir1.2-poppler-0.18 ffmpeg
+# apt install bubblewrap  # if you want sandboxing
 $ git clone https://0xacab.org/jvoisin/mat2.git
 $ cd mat2
 $ ./mat2

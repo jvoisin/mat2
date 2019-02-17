@@ -1,3 +1,12 @@
+# 0.7.0 - 2019-02-17
+
+- Add support for wmv files
+- Add support for gif files
+- Add support for html files
+- Sandbox external processes via bubblewrap
+- Simplify archive-based formats processing
+- The Nautilus extension now plays nicer with other extensions
+
 # 0.6.0 - 2018-11-10
 
 - Add lightweight cleaning for jpeg
