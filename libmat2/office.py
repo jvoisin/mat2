@@ -89,7 +89,7 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
             r'^word/theme',
             r'^word/people\.xml$',
 
-            # we have a whitelist in self.files_to_keep,
+            # we have an allowlist in self.files_to_keep,
             # so we can trash everything else
             r'^word/_rels/',
         }))
@@ -100,7 +100,7 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
     def __fill_files_to_keep_via_content_types(self) -> bool:
         """ There is a suer-handy `[Content_Types].xml` file
         in MS Office archives, describing what each other file contains.
-        The self.content_types_to_keep member contains a type whitelist,
+        The self.content_types_to_keep member contains a type allowlist,
         so we're using it to fill the self.files_to_keep one.
         """
         with zipfile.ZipFile(self.filename) as zin:
@@ -220,7 +220,7 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
                 for file_to_omit in self.files_to_omit:
                     if file_to_omit.search(fname):
                         matches = map(lambda r: r.search(fname), self.files_to_keep)
-                        if any(matches):  # the file is whitelisted
+                        if any(matches):  # the file is in the allowlist
                             continue
                         removed_fnames.add(fname)
                         break

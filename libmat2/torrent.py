@@ -6,7 +6,7 @@ from . import abstract
 
 class TorrentParser(abstract.AbstractParser):
     mimetypes = {'application/x-bittorrent', }
-    whitelist = {b'announce', b'announce-list', b'info'}
+    allowlist = {b'announce', b'announce-list', b'info'}
 
     def __init__(self, filename):
         super().__init__(filename)
@@ -18,14 +18,14 @@ class TorrentParser(abstract.AbstractParser):
     def get_meta(self) -> Dict[str, Union[str, dict]]:
         metadata = {}
         for key, value in self.dict_repr.items():
-            if key not in self.whitelist:
+            if key not in self.allowlist:
                 metadata[key.decode('utf-8')] = value
         return metadata
 
     def remove_all(self) -> bool:
         cleaned = dict()
         for key, value in self.dict_repr.items():
-            if key in self.whitelist:
+            if key in self.allowlist:
                 cleaned[key] = value
         with open(self.output_filename, 'wb') as f:
             f.write(_BencodeHandler().bencode(cleaned))

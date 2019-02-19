@@ -15,7 +15,7 @@ assert Set
 
 class PNGParser(exiftool.ExiftoolParser):
     mimetypes = {'image/png', }
-    meta_whitelist = {'SourceFile', 'ExifToolVersion', 'FileName',
+    meta_allowlist = {'SourceFile', 'ExifToolVersion', 'FileName',
                       'Directory', 'FileSize', 'FileModifyDate',
                       'FileAccessDate', 'FileInodeChangeDate',
                       'FilePermissions', 'FileType', 'FileTypeExtension',
@@ -44,7 +44,7 @@ class PNGParser(exiftool.ExiftoolParser):
 
 class GIFParser(exiftool.ExiftoolParser):
     mimetypes = {'image/gif'}
-    meta_whitelist = {'AnimationIterations', 'BackgroundColor', 'BitsPerPixel',
+    meta_allowlist = {'AnimationIterations', 'BackgroundColor', 'BitsPerPixel',
                       'ColorResolutionDepth', 'Directory', 'Duration',
                       'ExifToolVersion', 'FileAccessDate',
                       'FileInodeChangeDate', 'FileModifyDate', 'FileName',
@@ -86,7 +86,7 @@ class GdkPixbufAbstractParser(exiftool.ExiftoolParser):
 class JPGParser(GdkPixbufAbstractParser):
     _type = 'jpeg'
     mimetypes = {'image/jpeg'}
-    meta_whitelist = {'SourceFile', 'ExifToolVersion', 'FileName',
+    meta_allowlist = {'SourceFile', 'ExifToolVersion', 'FileName',
                       'Directory', 'FileSize', 'FileModifyDate',
                       'FileAccessDate', "FileInodeChangeDate",
                       'FilePermissions', 'FileType', 'FileTypeExtension',
@@ -99,7 +99,7 @@ class JPGParser(GdkPixbufAbstractParser):
 class TiffParser(GdkPixbufAbstractParser):
     _type = 'tiff'
     mimetypes = {'image/tiff'}
-    meta_whitelist = {'Compression', 'ExifByteOrder', 'ExtraSamples',
+    meta_allowlist = {'Compression', 'ExifByteOrder', 'ExtraSamples',
                       'FillOrder', 'PhotometricInterpretation',
                       'PlanarConfiguration', 'RowsPerStrip', 'SamplesPerPixel',
                       'StripByteCounts', 'StripOffsets', 'BitsPerSample',

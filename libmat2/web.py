@@ -37,15 +37,15 @@ class CSSParser(abstract.AbstractParser):
 
 
 class AbstractHTMLParser(abstract.AbstractParser):
-    tags_blacklist = set()  # type: Set[str]
+    tags_blocklist = set()  # type: Set[str]
     # In some html/xml-based formats some tags are mandatory,
     # so we're keeping them, but are discarding their content
-    tags_required_blacklist = set()  # type: Set[str]
+    tags_required_blocklist = set()  # type: Set[str]
 
     def __init__(self, filename):
         super().__init__(filename)
-        self.__parser = _HTMLParser(self.filename, self.tags_blacklist,
-                                    self.tags_required_blacklist)
+        self.__parser = _HTMLParser(self.filename, self.tags_blocklist,
+                                    self.tags_required_blocklist)
         with open(filename, encoding='utf-8') as f:
             self.__parser.feed(f.read())
         self.__parser.close()
@@ -59,13 +59,13 @@ class AbstractHTMLParser(abstract.AbstractParser):
 
 class HTMLParser(AbstractHTMLParser):
     mimetypes = {'text/html', }
-    tags_blacklist = {'meta', }
-    tags_required_blacklist = {'title', }
+    tags_blocklist = {'meta', }
+    tags_required_blocklist = {'title', }
 
 
 class DTBNCXParser(AbstractHTMLParser):
     mimetypes = {'application/x-dtbncx+xml', }
-    tags_required_blacklist = {'title', 'doctitle', 'meta'}
+    tags_required_blocklist = {'title', 'doctitle', 'meta'}
 
 
 class _HTMLParser(parser.HTMLParser):
@@ -79,7 +79,7 @@ class _HTMLParser(parser.HTMLParser):
 
     Also, gotcha: the `tag` parameters are always in lowercase.
     """
-    def __init__(self, filename, blacklisted_tags, required_blacklisted_tags):
+    def __init__(self, filename, blocklisted_tags, required_blocklisted_tags):
         super().__init__()
         self.filename = filename
         self.__textrepr = ''
@@ -90,24 +90,24 @@ class _HTMLParser(parser.HTMLParser):
         self.__in_dangerous_but_required_tag = 0
         self.__in_dangerous_tag = 0
 
-        if required_blacklisted_tags & blacklisted_tags:  # pragma: nocover
+        if required_blocklisted_tags & blocklisted_tags:  # pragma: nocover
             raise ValueError("There is an overlap between %s and %s" % (
-                required_blacklisted_tags, blacklisted_tags))
-        self.tag_required_blacklist = required_blacklisted_tags
-        self.tag_blacklist = blacklisted_tags
+                required_blocklisted_tags, blocklisted_tags))
+        self.tag_required_blocklist = required_blocklisted_tags
+        self.tag_blocklist = blocklisted_tags
 
     def handle_starttag(self, tag: str, attrs: List[Tuple[str, str]]):
         original_tag = self.get_starttag_text()
         self.__validation_queue.append(original_tag)
 
-        if tag in self.tag_blacklist:
+        if tag in self.tag_blocklist:
             self.__in_dangerous_tag += 1
 
         if self.__in_dangerous_tag == 0:
             if self.__in_dangerous_but_required_tag == 0:
                 self.__textrepr += original_tag
 
-        if tag in self.tag_required_blacklist:
+        if tag in self.tag_required_blocklist:
             self.__in_dangerous_but_required_tag += 1
 
     def handle_endtag(self, tag: str):
@@ -123,7 +123,7 @@ class _HTMLParser(parser.HTMLParser):
                              "tag %s in %s" %
                              (tag, previous_tag, self.filename))
 
-        if tag in self.tag_required_blacklist:
+        if tag in self.tag_required_blocklist:
             self.__in_dangerous_but_required_tag -= 1
 
         if self.__in_dangerous_tag == 0:
@@ -131,7 +131,7 @@ class _HTMLParser(parser.HTMLParser):
                 # There is no `get_endtag_text()` method :/
                 self.__textrepr += '</' + previous_tag + '>'
 
-        if tag in self.tag_blacklist:
+        if tag in self.tag_blocklist:
             self.__in_dangerous_tag -= 1
 
     def handle_data(self, data: str):
@@ -141,14 +141,14 @@ class _HTMLParser(parser.HTMLParser):
                     self.__textrepr += escape(data)
 
     def handle_startendtag(self, tag: str, attrs: List[Tuple[str, str]]):
-        if tag in self.tag_required_blacklist | self.tag_blacklist:
+        if tag in self.tag_required_blocklist | self.tag_blocklist:
             meta = {k:v for k, v in attrs}
             name = meta.get('name', 'harmful metadata')
             content = meta.get('content', 'harmful data')
             self.__meta[name] = content
 
             if self.__in_dangerous_tag == 0:
-                if tag in self.tag_required_blacklist:
+                if tag in self.tag_required_blocklist:
                     self.__textrepr += '<' + tag + ' />'
                 return
 

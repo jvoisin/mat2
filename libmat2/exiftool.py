@@ -15,14 +15,14 @@ class ExiftoolParser(abstract.AbstractParser):
     from a import file, hence why several parsers are re-using its `get_meta`
     method.
     """
-    meta_whitelist = set()  # type: Set[str]
+    meta_allowlist = set()  # type: Set[str]
 
     def get_meta(self) -> Dict[str, Union[str, dict]]:
         out = subprocess.run([_get_exiftool_path(), '-json', self.filename],
                              input_filename=self.filename,
                              check=True, stdout=subprocess.PIPE).stdout
         meta = json.loads(out.decode('utf-8'))[0]
-        for key in self.meta_whitelist:
+        for key in self.meta_allowlist:
             meta.pop(key, None)
         return meta
 

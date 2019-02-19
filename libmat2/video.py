@@ -10,10 +10,10 @@ from . import subprocess
 class AbstractFFmpegParser(exiftool.ExiftoolParser):
     """ Abstract parser for all FFmpeg-based ones, mainly for video. """
     # Some fileformats have mandatory metadata fields
-    meta_key_value_whitelist = {}  # type: Dict[str, Union[str, int]]
+    meta_key_value_allowlist = {}  # type: Dict[str, Union[str, int]]
 
     def remove_all(self) -> bool:
-        if self.meta_key_value_whitelist:
+        if self.meta_key_value_allowlist:
             logging.warning('The format of "%s" (%s) has some mandatory '
                             'metadata fields; mat2 filled them with standard '
                             'data.', self.filename, ', '.join(self.mimetypes))
@@ -45,8 +45,8 @@ class AbstractFFmpegParser(exiftool.ExiftoolParser):
 
         ret = dict()  # type: Dict[str, Union[str, dict]]
         for key, value in meta.items():
-            if key in self.meta_key_value_whitelist.keys():
-                if value == self.meta_key_value_whitelist[key]:
+            if key in self.meta_key_value_allowlist.keys():
+                if value == self.meta_key_value_allowlist[key]:
                     continue
             ret[key] = value
         return ret
@@ -54,7 +54,7 @@ class AbstractFFmpegParser(exiftool.ExiftoolParser):
 
 class WMVParser(AbstractFFmpegParser):
     mimetypes = {'video/x-ms-wmv', }
-    meta_whitelist = {'AudioChannels', 'AudioCodecID', 'AudioCodecName',
+    meta_allowlist = {'AudioChannels', 'AudioCodecID', 'AudioCodecName',
                       'ErrorCorrectionType', 'AudioSampleRate', 'DataPackets',
                       'Directory', 'Duration', 'ExifToolVersion',
                       'FileAccessDate', 'FileInodeChangeDate', 'FileLength',
@@ -64,7 +64,7 @@ class WMVParser(AbstractFFmpegParser):
                       'ImageWidth', 'MIMEType', 'MaxBitrate', 'MaxPacketSize',
                       'Megapixels', 'MinPacketSize', 'Preroll', 'SendDuration',
                       'SourceFile', 'StreamNumber', 'VideoCodecName', }
-    meta_key_value_whitelist = {  # some metadata are mandatory :/
+    meta_key_value_allowlist = {  # some metadata are mandatory :/
         'AudioCodecDescription': '',
         'CreationDate': '0000:00:00 00:00:00Z',
         'FileID': '00000000-0000-0000-0000-000000000000',
@@ -78,7 +78,7 @@ class WMVParser(AbstractFFmpegParser):
 
 class AVIParser(AbstractFFmpegParser):
     mimetypes = {'video/x-msvideo', }
-    meta_whitelist = {'SourceFile', 'ExifToolVersion', 'FileName', 'Directory',
+    meta_allowlist = {'SourceFile', 'ExifToolVersion', 'FileName', 'Directory',
                       'FileSize', 'FileModifyDate', 'FileAccessDate',
                       'FileInodeChangeDate', 'FilePermissions', 'FileType',
                       'FileTypeExtension', 'MIMEType', 'FrameRate', 'MaxDataRate',
@@ -98,7 +98,7 @@ class AVIParser(AbstractFFmpegParser):
 
 class MP4Parser(AbstractFFmpegParser):
     mimetypes = {'video/mp4', }
-    meta_whitelist = {'AudioFormat', 'AvgBitrate', 'Balance', 'TrackDuration',
+    meta_allowlist = {'AudioFormat', 'AvgBitrate', 'Balance', 'TrackDuration',
                       'XResolution', 'YResolution', 'ExifToolVersion',
                       'FileAccessDate', 'FileInodeChangeDate', 'FileModifyDate',
                       'FileName', 'FilePermissions', 'MIMEType', 'FileType',
@@ -109,7 +109,7 @@ class MP4Parser(AbstractFFmpegParser):
                       'MovieDataSize', 'VideoFrameRate', 'MediaTimeScale',
                       'SourceImageHeight', 'SourceImageWidth',
                       'MatrixStructure', 'MediaDuration'}
-    meta_key_value_whitelist = {  # some metadata are mandatory :/
+    meta_key_value_allowlist = {  # some metadata are mandatory :/
         'CreateDate': '0000:00:00 00:00:00',
         'CurrentTime': '0 s',
         'MediaCreateDate': '0000:00:00 00:00:00',
