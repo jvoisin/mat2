@@ -32,6 +32,7 @@ metadata.
 - `gir1.2-gdkpixbuf-2.0` for images support
 - `FFmpeg`, optionally, for video support 
 - `libimage-exiftool-perl` for everything else
+- `bubblewrap`, optionally, for sandboxing
 
 Please note that MAT2 requires at least Python3.5, meaning that it
 doesn't run on [Debian Jessie](https://packages.debian.org/jessie/python3).
