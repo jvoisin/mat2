@@ -6,7 +6,7 @@ import os
 import zipfile
 
 from libmat2 import pdf, images, audio, office, parser_factory, torrent, harmless
-from libmat2 import check_dependencies, video, archive, html
+from libmat2 import check_dependencies, video, archive, web, epub
 
 
 class TestCheckDependencies(unittest.TestCase):
@@ -176,6 +176,23 @@ class TestGetMeta(unittest.TestCase):
         self.assertEqual(mimetype, 'image/gif')
         meta = p.get_meta()
         self.assertEqual(meta['Comment'], 'this is a test comment')
+
+    def test_epub(self):
+        p, mimetype = parser_factory.get_parser('./tests/data/dirty.epub')
+        self.assertEqual(mimetype, 'application/epub+zip')
+        meta = p.get_meta()
+        self.assertEqual(meta['OEBPS/content.opf']['dc:creator'], 'Dorothy L. Sayers')
+        self.assertEqual(meta['OEBPS/toc.ncx']['dtb:generator'], 'Ebookmaker 0.4.0a5 by Marcello Perathoner <webmaster@gutenberg.org>')
+        self.assertEqual(meta['OEBPS/@public@vhost@g@gutenberg@html@files@58820@58820-h@images@shield25.jpg']['CreatorTool'], 'Adobe Photoshop CS5 Macintosh')
+        self.assertEqual(meta['OEBPS/@public@vhost@g@gutenberg@html@files@58820@58820-h@58820-h-2.htm.html']['generator'], 'Ebookmaker 0.4.0a5 by Marcello Perathoner <webmaster@gutenberg.org>')
+
+    def test_css(self):
+        p, mimetype = parser_factory.get_parser('./tests/data/dirty.css')
+        self.assertEqual(mimetype, 'text/css')
+        meta = p.get_meta()
+        self.assertEqual(meta['author'], 'jvoisin')
+        self.assertEqual(meta['version'], '1.0')
+        self.assertEqual(meta['harmful data'], 'underline is cool')
 
 class TestRemovingThumbnails(unittest.TestCase):
     def test_odt(self):
@@ -599,7 +616,7 @@ class TestCleaning(unittest.TestCase):
 
     def test_html(self):
         shutil.copy('./tests/data/dirty.html', './tests/data/clean.html')
-        p = html.HTMLParser('./tests/data/clean.html')
+        p = web.HTMLParser('./tests/data/clean.html')
 
         meta = p.get_meta()
         self.assertEqual(meta['author'], 'jvoisin')
@@ -607,10 +624,50 @@ class TestCleaning(unittest.TestCase):
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = html.HTMLParser('./tests/data/clean.cleaned.html')
+        p = web.HTMLParser('./tests/data/clean.cleaned.html')
         self.assertEqual(p.get_meta(), {})
         self.assertTrue(p.remove_all())
 
         os.remove('./tests/data/clean.html')
         os.remove('./tests/data/clean.cleaned.html')
         os.remove('./tests/data/clean.cleaned.cleaned.html')
+
+
+    def test_epub(self):
+        shutil.copy('./tests/data/dirty.epub', './tests/data/clean.epub')
+        p = epub.EPUBParser('./tests/data/clean.epub')
+
+        meta = p.get_meta()
+        self.assertEqual(meta['OEBPS/content.opf']['dc:source'], 'http://www.gutenberg.org/files/58820/58820-h/58820-h.htm')
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = epub.EPUBParser('./tests/data/clean.cleaned.epub')
+        self.assertEqual(p.get_meta(), {})
+        self.assertTrue(p.remove_all())
+
+        os.remove('./tests/data/clean.epub')
+        os.remove('./tests/data/clean.cleaned.epub')
+        os.remove('./tests/data/clean.cleaned.cleaned.epub')
+
+
+    def test_css(self):
+        shutil.copy('./tests/data/dirty.css', './tests/data/clean.css')
+        p = web.CSSParser('./tests/data/clean.css')
+
+        self.assertEqual(p.get_meta(), {
+            'harmful data': 'underline is cool',
+            'version': '1.0',
+            'author': 'jvoisin'})
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = web.CSSParser('./tests/data/clean.cleaned.css')
+        self.assertEqual(p.get_meta(), {})
+        self.assertTrue(p.remove_all())
+
+        os.remove('./tests/data/clean.css')
+        os.remove('./tests/data/clean.cleaned.css')
+        os.remove('./tests/data/clean.cleaned.cleaned.css')

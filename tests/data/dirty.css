@@ -1,0 +1,14 @@
+/**
+ * This is my super css framework
+ * version: 1.0
+ * author : jvoisin
+ */
+
+body {
+	color: red;
+	background-color: blue;
+}
+
+.underline {
+	text-decoration: underline; /* underline is cool */	
+}

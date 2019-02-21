@@ -7,7 +7,7 @@ import logging
 import zipfile
 
 from libmat2 import pdf, images, audio, office, parser_factory, torrent
-from libmat2 import harmless, video, html
+from libmat2 import harmless, video, web
 
 # No need to logging messages, should something go wrong,
 # the testsuite _will_ fail.
@@ -220,34 +220,34 @@ class TestCorruptedFiles(unittest.TestCase):
         os.remove('./tests/data/--output.avi')
 
     def test_zip(self):
-        with zipfile.ZipFile('./tests/data/dirty.zip', 'w') as zout:
+        with zipfile.ZipFile('./tests/data/clean.zip', 'w') as zout:
             zout.write('./tests/data/dirty.flac')
             zout.write('./tests/data/dirty.docx')
             zout.write('./tests/data/dirty.jpg')
             zout.write('./tests/data/embedded_corrupted.docx')
-        p, mimetype = parser_factory.get_parser('./tests/data/dirty.zip')
+        p, mimetype = parser_factory.get_parser('./tests/data/clean.zip')
         self.assertEqual(mimetype, 'application/zip')
         meta = p.get_meta()
         self.assertEqual(meta['tests/data/dirty.flac']['comments'], 'Thank you for using MAT !')
         self.assertEqual(meta['tests/data/dirty.docx']['word/media/image1.png']['Comment'], 'This is a comment, be careful!')
         self.assertFalse(p.remove_all())
-        os.remove('./tests/data/dirty.zip')
+        os.remove('./tests/data/clean.zip')
 
     def test_html(self):
         shutil.copy('./tests/data/dirty.html', './tests/data/clean.html')
         with open('./tests/data/clean.html', 'a') as f:
             f.write('<open>but not</closed>')
         with self.assertRaises(ValueError):
-            html.HTMLParser('./tests/data/clean.html')
+            web.HTMLParser('./tests/data/clean.html')
         os.remove('./tests/data/clean.html')
 
         # Yes, we're able to deal with malformed html :/
         shutil.copy('./tests/data/dirty.html', './tests/data/clean.html')
         with open('./tests/data/clean.html', 'a') as f:
             f.write('<meta name=\'this" is="weird"/>')
-        p = html.HTMLParser('./tests/data/clean.html')
+        p = web.HTMLParser('./tests/data/clean.html')
         self.assertTrue(p.remove_all())
-        p = html.HTMLParser('./tests/data/clean.cleaned.html')
+        p = web.HTMLParser('./tests/data/clean.cleaned.html')
         self.assertEqual(p.get_meta(), {})
         os.remove('./tests/data/clean.html')
         os.remove('./tests/data/clean.cleaned.html')
@@ -255,17 +255,38 @@ class TestCorruptedFiles(unittest.TestCase):
         with open('./tests/data/clean.html', 'w') as f:
             f.write('</close>')
         with self.assertRaises(ValueError):
-            html.HTMLParser('./tests/data/clean.html')
+            web.HTMLParser('./tests/data/clean.html')
         os.remove('./tests/data/clean.html')
 
         with open('./tests/data/clean.html', 'w') as f:
             f.write('<notclosed>')
-        p = html.HTMLParser('./tests/data/clean.html')
+        p = web.HTMLParser('./tests/data/clean.html')
         with self.assertRaises(ValueError):
             p.get_meta()
-        p = html.HTMLParser('./tests/data/clean.html')
+        p = web.HTMLParser('./tests/data/clean.html')
         with self.assertRaises(ValueError):
             p.remove_all()
         os.remove('./tests/data/clean.html')
 
+        with open('./tests/data/clean.html', 'w') as f:
+            f.write('<doctitle><br/></doctitle><br/><notclosed>')
+        p = web.HTMLParser('./tests/data/clean.html')
+        with self.assertRaises(ValueError):
+            p.get_meta()
+        p = web.HTMLParser('./tests/data/clean.html')
+        with self.assertRaises(ValueError):
+            p.remove_all()
+        os.remove('./tests/data/clean.html')
+
+    def test_epub(self):
+        with zipfile.ZipFile('./tests/data/clean.epub', 'w') as zout:
+            zout.write('./tests/data/dirty.jpg', 'OEBPS/content.opf')
+        p, mimetype = parser_factory.get_parser('./tests/data/clean.epub')
+        self.assertEqual(mimetype, 'application/epub+zip')
+        meta = p.get_meta()
+        self.assertEqual(meta['OEBPS/content.opf']['OEBPS/content.opf'],
+                'harmful content')
+
+        self.assertFalse(p.remove_all())
+        os.remove('./tests/data/clean.epub')
 

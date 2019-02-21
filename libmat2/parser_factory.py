@@ -1,3 +1,4 @@
+import logging
 import glob
 import os
 import mimetypes
@@ -9,6 +10,10 @@ from . import abstract, UNSUPPORTED_EXTENSIONS
 assert Tuple  # make pyflakes happy
 
 T = TypeVar('T', bound='abstract.AbstractParser')
+
+mimetypes.add_type('application/epub+zip', '.epub')
+# EPUB Navigation Control XML File
+mimetypes.add_type('application/x-dtbncx+xml', '.ncx')
 
 
 def __load_all_parsers():
@@ -49,6 +54,8 @@ def get_parser(filename: str) -> Tuple[Optional[T], Optional[str]]:
         if mtype in parser_class.mimetypes:
             try:
                 return parser_class(filename), mtype
-            except ValueError:
+            except ValueError as e:
+                logging.info("Got an exception when trying to instanciate "
+                             "%s for %s: %s", parser_class, filename, e)
                 return None, mtype
     return None, mtype
