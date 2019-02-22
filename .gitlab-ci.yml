@@ -1,10 +1,12 @@
-image: debian
+variables:
+  CONTAINER_REGISTRY: $CI_REGISTRY/georg/mat2-ci-images
 
 stages:
   - linting
   - test
 
 bandit:
+  image: $CONTAINER_REGISTRY:linting 
   stage: linting
   script:  # TODO: remove B405 and B314
   - apt-get -qqy update
@@ -14,6 +16,7 @@ bandit:
   - bandit -r ./libmat2 --format txt --skip B101,B404,B603,B405,B314
 
 pylint:
+  image: $CONTAINER_REGISTRY:linting
   stage: linting
   script:
   - apt-get -qqy update
@@ -23,6 +26,7 @@ pylint:
   - pylint3 --extension-pkg-whitelist=Nautilus,GObject,Gtk,Gio,GLib,gi ./nautilus/mat2.py
 
 pyflakes:
+  image: $CONTAINER_REGISTRY:linting
   stage: linting
   script:
   - apt-get -qqy update
@@ -30,6 +34,7 @@ pyflakes:
   - pyflakes3 ./libmat2 ./mat2 ./tests/ ./nautilus
 
 mypy:
+  image: $CONTAINER_REGISTRY:linting
   stage: linting
   script:
   - apt-get -qqy update
@@ -38,6 +43,7 @@ mypy:
   - mypy --ignore-missing-imports mat2 libmat2/*.py ./nautilus/mat2.py
 
 tests:debian:
+  image: $CONTAINER_REGISTRY:debian
   stage: test
   script:
   - apt-get -qqy update
@@ -47,6 +53,7 @@ tests:debian:
   - python3-coverage report --fail-under=90 -m --include 'libmat2/*'
 
 tests:debian_with_bubblewrap:
+  image: $CONTAINER_REGISTRY:debian
   stage: test
   tags:
     - whitewhale
@@ -57,7 +64,7 @@ tests:debian_with_bubblewrap:
   - python3-coverage report --fail-under=100 -m --include 'libmat2/*'
 
 tests:fedora:
-  image: fedora
+  image: $CONTAINER_REGISTRY:fedora
   stage: test
   tags:
     - whitewhale
@@ -67,7 +74,7 @@ tests:fedora:
   - python3 setup.py test
 
 tests:archlinux:
-  image: archlinux/base
+  image: $CONTAINER_REGISTRY:archlinux
   stage: test
   tags:
     - whitewhale
