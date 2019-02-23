@@ -14,7 +14,7 @@ class CSSParser(abstract.AbstractParser):
 
     def remove_all(self) -> bool:
         with open(self.filename, encoding='utf-8') as f:
-            cleaned = re.sub(r'/\*.+?\*/', '', f.read(), 0, self.flags)
+            cleaned = re.sub(r'/\*.*?\*/', '', f.read(), 0, self.flags)
         with open(self.output_filename, 'w', encoding='utf-8') as f:
             f.write(cleaned)
         return True
@@ -22,7 +22,7 @@ class CSSParser(abstract.AbstractParser):
     def get_meta(self) -> Dict[str, Any]:
         metadata = {}
         with open(self.filename, encoding='utf-8') as f:
-            cssdoc = re.findall(r'/\*(.+?)\*/', f.read(), self.flags)
+            cssdoc = re.findall(r'/\*(.*?)\*/', f.read(), self.flags)
         for match in cssdoc:
             for line in match.splitlines():
                 try:
