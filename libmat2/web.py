@@ -54,7 +54,7 @@ class _HTMLParser(parser.HTMLParser):
     we're using an internal queue to track all the opening/closing tags,
     and hoping for the best.
     """
-    tag_blacklist = {'doctitle', 'meta'}  # everything is lowercase
+    tag_blacklist = {'doctitle', 'meta', 'title'}  # everything is lowercase
     def __init__(self, filename):
         super().__init__()
         self.filename = filename
