@@ -83,6 +83,8 @@ class TestZipOrder(unittest.TestCase):
             previous_name = ''
             for item in zin.infolist():
                 if previous_name == '':
+                    if item.filename == 'mimetype':
+                        continue
                     previous_name = item.filename
                     continue
                 elif item.filename < previous_name:
@@ -97,6 +99,8 @@ class TestZipOrder(unittest.TestCase):
             previous_name = ''
             for item in zin.infolist():
                 if previous_name == '':
+                    if item.filename == 'mimetype':
+                        continue
                     previous_name = item.filename
                     continue
                 self.assertGreaterEqual(item.filename, previous_name)

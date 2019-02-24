@@ -4,13 +4,14 @@ import tempfile
 import os
 import logging
 import shutil
-from typing import Dict, Set, Pattern, Union, Any
+from typing import Dict, Set, Pattern, Union, Any, List
 
 from . import abstract, UnknownMemberPolicy, parser_factory
 
 # Make pyflakes happy
 assert Set
 assert Pattern
+assert List
 assert Union
 
 
@@ -115,9 +116,16 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
             temp_folder = tempfile.mkdtemp()
             abort = False
 
+            items = list()  # type: List[zipfile.ZipInfo]
+            for item in sorted(zin.infolist(), key=lambda z: z.filename):
+                if item.filename == 'mimetype':
+                    items = [item] + items
+                else:
+                    items.append(item)
+
             # Since files order is a fingerprint factor,
             # we're iterating (and thus inserting) them in lexicographic order.
-            for item in sorted(zin.infolist(), key=lambda z: z.filename):
+            for item in items:
                 if item.filename[-1] == '/':  # `is_dir` is added in Python3.6
                     continue  # don't keep empty folders
 
