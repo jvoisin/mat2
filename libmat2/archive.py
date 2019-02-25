@@ -118,6 +118,8 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
             items = list()  # type: List[zipfile.ZipInfo]
             for item in sorted(zin.infolist(), key=lambda z: z.filename):
+                # Some fileformats do require to have the `mimetype` file
+                # as the first file in the archive.
                 if item.filename == 'mimetype':
                     items = [item] + items
                 else:
