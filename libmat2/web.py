@@ -38,8 +38,8 @@ class CSSParser(abstract.AbstractParser):
 
 class AbstractHTMLParser(abstract.AbstractParser):
     tags_blacklist = set()  # type: Set[str]
-    # In some html/xml based formats some tags are mandatory,
-    # so we're keeping them, but are discaring their contents
+    # In some html/xml-based formats some tags are mandatory,
+    # so we're keeping them, but are discaring their content
     tags_required_blacklist = set()  # type: Set[str]
 
     def __init__(self, filename):
@@ -72,6 +72,12 @@ class _HTMLParser(parser.HTMLParser):
     """Python doesn't have a validating html parser in its stdlib, so
     we're using an internal queue to track all the opening/closing tags,
     and hoping for the best.
+
+    Moreover, the parser.HTMLParser call doesn't provide a get_endtag_text
+    method, so we have to use get_starttag_text instead, put its result in a
+    LIFO, and transform it in a closing tag when needed.
+
+    Also, gotcha: the `tag` parameters are always in lowercase.
     """
     def __init__(self, filename, blacklisted_tags, required_blacklisted_tags):
         super().__init__()
@@ -79,6 +85,7 @@ class _HTMLParser(parser.HTMLParser):
         self.__textrepr = ''
         self.__meta = {}
         self.__validation_queue = []  # type: List[str]
+
         # We're using counters instead of booleans, to handle nested tags
         self.__in_dangerous_but_required_tag = 0
         self.__in_dangerous_tag = 0
@@ -93,14 +100,15 @@ class _HTMLParser(parser.HTMLParser):
         original_tag = self.get_starttag_text()
         self.__validation_queue.append(original_tag)
 
-        if tag in self.tag_required_blacklist:
-            self.__in_dangerous_but_required_tag += 1
         if tag in self.tag_blacklist:
             self.__in_dangerous_tag += 1
 
         if self.__in_dangerous_tag == 0:
-            if self.__in_dangerous_but_required_tag <= 1:
+            if self.__in_dangerous_but_required_tag == 0:
                 self.__textrepr += original_tag
+
+        if tag in self.tag_required_blacklist:
+            self.__in_dangerous_but_required_tag += 1
 
     def handle_endtag(self, tag: str):
         if not self.__validation_queue:
@@ -115,14 +123,15 @@ class _HTMLParser(parser.HTMLParser):
                              "tag %s in %s" %
                              (tag, previous_tag, self.filename))
 
+        if tag in self.tag_required_blacklist:
+            self.__in_dangerous_but_required_tag -= 1
+
         if self.__in_dangerous_tag == 0:
-            if self.__in_dangerous_but_required_tag <= 1:
+            if self.__in_dangerous_but_required_tag == 0:
                 # There is no `get_endtag_text()` method :/
                 self.__textrepr += '</' + previous_tag + '>'
 
-        if tag in self.tag_required_blacklist:
-            self.__in_dangerous_but_required_tag -= 1
-        elif tag in self.tag_blacklist:
+        if tag in self.tag_blacklist:
             self.__in_dangerous_tag -= 1
 
     def handle_data(self, data: str):
@@ -138,14 +147,13 @@ class _HTMLParser(parser.HTMLParser):
             content = meta.get('content', 'harmful data')
             self.__meta[name] = content
 
-            if self.__in_dangerous_tag != 0:
-                return
-            elif tag in self.tag_required_blacklist:
-                self.__textrepr += '<' + tag + ' />'
-            return
-
-        if self.__in_dangerous_but_required_tag == 0:
             if self.__in_dangerous_tag == 0:
+                if tag in self.tag_required_blacklist:
+                    self.__textrepr += '<' + tag + ' />'
+                return
+
+        if self.__in_dangerous_tag == 0:
+            if self.__in_dangerous_but_required_tag == 0:
                 self.__textrepr += self.get_starttag_text()
 
     def remove_all(self, output_filename: str) -> bool:

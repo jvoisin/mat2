@@ -269,9 +269,6 @@ class TestCorruptedFiles(unittest.TestCase):
         os.remove('./tests/data/clean.html')
 
         with open('./tests/data/clean.html', 'w') as f:
-            f.write('<meta><meta/></meta>')
-            f.write('<title><title>pouet</title></title>')
-            f.write('<title><mysupertag/></title>')
             f.write('<doctitle><br/></doctitle><br/><notclosed>')
         p = web.HTMLParser('./tests/data/clean.html')
         with self.assertRaises(ValueError):
@@ -280,6 +277,7 @@ class TestCorruptedFiles(unittest.TestCase):
         with self.assertRaises(ValueError):
             p.remove_all()
         os.remove('./tests/data/clean.html')
+
 
     def test_epub(self):
         with zipfile.ZipFile('./tests/data/clean.epub', 'w') as zout:

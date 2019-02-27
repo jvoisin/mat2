@@ -633,6 +633,33 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/clean.cleaned.html')
         os.remove('./tests/data/clean.cleaned.cleaned.html')
 
+        with open('./tests/data/clean.html', 'w') as f:
+            f.write('<title><title><pouet/><meta/></title></title><test/>')
+        p = web.HTMLParser('./tests/data/clean.html')
+        self.assertTrue(p.remove_all())
+        with open('./tests/data/clean.cleaned.html', 'r') as f:
+            self.assertEqual(f.read(), '<title></title><test/>')
+        os.remove('./tests/data/clean.html')
+        os.remove('./tests/data/clean.cleaned.html')
+
+        with open('./tests/data/clean.html', 'w') as f:
+            f.write('<test><title>Some<b>metadata</b><br/></title></test>')
+        p = web.HTMLParser('./tests/data/clean.html')
+        self.assertTrue(p.remove_all())
+        with open('./tests/data/clean.cleaned.html', 'r') as f:
+            self.assertEqual(f.read(), '<test><title></title></test>')
+        os.remove('./tests/data/clean.html')
+        os.remove('./tests/data/clean.cleaned.html')
+
+        with open('./tests/data/clean.html', 'w') as f:
+            f.write('<meta><meta/></meta>')
+        p = web.HTMLParser('./tests/data/clean.html')
+        self.assertTrue(p.remove_all())
+        with open('./tests/data/clean.cleaned.html', 'r') as f:
+            self.assertEqual(f.read(), '')
+        os.remove('./tests/data/clean.html')
+        os.remove('./tests/data/clean.cleaned.html')
+
 
     def test_epub(self):
         shutil.copy('./tests/data/dirty.epub', './tests/data/clean.epub')
