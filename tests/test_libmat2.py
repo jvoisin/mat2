@@ -3,6 +3,7 @@
 import unittest
 import shutil
 import os
+import re
 import zipfile
 
 from libmat2 import pdf, images, audio, office, parser_factory, torrent, harmless
@@ -644,7 +645,10 @@ class TestCleaning(unittest.TestCase):
         self.assertTrue(ret)
 
         p = epub.EPUBParser('./tests/data/clean.cleaned.epub')
-        self.assertEqual(p.get_meta(), {})
+        meta = p.get_meta()
+        res = re.match(meta['OEBPS/content.opf']['metadata'], '^<dc:identifier>[0-9a-f-]+</dc:identifier><dc:title /><dc:language />$')
+        self.assertNotEqual(res, False)
+
         self.assertTrue(p.remove_all())
 
         os.remove('./tests/data/clean.epub')

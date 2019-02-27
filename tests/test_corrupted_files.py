@@ -253,13 +253,13 @@ class TestCorruptedFiles(unittest.TestCase):
         os.remove('./tests/data/clean.cleaned.html')
 
         with open('./tests/data/clean.html', 'w') as f:
-            f.write('</close>')
+            f.write('</meta>')
         with self.assertRaises(ValueError):
             web.HTMLParser('./tests/data/clean.html')
         os.remove('./tests/data/clean.html')
 
         with open('./tests/data/clean.html', 'w') as f:
-            f.write('<notclosed>')
+            f.write('<meta><a>test</a><set/></meta><title></title><meta>')
         p = web.HTMLParser('./tests/data/clean.html')
         with self.assertRaises(ValueError):
             p.get_meta()
@@ -269,6 +269,9 @@ class TestCorruptedFiles(unittest.TestCase):
         os.remove('./tests/data/clean.html')
 
         with open('./tests/data/clean.html', 'w') as f:
+            f.write('<meta><meta/></meta>')
+            f.write('<title><title>pouet</title></title>')
+            f.write('<title><mysupertag/></title>')
             f.write('<doctitle><br/></doctitle><br/><notclosed>')
         p = web.HTMLParser('./tests/data/clean.html')
         with self.assertRaises(ValueError):

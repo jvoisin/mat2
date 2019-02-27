@@ -1,10 +1,13 @@
-from html import parser
-from typing import Dict, Any, List, Tuple
+from html import parser, escape
+from typing import Dict, Any, List, Tuple, Set
 import re
 import string
 
 from . import abstract
 
+assert Set
+
+# pylint: disable=too-many-instance-attributes
 
 class CSSParser(abstract.AbstractParser):
     """There is no such things as metadata in CSS files,
@@ -33,11 +36,16 @@ class CSSParser(abstract.AbstractParser):
         return metadata
 
 
-class HTMLParser(abstract.AbstractParser):
-    mimetypes = {'text/html', 'application/x-dtbncx+xml', }
+class AbstractHTMLParser(abstract.AbstractParser):
+    tags_blacklist = set()  # type: Set[str]
+    # In some html/xml based formats some tags are mandatory,
+    # so we're keeping them, but are discaring their contents
+    tags_required_blacklist = set()  # type: Set[str]
+
     def __init__(self, filename):
         super().__init__(filename)
-        self.__parser = _HTMLParser(self.filename)
+        self.__parser = _HTMLParser(self.filename, self.tags_blacklist,
+                                    self.tags_required_blacklist)
         with open(filename, encoding='utf-8') as f:
             self.__parser.feed(f.read())
         self.__parser.close()
@@ -49,29 +57,50 @@ class HTMLParser(abstract.AbstractParser):
         return self.__parser.remove_all(self.output_filename)
 
 
+class HTMLParser(AbstractHTMLParser):
+    mimetypes = {'text/html', }
+    tags_blacklist = {'meta', }
+    tags_required_blacklist = {'title', }
+
+
+class DTBNCXParser(AbstractHTMLParser):
+    mimetypes = {'application/x-dtbncx+xml', }
+    tags_required_blacklist = {'title', 'doctitle', 'meta'}
+
+
 class _HTMLParser(parser.HTMLParser):
     """Python doesn't have a validating html parser in its stdlib, so
     we're using an internal queue to track all the opening/closing tags,
     and hoping for the best.
     """
-    tag_blacklist = {'doctitle', 'meta', 'title'}  # everything is lowercase
-    def __init__(self, filename):
+    def __init__(self, filename, blacklisted_tags, required_blacklisted_tags):
         super().__init__()
         self.filename = filename
         self.__textrepr = ''
         self.__meta = {}
-        self.__validation_queue = []
-        # We're using a counter instead of a boolean to handle nested tags
+        self.__validation_queue = []  # type: List[str]
+        # We're using counters instead of booleans, to handle nested tags
+        self.__in_dangerous_but_required_tag = 0
         self.__in_dangerous_tag = 0
 
+        if required_blacklisted_tags & blacklisted_tags:  # pragma: nocover
+            raise ValueError("There is an overlap between %s and %s" % (
+                required_blacklisted_tags, blacklisted_tags))
+        self.tag_required_blacklist = required_blacklisted_tags
+        self.tag_blacklist = blacklisted_tags
+
     def handle_starttag(self, tag: str, attrs: List[Tuple[str, str]]):
-        self.__validation_queue.append(tag)
+        original_tag = self.get_starttag_text()
+        self.__validation_queue.append(original_tag)
+
+        if tag in self.tag_required_blacklist:
+            self.__in_dangerous_but_required_tag += 1
         if tag in self.tag_blacklist:
             self.__in_dangerous_tag += 1
-            return
 
         if self.__in_dangerous_tag == 0:
-            self.__textrepr += self.get_starttag_text()
+            if self.__in_dangerous_but_required_tag <= 1:
+                self.__textrepr += original_tag
 
     def handle_endtag(self, tag: str):
         if not self.__validation_queue:
@@ -79,29 +108,43 @@ class _HTMLParser(parser.HTMLParser):
                              "opening one in %s." % (tag, self.filename))
 
         previous_tag = self.__validation_queue.pop()
-        if tag != previous_tag:
+        previous_tag = previous_tag[1:-1]  # remove < and >
+        previous_tag = previous_tag.split(' ')[0]  # remove attributes
+        if tag != previous_tag.lower():
             raise ValueError("The closing tag %s doesn't match the previous "
                              "tag %s in %s" %
                              (tag, previous_tag, self.filename))
-        elif tag in self.tag_blacklist:
-            self.__in_dangerous_tag -= 1
-            return
 
         if self.__in_dangerous_tag == 0:
-            # There is no `get_endtag_text()` method :/
-            self.__textrepr += '</' + tag + '>\n'
+            if self.__in_dangerous_but_required_tag <= 1:
+                # There is no `get_endtag_text()` method :/
+                self.__textrepr += '</' + previous_tag + '>'
+
+        if tag in self.tag_required_blacklist:
+            self.__in_dangerous_but_required_tag -= 1
+        elif tag in self.tag_blacklist:
+            self.__in_dangerous_tag -= 1
 
     def handle_data(self, data: str):
-        if self.__in_dangerous_tag == 0 and data.strip():
-            self.__textrepr += data
+        if self.__in_dangerous_but_required_tag == 0:
+            if self.__in_dangerous_tag == 0:
+                if data.strip():
+                    self.__textrepr += escape(data)
 
     def handle_startendtag(self, tag: str, attrs: List[Tuple[str, str]]):
-        if tag in self.tag_blacklist:
+        if tag in self.tag_required_blacklist | self.tag_blacklist:
             meta = {k:v for k, v in attrs}
             name = meta.get('name', 'harmful metadata')
             content = meta.get('content', 'harmful data')
             self.__meta[name] = content
-        else:
+
+            if self.__in_dangerous_tag != 0:
+                return
+            elif tag in self.tag_required_blacklist:
+                self.__textrepr += '<' + tag + ' />'
+            return
+
+        if self.__in_dangerous_but_required_tag == 0:
             if self.__in_dangerous_tag == 0:
                 self.__textrepr += self.get_starttag_text()
 
