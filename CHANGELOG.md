@@ -1,3 +1,10 @@
+# 0.8.0 - 2019-02-28
+
+- Add support for epub files
+- Fix the setup.py file crashing on non-utf8 platforms
+- Improve css support
+- Improve html support
+
 # 0.7.0 - 2019-02-17
 
 - Add support for wmv files

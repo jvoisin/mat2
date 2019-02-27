@@ -652,7 +652,7 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/clean.cleaned.html')
 
         with open('./tests/data/clean.html', 'w') as f:
-            f.write('<meta><meta/></meta>')
+            f.write('<meta><meta/><!----><!-- test--></meta>')
         p = web.HTMLParser('./tests/data/clean.html')
         self.assertTrue(p.remove_all())
         with open('./tests/data/clean.cleaned.html', 'r') as f:
