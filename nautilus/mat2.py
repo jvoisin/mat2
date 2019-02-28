@@ -173,7 +173,7 @@ class Mat2Extension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationWid
         if fname is None:
             self.infobar_hbox.destroy()
             self.infobar.hide()
-            if len(self.failed_items):
+            if self.failed_items:
                 self.__infobar_failure()
             if not processing_queue.empty():
                 print("Something went wrong, the queue isn't empty :/")
