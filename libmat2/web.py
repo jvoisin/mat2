@@ -39,7 +39,7 @@ class CSSParser(abstract.AbstractParser):
 class AbstractHTMLParser(abstract.AbstractParser):
     tags_blacklist = set()  # type: Set[str]
     # In some html/xml-based formats some tags are mandatory,
-    # so we're keeping them, but are discaring their content
+    # so we're keeping them, but are discarding their content
     tags_required_blacklist = set()  # type: Set[str]
 
     def __init__(self, filename):
