@@ -45,8 +45,6 @@ tests:debian:
 tests:debian_with_bubblewrap:
   image: $CONTAINER_REGISTRY:debian
   stage: test
-  tags:
-    - whitewhale
   script:
   - python3-coverage run --branch -m unittest discover -s tests/
   - python3-coverage report --fail-under=100 -m --include 'libmat2/*'
@@ -54,15 +52,11 @@ tests:debian_with_bubblewrap:
 tests:fedora:
   image: $CONTAINER_REGISTRY:fedora
   stage: test
-  tags:
-    - whitewhale
   script:
   - python3 setup.py test
 
 tests:archlinux:
   image: $CONTAINER_REGISTRY:archlinux
   stage: test
-  tags:
-    - whitewhale
   script:
   - python3 setup.py test
