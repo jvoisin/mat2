@@ -9,8 +9,6 @@ bandit:
   image: $CONTAINER_REGISTRY:linting 
   stage: linting
   script:  # TODO: remove B405 and B314
-  - apt-get -qqy update
-  - apt-get -qqy install --no-install-recommends python3-bandit
   - bandit ./mat2 --format txt --skip B101
   - bandit -r ./nautilus/ --format txt --skip B101
   - bandit -r ./libmat2 --format txt --skip B101,B404,B603,B405,B314
@@ -19,8 +17,6 @@ pylint:
   image: $CONTAINER_REGISTRY:linting
   stage: linting
   script:
-  - apt-get -qqy update
-  - apt-get -qqy install --no-install-recommends pylint3 python3-mutagen python3-gi-cairo gir1.2-poppler-0.18 gir1.2-gdkpixbuf-2.0
   - pylint3 --disable=no-else-return --extension-pkg-whitelist=cairo,gi ./libmat2 ./mat2
   # Once nautilus-python is in Debian, decomment it form the line below
   - pylint3 --disable=no-else-return --extension-pkg-whitelist=Nautilus,GObject,Gtk,Gio,GLib,gi ./nautilus/mat2.py
@@ -29,16 +25,12 @@ pyflakes:
   image: $CONTAINER_REGISTRY:linting
   stage: linting
   script:
-  - apt-get -qqy update
-  - apt-get -qqy install --no-install-recommends pyflakes3
   - pyflakes3 ./libmat2 ./mat2 ./tests/ ./nautilus
 
 mypy:
   image: $CONTAINER_REGISTRY:linting
   stage: linting
   script:
-  - apt-get -qqy update
-  - apt-get -qqy install --no-install-recommends python3-pip
   - pip3 install mypy
   - mypy --ignore-missing-imports mat2 libmat2/*.py ./nautilus/mat2.py
 
@@ -46,8 +38,6 @@ tests:debian:
   image: $CONTAINER_REGISTRY:debian
   stage: test
   script:
-  - apt-get -qqy update
-  - apt-get -qqy install --no-install-recommends python3-mutagen python3-gi-cairo gir1.2-poppler-0.18 gir1.2-gdkpixbuf-2.0 libimage-exiftool-perl python3-coverage ffmpeg
   - apt-get -qqy purge bubblewrap
   - python3-coverage run --branch -m unittest discover -s tests/
   - python3-coverage report --fail-under=90 -m --include 'libmat2/*'
@@ -58,8 +48,6 @@ tests:debian_with_bubblewrap:
   tags:
     - whitewhale
   script:
-  - apt-get -qqy update
-  - apt-get -qqy install --no-install-recommends python3-mutagen python3-gi-cairo gir1.2-poppler-0.18 gir1.2-gdkpixbuf-2.0 libimage-exiftool-perl python3-coverage ffmpeg bubblewrap
   - python3-coverage run --branch -m unittest discover -s tests/
   - python3-coverage report --fail-under=100 -m --include 'libmat2/*'
 
@@ -69,8 +57,6 @@ tests:fedora:
   tags:
     - whitewhale
   script:
-  - dnf install -y python3 python3-mutagen python3-gobject gdk-pixbuf2 poppler-glib gdk-pixbuf2 gdk-pixbuf2-modules cairo-gobject cairo python3-cairo perl-Image-ExifTool mailcap
-  - gdk-pixbuf-query-loaders-64 > /usr/lib64/gdk-pixbuf-2.0/2.10.0/loaders.cache
   - python3 setup.py test
 
 tests:archlinux:
@@ -79,5 +65,4 @@ tests:archlinux:
   tags:
     - whitewhale
   script:
-  - pacman -Sy --noconfirm python-mutagen python-gobject gdk-pixbuf2 poppler-glib gdk-pixbuf2 python-cairo perl-image-exiftool python-setuptools mailcap ffmpeg
   - python3 setup.py test
