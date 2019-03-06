@@ -29,9 +29,10 @@ Since MAT2 is written in Python3, please conform as much as possible to the
 6. Create a tag with `git tag -s $VERSION`
 7. Push the commit with `git push origin master`
 8. Push the tag with `git push --tags`
-9. Create the signed tarball with `git archive --format=tar.xz --prefix=mat-$VERSION/ $VERSION > mat-$VERSION.tar.xz`
-10. Sign the tarball with `gpg --armor --detach-sign mat-$VERSION.tar.xz`
-11. Upload the result on Gitlab's [tag page](https://0xacab.org/jvoisin/mat2/tags) and add the changelog there
-12. Announce the release on the [mailing list](https://mailman.boum.org/listinfo/mat-dev)
-13. Upload the new version on pypi with `python3 setup.py sdist bdist_wheel` then `twine upload -s dist/*`
-14. Do the secret release dance
+9. Download the gitlab archive of the release
+10. Diff it against the local copy
+11. If there is no different, sign the archive with `gpg --armor --detach-sign mat-$VERSION.tar.xz`
+12. Upload the signature on Gitlab's [tag page](https://0xacab.org/jvoisin/mat2/tags) and add the changelog there
+13. Announce the release on the [mailing list](https://mailman.boum.org/listinfo/mat-dev)
+14. Sign'n'upload the new version on pypi with `python3 setup.py sdist bdist_wheel` then `twine upload -s dist/*`
+15. Do the secret release dance
