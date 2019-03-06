@@ -1,7 +1,7 @@
 # Contributing to MAT2
 
 The main repository for MAT2 is on [0xacab]( https://0xacab.org/jvoisin/mat2 ),
-with a mirror on [gitlab.com]( https://gitlab.com/jvoisin/mat2 ).
+but you can send patches to jvoisin by [email](https://dustri.org/) if you prefer.
 
 Do feel free to pick up [an issue]( https://0xacab.org/jvoisin/mat2/issues )
 and to send a pull-request. Please do check that everything is fine by running the
