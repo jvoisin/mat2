@@ -31,7 +31,6 @@ mypy:
   image: $CONTAINER_REGISTRY:linting
   stage: linting
   script:
-  - pip3 install mypy
   - mypy --ignore-missing-imports mat2 libmat2/*.py ./nautilus/mat2.py
 
 tests:debian:
