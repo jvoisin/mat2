@@ -5,57 +5,63 @@ stages:
   - linting
   - test
 
-bandit:
+linting:bandit:
   image: $CONTAINER_REGISTRY:linting 
   stage: linting
   script:  # TODO: remove B405 and B314
-  - bandit ./mat2 --format txt --skip B101
-  - bandit -r ./nautilus/ --format txt --skip B101
-  - bandit -r ./libmat2 --format txt --skip B101,B404,B603,B405,B314
+    - bandit ./mat2 --format txt --skip B101
+    - bandit -r ./nautilus/ --format txt --skip B101
+    - bandit -r ./libmat2 --format txt --skip B101,B404,B603,B405,B314
 
-pylint:
+linting:pylint:
   image: $CONTAINER_REGISTRY:linting
   stage: linting
   script:
-  - pylint3 --disable=no-else-return --extension-pkg-whitelist=cairo,gi ./libmat2 ./mat2
-  # Once nautilus-python is in Debian, decomment it form the line below
-  - pylint3 --disable=no-else-return --extension-pkg-whitelist=Nautilus,GObject,Gtk,Gio,GLib,gi ./nautilus/mat2.py
+    - pylint3 --disable=no-else-return --extension-pkg-whitelist=cairo,gi ./libmat2 ./mat2
+    # Once nautilus-python is in Debian, decomment it form the line below
+    - pylint3 --disable=no-else-return --extension-pkg-whitelist=Nautilus,GObject,Gtk,Gio,GLib,gi ./nautilus/mat2.py
 
-pyflakes:
+linting:pyflakes:
   image: $CONTAINER_REGISTRY:linting
   stage: linting
   script:
-  - pyflakes3 ./libmat2 ./mat2 ./tests/ ./nautilus
+    - pyflakes3 ./libmat2 ./mat2 ./tests/ ./nautilus
 
-mypy:
+linting:mypy:
   image: $CONTAINER_REGISTRY:linting
   stage: linting
   script:
-  - mypy --ignore-missing-imports mat2 libmat2/*.py ./nautilus/mat2.py
-
-tests:debian:
-  image: $CONTAINER_REGISTRY:debian
-  stage: test
-  script:
-  - apt-get -qqy purge bubblewrap
-  - python3-coverage run --branch -m unittest discover -s tests/
-  - python3-coverage report --fail-under=90 -m --include 'libmat2/*'
-
-tests:debian_with_bubblewrap:
-  image: $CONTAINER_REGISTRY:debian
-  stage: test
-  script:
-  - python3-coverage run --branch -m unittest discover -s tests/
-  - python3-coverage report --fail-under=100 -m --include 'libmat2/*'
-
-tests:fedora:
-  image: $CONTAINER_REGISTRY:fedora
-  stage: test
-  script:
-  - python3 setup.py test
+    - mypy --ignore-missing-imports mat2 libmat2/*.py ./nautilus/mat2.py
 
 tests:archlinux:
   image: $CONTAINER_REGISTRY:archlinux
   stage: test
   script:
-  - python3 setup.py test
+    - python3 setup.py test
+  
+tests:debian:
+  image: $CONTAINER_REGISTRY:debian
+  stage: test
+  script:
+    - apt-get -qqy purge bubblewrap
+    - python3-coverage run --branch -m unittest discover -s tests/
+    - python3-coverage report --fail-under=90 -m --include 'libmat2/*'
+
+tests:debian_with_bubblewrap:
+  image: $CONTAINER_REGISTRY:debian
+  stage: test
+  script:
+    - python3-coverage run --branch -m unittest discover -s tests/
+    - python3-coverage report --fail-under=100 -m --include 'libmat2/*'
+
+tests:fedora:
+  image: $CONTAINER_REGISTRY:fedora
+  stage: test
+  script:
+    - python3 setup.py test
+
+tests:gentoo:
+  image: $CONTAINER_REGISTRY:gentoo
+  stage: test
+  script:
+    - python3 -m unittest discover -v
