@@ -38,7 +38,7 @@ class MP3Parser(MutagenParser):
         metadata = {}  # type: Dict[str, Union[str, dict]]
         meta = mutagen.File(self.filename).tags
         for key in meta:
-            if not hasattr(meta[key], 'text'):
+            if not hasattr(meta[key], 'text'):  # pragma: no cover
                 continue
             metadata[key.rstrip(' \t\r\n\0')] = ', '.join(map(str, meta[key].text))
         return metadata

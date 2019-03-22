@@ -63,5 +63,6 @@ tests:fedora:
 tests:gentoo:
   image: $CONTAINER_REGISTRY:gentoo
   stage: test
+  allow_failure: true
   script:
     - python3 -m unittest discover -v
