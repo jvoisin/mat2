@@ -26,7 +26,7 @@ logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.WARNING)
 
 def __check_file(filename: str, mode: int = os.R_OK) -> bool:
     if not os.path.exists(filename):
-        print("[-] %s is doesn't exist." % filename)
+        print("[-] %s doesn't exist." % filename)
         return False
     elif not os.path.isfile(filename):
         print("[-] %s is not a regular file." % filename)
