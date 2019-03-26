@@ -100,7 +100,7 @@ def __print_meta(filename: str, metadata: dict, depth: int = 1):
 
 
 def clean_meta(filename: str, is_lightweight: bool, policy: UnknownMemberPolicy) -> bool:
-    if not __check_file(filename, os.R_OK|os.W_OK):
+    if not __check_file(filename, os.R_OK):
         return False
 
     p, mtype = parser_factory.get_parser(filename)  # type: ignore
