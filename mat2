@@ -50,7 +50,7 @@ def create_arg_parser() -> argparse.ArgumentParser:
                         help='show more verbose status information')
     parser.add_argument('--unknown-members', metavar='policy', default='abort',
                         help='how to handle unknown members of archive-style files (policy should' +
-                        ' be one of: %s)' % ', '.join(p.value for p in UnknownMemberPolicy))
+                        ' be one of: %s) [Default: abort]' % ', '.join(p.value for p in UnknownMemberPolicy))
 
 
     info = parser.add_mutually_exclusive_group()
