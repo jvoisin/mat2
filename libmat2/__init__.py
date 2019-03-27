@@ -30,12 +30,12 @@ UNSUPPORTED_EXTENSIONS = {
     }
 
 DEPENDENCIES = {
-    'cairo': 'Cairo',
-    'gi': 'PyGobject',
-    'gi.repository.GdkPixbuf': 'GdkPixbuf from PyGobject',
-    'gi.repository.Poppler': 'Poppler from PyGobject',
-    'gi.repository.GLib': 'GLib from PyGobject',
-    'mutagen': 'Mutagen',
+    'Cairo': 'cairo',
+    'PyGobject': 'gi',
+    'GdkPixbuf from PyGobject': 'gi.repository.GdkPixbuf',
+    'Poppler from PyGobject': 'gi.repository.Poppler',
+    'GLib from PyGobject': 'gi.repository.GLib',
+    'Mutagen': 'mutagen',
     }
 
 
@@ -46,11 +46,11 @@ def check_dependencies() -> Dict[str, bool]:
     ret['Ffmpeg'] = bool(video._get_ffmpeg_path())
 
     for key, value in DEPENDENCIES.items():
-        ret[value] = True
+        ret[key] = True
         try:
-            importlib.import_module(key)
+            importlib.import_module(value)
         except ImportError:  # pragma: no cover
-            ret[value] = False  # pragma: no cover
+            ret[key] = False  # pragma: no cover
 
     return ret
 
