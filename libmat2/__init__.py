@@ -38,12 +38,13 @@ DEPENDENCIES = {
     'Mutagen': 'mutagen',
     }
 
+CMD_DEPENDENCIES = {
+    'Exiftool': exiftool._get_exiftool_path,
+    'Ffmpeg': video._get_ffmpeg_path,
+    }
 
 def check_dependencies() -> Dict[str, bool]:
     ret = collections.defaultdict(bool)  # type: Dict[str, bool]
-
-    ret['Exiftool'] = bool(exiftool._get_exiftool_path())
-    ret['Ffmpeg'] = bool(video._get_ffmpeg_path())
 
     for key, value in DEPENDENCIES.items():
         ret[key] = True
@@ -51,6 +52,13 @@ def check_dependencies() -> Dict[str, bool]:
             importlib.import_module(value)
         except ImportError:  # pragma: no cover
             ret[key] = False  # pragma: no cover
+
+    for key, value in CMD_DEPENDENCIES.items():
+        ret[key] = True
+        try:
+            value()
+        except RuntimeError:  # pragma: no cover
+            ret[key] = False
 
     return ret
 
