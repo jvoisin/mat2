@@ -70,7 +70,8 @@ optional arguments:
   -V, --verbose         show more verbose status information
   --unknown-members policy
                         how to handle unknown members of archive-style files
-                        (policy should be one of: abort, omit, keep)
+                        (policy should be one of: abort, omit, keep) [Default:
+                        abort]
   -s, --show            list harmful metadata detectable by MAT2 without
                         removing them
   -L, --lightweight     remove SOME metadata
