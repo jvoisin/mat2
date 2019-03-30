@@ -53,12 +53,12 @@ def check_dependencies() -> Dict[str, bool]:
         except ImportError:  # pragma: no cover
             ret[key] = False  # pragma: no cover
 
-    for key, value in CMD_DEPENDENCIES.items():
-        ret[key] = True
+    for k, v in CMD_DEPENDENCIES.items():
+        ret[k] = True
         try:
-            value()
+            v()
         except RuntimeError:  # pragma: no cover
-            ret[key] = False
+            ret[k] = False
 
     return ret
 
