@@ -58,7 +58,7 @@ class AbstractHTMLParser(abstract.AbstractParser):
 
 
 class HTMLParser(AbstractHTMLParser):
-    mimetypes = {'text/html', }
+    mimetypes = {'text/html', 'application/xhtml+xml'}
     tags_blocklist = {'meta', }
     tags_required_blocklist = {'title', }
 
