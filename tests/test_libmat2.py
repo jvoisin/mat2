@@ -17,8 +17,8 @@ class TestCheckDependencies(unittest.TestCase):
         except RuntimeError:
             return   # this happens if not every dependency is installed
 
-        for value in ret.values():
-            self.assertTrue(value)
+        for key, value in ret.items():
+            self.assertTrue(value, "The value for %s is False" % key)
 
 
 class TestParserFactory(unittest.TestCase):
