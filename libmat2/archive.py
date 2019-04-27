@@ -239,7 +239,7 @@ class TarParser(ArchiveBasedAbstractParser):
         assert isinstance(member, tarfile.TarInfo)  # please mypy
         metadata = {}
         if member.mtime != 0:
-            metadata['mtime'] = str(member.mtime)
+            metadata['mtime'] = datetime.datetime.fromtimestamp(member.mtime)
         if member.uid != 0:
             metadata['uid'] = str(member.uid)
         if member.gid != 0:
