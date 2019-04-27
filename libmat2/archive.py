@@ -1,4 +1,5 @@
 import abc
+import stat
 import zipfile
 import datetime
 import tarfile
@@ -104,6 +105,12 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                              full_path: str):
         """Add the file at full_path to the archive, via the given member."""
 
+    @staticmethod
+    def _set_member_permissions(member: ArchiveMember, permissions: int) -> ArchiveMember:
+        """Set the permission of the archive member."""
+        # pylint: disable=unused-argument
+        return member
+
     def get_meta(self) -> Dict[str, Union[str, dict]]:
         meta = dict()  # type: Dict[str, Union[str, dict]]
 
@@ -120,6 +127,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
                 zin.extract(member=item, path=temp_folder)
                 full_path = os.path.join(temp_folder, member_name)
+                os.chmod(full_path, stat.S_IRUSR)
 
                 specific_meta = self._specific_get_meta(full_path, member_name)
                 local_meta = {**local_meta, **specific_meta}
@@ -164,6 +172,9 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                 zin.extract(member=item, path=temp_folder)
                 full_path = os.path.join(temp_folder, member_name)
 
+                original_permissions = os.stat(full_path).st_mode
+                os.chmod(full_path, original_permissions | stat.S_IWUSR | stat.S_IRUSR)
+
                 if self._specific_cleanup(full_path) is False:
                     logging.warning("Something went wrong during deep cleaning of %s",
                                     member_name)
@@ -202,6 +213,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                         os.rename(member_parser.output_filename, full_path)
 
                 zinfo = self.member_class(member_name)  # type: ignore
+                zinfo = self._set_member_permissions(zinfo, original_permissions)
                 clean_zinfo = self._clean_member(zinfo)
                 self._add_file_to_archive(zout, clean_zinfo, full_path)
 
@@ -216,11 +228,11 @@ class TarParser(ArchiveBasedAbstractParser):
     mimetypes = {'application/x-tar'}
     def __init__(self, filename):
         super().__init__(filename)
-        # yes, it's tarfile.TarFile.open and not tarfile.TarFile,
+        # yes, it's tarfile.open and not tarfile.TarFile,
         # as stated in the documentation:
         # https://docs.python.org/3/library/tarfile.html#tarfile.TarFile
         # This is required to support compressed archives.
-        self.archive_class = tarfile.TarFile.open
+        self.archive_class = tarfile.open
         self.member_class = tarfile.TarInfo
 
     def is_archive_valid(self):
@@ -239,7 +251,7 @@ class TarParser(ArchiveBasedAbstractParser):
         assert isinstance(member, tarfile.TarInfo)  # please mypy
         metadata = {}
         if member.mtime != 0:
-            metadata['mtime'] = datetime.datetime.fromtimestamp(member.mtime)
+            metadata['mtime'] = str(datetime.datetime.fromtimestamp(member.mtime))
         if member.uid != 0:
             metadata['uid'] = str(member.uid)
         if member.gid != 0:
@@ -266,6 +278,12 @@ class TarParser(ArchiveBasedAbstractParser):
     def _get_member_name(member: ArchiveMember) -> str:
         assert isinstance(member, tarfile.TarInfo)  # please mypy
         return member.name
+
+    @staticmethod
+    def _set_member_permissions(member: ArchiveMember, permissions: int) -> ArchiveMember:
+        assert isinstance(member, tarfile.TarInfo)  # please mypy
+        member.mode = permissions
+        return member
 
 
 class TarGzParser(TarParser):

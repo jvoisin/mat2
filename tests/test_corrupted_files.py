@@ -293,7 +293,7 @@ class TestCorruptedFiles(unittest.TestCase):
         os.remove('./tests/data/clean.epub')
 
     def test_tar(self):
-        with tarfile.TarFile('./tests/data/clean.tar', 'w') as zout:
+        with tarfile.TarFile.open('./tests/data/clean.tar', 'w') as zout:
             zout.add('./tests/data/dirty.flac')
             zout.add('./tests/data/dirty.docx')
             zout.add('./tests/data/dirty.jpg')
@@ -302,6 +302,7 @@ class TestCorruptedFiles(unittest.TestCase):
             tarinfo.mtime = time.time()
             tarinfo.uid = 1337
             tarinfo.gid = 1338
+            tarinfo.size = os.stat('./tests/data/dirty.png').st_size
             with open('./tests/data/dirty.png', 'rb') as f:
                 zout.addfile(tarinfo, f)
         p, mimetype = parser_factory.get_parser('./tests/data/clean.tar')
@@ -316,3 +317,26 @@ class TestCorruptedFiles(unittest.TestCase):
         with self.assertRaises(ValueError):
             archive.TarParser('./tests/data/clean.tar')
         os.remove('./tests/data/clean.tar')
+
+class TestReadOnlyArchiveMembers(unittest.TestCase):
+    def test_onlymember_tar(self):
+        with tarfile.open('./tests/data/clean.tar', 'w') as zout:
+            zout.add('./tests/data/dirty.png')
+            tarinfo = tarfile.TarInfo('./tests/data/dirty.jpg')
+            tarinfo.mtime = time.time()
+            tarinfo.uid = 1337
+            tarinfo.mode = 0o000
+            tarinfo.size = os.stat('./tests/data/dirty.jpg').st_size
+            with open('./tests/data/dirty.jpg', 'rb') as f:
+                zout.addfile(tarinfo=tarinfo, fileobj=f)
+        p, mimetype = parser_factory.get_parser('./tests/data/clean.tar')
+        self.assertEqual(mimetype, 'application/x-tar')
+        meta = p.get_meta()
+        self.assertEqual(meta['./tests/data/dirty.jpg']['uid'], '1337')
+        self.assertTrue(p.remove_all())
+
+        p = archive.TarParser('./tests/data/clean.cleaned.tar')
+        self.assertEqual(p.get_meta(), {})
+        os.remove('./tests/data/clean.tar')
+        os.remove('./tests/data/clean.cleaned.tar')
+
