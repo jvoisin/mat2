@@ -4,6 +4,8 @@ import unittest
 import shutil
 import os
 import re
+import tarfile
+import tempfile
 import zipfile
 
 from libmat2 import pdf, images, audio, office, parser_factory, torrent, harmless
@@ -194,6 +196,19 @@ class TestGetMeta(unittest.TestCase):
         self.assertEqual(meta['author'], 'jvoisin')
         self.assertEqual(meta['version'], '1.0')
         self.assertEqual(meta['harmful data'], 'underline is cool')
+
+    def test_tar(self):
+        with tarfile.TarFile('./tests/data/dirty.tar', 'w') as tout:
+            tout.add('./tests/data/dirty.flac')
+            tout.add('./tests/data/dirty.docx')
+            tout.add('./tests/data/dirty.jpg')
+        p, mimetype = parser_factory.get_parser('./tests/data/dirty.tar')
+        self.assertEqual(mimetype, 'application/x-tar')
+        meta = p.get_meta()
+        self.assertEqual(meta['./tests/data/dirty.flac']['comments'], 'Thank you for using MAT !')
+        self.assertEqual(meta['./tests/data/dirty.docx']['word/media/image1.png']['Comment'], 'This is a comment, be careful!')
+        os.remove('./tests/data/dirty.tar')
+
 
 class TestRemovingThumbnails(unittest.TestCase):
     def test_odt(self):
@@ -702,3 +717,38 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/clean.css')
         os.remove('./tests/data/clean.cleaned.css')
         os.remove('./tests/data/clean.cleaned.cleaned.css')
+
+    def test_tar(self):
+        with tarfile.TarFile('./tests/data/dirty.tar', 'w') as zout:
+            zout.add('./tests/data/dirty.flac')
+            zout.add('./tests/data/dirty.docx')
+            zout.add('./tests/data/dirty.jpg')
+        p = archive.TarParser('./tests/data/dirty.tar')
+        meta = p.get_meta()
+        self.assertEqual(meta['./tests/data/dirty.docx']['word/media/image1.png']['Comment'], 'This is a comment, be careful!')
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = archive.TarParser('./tests/data/dirty.cleaned.tar')
+        self.assertEqual(p.get_meta(), {})
+        self.assertTrue(p.remove_all())
+
+        tmp_dir = tempfile.mkdtemp()
+        with tarfile.open('./tests/data/dirty.cleaned.tar') as zout:
+            zout.extractall(path=tmp_dir)
+            zout.close()
+
+        number_of_files = 0
+        for root, _, fnames in os.walk(tmp_dir):
+            for f in fnames:
+                complete_path = os.path.join(root, f)
+                p, _ = parser_factory.get_parser(complete_path)
+                self.assertIsNotNone(p)
+                self.assertEqual(p.get_meta(), {})
+                number_of_files += 1
+        self.assertEqual(number_of_files, 3)
+
+        os.remove('./tests/data/dirty.tar')
+        os.remove('./tests/data/dirty.cleaned.tar')
+        os.remove('./tests/data/dirty.cleaned.cleaned.tar')

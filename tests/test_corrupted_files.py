@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
 import unittest
+import time
 import shutil
 import os
 import logging
 import zipfile
+import tarfile
 
 from libmat2 import pdf, images, audio, office, parser_factory, torrent
-from libmat2 import harmless, video, web
+from libmat2 import harmless, video, web, archive
 
 # No need to logging messages, should something go wrong,
 # the testsuite _will_ fail.
@@ -278,7 +280,6 @@ class TestCorruptedFiles(unittest.TestCase):
             p.remove_all()
         os.remove('./tests/data/clean.html')
 
-
     def test_epub(self):
         with zipfile.ZipFile('./tests/data/clean.epub', 'w') as zout:
             zout.write('./tests/data/dirty.jpg', 'OEBPS/content.opf')
@@ -291,3 +292,27 @@ class TestCorruptedFiles(unittest.TestCase):
         self.assertFalse(p.remove_all())
         os.remove('./tests/data/clean.epub')
 
+    def test_tar(self):
+        with tarfile.TarFile('./tests/data/clean.tar', 'w') as zout:
+            zout.add('./tests/data/dirty.flac')
+            zout.add('./tests/data/dirty.docx')
+            zout.add('./tests/data/dirty.jpg')
+            zout.add('./tests/data/embedded_corrupted.docx')
+            tarinfo = tarfile.TarInfo(name='./tests/data/dirty.png')
+            tarinfo.mtime = time.time()
+            tarinfo.uid = 1337
+            tarinfo.gid = 1338
+            with open('./tests/data/dirty.png', 'rb') as f:
+                zout.addfile(tarinfo, f)
+        p, mimetype = parser_factory.get_parser('./tests/data/clean.tar')
+        self.assertEqual(mimetype, 'application/x-tar')
+        meta = p.get_meta()
+        self.assertEqual(meta['./tests/data/dirty.flac']['comments'], 'Thank you for using MAT !')
+        self.assertEqual(meta['./tests/data/dirty.docx']['word/media/image1.png']['Comment'], 'This is a comment, be careful!')
+        self.assertFalse(p.remove_all())
+        os.remove('./tests/data/clean.tar')
+
+        shutil.copy('./tests/data/dirty.png', './tests/data/clean.tar')
+        with self.assertRaises(ValueError):
+            archive.TarParser('./tests/data/clean.tar')
+        os.remove('./tests/data/clean.tar')

@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET  # type: ignore
 
 from . import archive, office
 
-class EPUBParser(archive.ArchiveBasedAbstractParser):
+class EPUBParser(archive.ZipParser):
     mimetypes = {'application/epub+zip', }
     metadata_namespace = '{http://purl.org/dc/elements/1.1/}'
 

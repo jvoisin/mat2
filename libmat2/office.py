@@ -6,7 +6,7 @@ from typing import Dict, Set, Pattern, Tuple, Any
 
 import xml.etree.ElementTree as ET  # type: ignore
 
-from .archive import ArchiveBasedAbstractParser
+from .archive import ZipParser
 
 # pylint: disable=line-too-long
 
@@ -43,7 +43,7 @@ def _sort_xml_attributes(full_path: str) -> bool:
     return True
 
 
-class MSOfficeParser(ArchiveBasedAbstractParser):
+class MSOfficeParser(ZipParser):
     mimetypes = {
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -312,7 +312,7 @@ class MSOfficeParser(ArchiveBasedAbstractParser):
                 return {file_path: 'harmful content', }
 
 
-class LibreOfficeParser(ArchiveBasedAbstractParser):
+class LibreOfficeParser(ZipParser):
     mimetypes = {
         'application/vnd.oasis.opendocument.text',
         'application/vnd.oasis.opendocument.spreadsheet',
