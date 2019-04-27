@@ -50,6 +50,10 @@ def get_parser(filename: str) -> Tuple[Optional[T], Optional[str]]:
     if extension.lower() in UNSUPPORTED_EXTENSIONS:
         return None, mtype
 
+    if mtype == 'application/x-tar':
+        if extension[1:] in ('bz2', 'gz', 'xz'):
+            mtype = mtype + '+' + extension[1:]
+
     for parser_class in _get_parsers():  # type: ignore
         if mtype in parser_class.mimetypes:
             try:

@@ -30,6 +30,14 @@ class TestParserFactory(unittest.TestCase):
         self.assertEqual(mimetype, 'audio/mpeg')
         self.assertEqual(parser.__class__, audio.MP3Parser)
 
+    def test_tarfile_double_extension_handling(self):
+        """ Test that our module auto-detection is handling sub-sub-classes """
+        with tarfile.TarFile.open('./tests/data/dirty.tar.bz2', 'w:bz2') as zout:
+            zout.add('./tests/data/dirty.jpg')
+        parser, mimetype = parser_factory.get_parser('./tests/data/dirty.tar.bz2')
+        self.assertEqual(mimetype, 'application/x-tar+bz2')
+        os.remove('./tests/data/dirty.tar.bz2')
+
 
 class TestParameterInjection(unittest.TestCase):
     def test_ver_injection(self):
@@ -719,7 +727,7 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/clean.cleaned.cleaned.css')
 
     def test_tar(self):
-        with tarfile.TarFile('./tests/data/dirty.tar', 'w') as zout:
+        with tarfile.TarFile.open('./tests/data/dirty.tar', 'w') as zout:
             zout.add('./tests/data/dirty.flac')
             zout.add('./tests/data/dirty.docx')
             zout.add('./tests/data/dirty.jpg')
@@ -752,3 +760,108 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/dirty.tar')
         os.remove('./tests/data/dirty.cleaned.tar')
         os.remove('./tests/data/dirty.cleaned.cleaned.tar')
+
+    def test_targz(self):
+        with tarfile.TarFile.open('./tests/data/dirty.tar.gz', 'w:gz') as zout:
+            zout.add('./tests/data/dirty.flac')
+            zout.add('./tests/data/dirty.docx')
+            zout.add('./tests/data/dirty.jpg')
+        p = archive.TarParser('./tests/data/dirty.tar.gz')
+        meta = p.get_meta()
+        self.assertEqual(meta['./tests/data/dirty.docx']['word/media/image1.png']['Comment'], 'This is a comment, be careful!')
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = archive.TarParser('./tests/data/dirty.cleaned.tar.gz')
+        self.assertEqual(p.get_meta(), {})
+        self.assertTrue(p.remove_all())
+
+        tmp_dir = tempfile.mkdtemp()
+        with tarfile.open('./tests/data/dirty.cleaned.tar.gz') as zout:
+            zout.extractall(path=tmp_dir)
+            zout.close()
+
+        number_of_files = 0
+        for root, _, fnames in os.walk(tmp_dir):
+            for f in fnames:
+                complete_path = os.path.join(root, f)
+                p, _ = parser_factory.get_parser(complete_path)
+                self.assertIsNotNone(p)
+                self.assertEqual(p.get_meta(), {})
+                number_of_files += 1
+        self.assertEqual(number_of_files, 3)
+
+        os.remove('./tests/data/dirty.tar.gz')
+        os.remove('./tests/data/dirty.cleaned.tar.gz')
+        os.remove('./tests/data/dirty.cleaned.cleaned.tar.gz')
+
+    def test_tarbz2(self):
+        with tarfile.TarFile.open('./tests/data/dirty.tar.bz2', 'w:bz2') as zout:
+            zout.add('./tests/data/dirty.flac')
+            zout.add('./tests/data/dirty.docx')
+            zout.add('./tests/data/dirty.jpg')
+        p = archive.TarParser('./tests/data/dirty.tar.bz2')
+        meta = p.get_meta()
+        self.assertEqual(meta['./tests/data/dirty.docx']['word/media/image1.png']['Comment'], 'This is a comment, be careful!')
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = archive.TarParser('./tests/data/dirty.cleaned.tar.bz2')
+        self.assertEqual(p.get_meta(), {})
+        self.assertTrue(p.remove_all())
+
+        tmp_dir = tempfile.mkdtemp()
+        with tarfile.open('./tests/data/dirty.cleaned.tar.bz2') as zout:
+            zout.extractall(path=tmp_dir)
+            zout.close()
+
+        number_of_files = 0
+        for root, _, fnames in os.walk(tmp_dir):
+            for f in fnames:
+                complete_path = os.path.join(root, f)
+                p, _ = parser_factory.get_parser(complete_path)
+                self.assertIsNotNone(p)
+                self.assertEqual(p.get_meta(), {})
+                number_of_files += 1
+        self.assertEqual(number_of_files, 3)
+
+        os.remove('./tests/data/dirty.tar.bz2')
+        os.remove('./tests/data/dirty.cleaned.tar.bz2')
+        os.remove('./tests/data/dirty.cleaned.cleaned.tar.bz2')
+
+    def test_tarxz(self):
+        with tarfile.TarFile.open('./tests/data/dirty.tar.xz', 'w:xz') as zout:
+            zout.add('./tests/data/dirty.flac')
+            zout.add('./tests/data/dirty.docx')
+            zout.add('./tests/data/dirty.jpg')
+        p = archive.TarParser('./tests/data/dirty.tar.xz')
+        meta = p.get_meta()
+        self.assertEqual(meta['./tests/data/dirty.docx']['word/media/image1.png']['Comment'], 'This is a comment, be careful!')
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = archive.TarParser('./tests/data/dirty.cleaned.tar.xz')
+        self.assertEqual(p.get_meta(), {})
+        self.assertTrue(p.remove_all())
+
+        tmp_dir = tempfile.mkdtemp()
+        with tarfile.open('./tests/data/dirty.cleaned.tar.xz') as zout:
+            zout.extractall(path=tmp_dir)
+            zout.close()
+
+        number_of_files = 0
+        for root, _, fnames in os.walk(tmp_dir):
+            for f in fnames:
+                complete_path = os.path.join(root, f)
+                p, _ = parser_factory.get_parser(complete_path)
+                self.assertIsNotNone(p)
+                self.assertEqual(p.get_meta(), {})
+                number_of_files += 1
+        self.assertEqual(number_of_files, 3)
+
+        os.remove('./tests/data/dirty.tar.xz')
+        os.remove('./tests/data/dirty.cleaned.tar.xz')
+        os.remove('./tests/data/dirty.cleaned.cleaned.tar.xz')

@@ -25,6 +25,11 @@ class AbstractParser(abc.ABC):
 
         self.filename = filename
         fname, extension = os.path.splitext(filename)
+
+        # Special case for tar.gz, tar.bz2, … files
+        if fname.endswith('.tar') and len(fname) > 4:
+            fname, extension = fname[:-4], '.tar' + extension
+
         self.output_filename = fname + '.cleaned' + extension
         self.lightweight_cleaning = False
 

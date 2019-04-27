@@ -40,6 +40,10 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
           the Union[A, B] constrain, hence the weird `#  type: ignore`
           annotations.
     """
+    # Tarfiles can optionally support compression
+    # https://docs.python.org/3/library/tarfile.html#tarfile.open
+    compression = ''
+
     def __init__(self, filename):
         super().__init__(filename)
         self.archive_class = None  #  type: Optional[ArchiveClass]
@@ -134,7 +138,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
         # pylint: disable=too-many-branches
 
         with self.archive_class(self.filename) as zin,\
-             self.archive_class(self.output_filename, 'w') as zout:
+             self.archive_class(self.output_filename, 'w' + self.compression) as zout:
 
             temp_folder = tempfile.mkdtemp()
             abort = False
@@ -212,7 +216,11 @@ class TarParser(ArchiveBasedAbstractParser):
     mimetypes = {'application/x-tar'}
     def __init__(self, filename):
         super().__init__(filename)
-        self.archive_class = tarfile.TarFile
+        # yes, it's tarfile.TarFile.open and not tarfile.TarFile,
+        # as stated in the documentation:
+        # https://docs.python.org/3/library/tarfile.html#tarfile.TarFile
+        # This is required to support compressed archives.
+        self.archive_class = tarfile.TarFile.open
         self.member_class = tarfile.TarInfo
 
     def is_archive_valid(self):
@@ -258,6 +266,22 @@ class TarParser(ArchiveBasedAbstractParser):
     def _get_member_name(member: ArchiveMember) -> str:
         assert isinstance(member, tarfile.TarInfo)  # please mypy
         return member.name
+
+
+class TarGzParser(TarParser):
+    compression = ':gz'
+    mimetypes = {'application/x-tar+gz'}
+
+
+class TarBz2Parser(TarParser):
+    compression = ':bz2'
+    mimetypes = {'application/x-tar+bz2'}
+
+
+class TarXzParser(TarParser):
+    compression = ':xz'
+    mimetypes = {'application/x-tar+xz'}
+
 
 class ZipParser(ArchiveBasedAbstractParser):
     mimetypes = {'application/zip'}
