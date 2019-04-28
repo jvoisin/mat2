@@ -15,7 +15,7 @@ from . import abstract, UnknownMemberPolicy, parser_factory
 assert Set
 assert Pattern
 
-# pylint: disable=not-callable,assignment-from-no-return
+# pylint: disable=not-callable,assignment-from-no-return,too-many-branches
 
 # An ArchiveClass is a class representing an archive,
 # while an ArchiveMember is a class representing an element
@@ -238,6 +238,57 @@ class TarParser(ArchiveBasedAbstractParser):
     def is_archive_valid(self):
         if tarfile.is_tarfile(self.filename) is False:
             raise ValueError
+        self.__check_tarfile_safety()
+
+    def __check_tarfile_safety(self):
+        """Checks if the tarfile doesn't have any "suspicious" members.
+
+        This is a rewrite of this patch: https://bugs.python.org/file47826/safetarfile-4.diff
+        inspired by this bug from 2014: https://bugs.python.org/issue21109
+        because Python's stdlib doesn't provide a way to "safely" extract
+        things from a tar file.
+        """
+        names = set()
+        with tarfile.open(self.filename) as f:
+            members = f.getmembers()
+        for member in members:
+            name = member.name
+            if os.path.isabs(name):
+                raise ValueError("The archive %s contains a file with an " \
+                        "absolute path: %s" % (self.filename, name))
+            elif os.path.normpath(name).startswith('../') or '/../' in name:
+                raise ValueError("The archive %s contains a file with an " \
+                        "path traversal attack: %s" % (self.filename, name))
+
+            if name in names:
+                raise ValueError("The archive %s contains two times the same " \
+                        "file: %s" % (self.filename, name))
+            else:
+                names.add(name)
+
+            if member.isfile():
+                if member.mode & stat.S_ISUID:
+                    raise ValueError("The archive %s contains a setuid file: %s" % \
+                        (self.filename, name))
+                elif member.mode & stat.S_ISGID:
+                    raise ValueError("The archive %s contains a setgid file: %s" % \
+                            (self.filename, name))
+            elif member.issym():
+                linkname = member.linkname
+                if os.path.normpath(linkname).startswith('..'):
+                    raise ValueError('The archive %s contains a symlink pointing' \
+                            'outside of the archive via a path traversal: %s -> %s' % \
+                            (self.filename, name, linkname))
+                if os.path.isabs(linkname):
+                    raise ValueError('The archive %s contains a symlink pointing' \
+                            'outside of the archive: %s -> %s' % \
+                            (self.filename, name, linkname))
+            elif member.isdev():
+                raise ValueError("The archive %s contains a non-regular " \
+                        "file: %s" % (self.filename, name))
+            elif member.islnk():
+                raise ValueError("The archive %s contains a hardlink: %s" \
+                        % (self.filename, name))
 
     @staticmethod
     def _clean_member(member: ArchiveMember) -> ArchiveMember:

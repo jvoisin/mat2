@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import unittest
+import stat
 import time
 import shutil
 import os
@@ -325,6 +326,7 @@ class TestReadOnlyArchiveMembers(unittest.TestCase):
             tarinfo = tarfile.TarInfo('./tests/data/dirty.jpg')
             tarinfo.mtime = time.time()
             tarinfo.uid = 1337
+            tarinfo.gid = 0
             tarinfo.mode = 0o000
             tarinfo.size = os.stat('./tests/data/dirty.jpg').st_size
             with open('./tests/data/dirty.jpg', 'rb') as f:
@@ -340,3 +342,121 @@ class TestReadOnlyArchiveMembers(unittest.TestCase):
         os.remove('./tests/data/clean.tar')
         os.remove('./tests/data/clean.cleaned.tar')
 
+
+class TestPathTraversalArchiveMembers(unittest.TestCase):
+    def test_tar_traversal(self):
+        with tarfile.open('./tests/data/clean.tar', 'w') as zout:
+            zout.add('./tests/data/dirty.png')
+            tarinfo = tarfile.TarInfo('./tests/data/dirty.jpg')
+            tarinfo.name = '../../../../../../../../../../tmp/mat2_test.png'
+            with open('./tests/data/dirty.jpg', 'rb') as f:
+                zout.addfile(tarinfo=tarinfo, fileobj=f)
+        with self.assertRaises(ValueError):
+            archive.TarParser('./tests/data/clean.tar')
+        os.remove('./tests/data/clean.tar')
+
+    def test_tar_absolute_path(self):
+        with tarfile.open('./tests/data/clean.tar', 'w') as zout:
+            zout.add('./tests/data/dirty.png')
+            tarinfo = tarfile.TarInfo('./tests/data/dirty.jpg')
+            tarinfo.name = '/etc/passwd'
+            with open('./tests/data/dirty.jpg', 'rb') as f:
+                zout.addfile(tarinfo=tarinfo, fileobj=f)
+        with self.assertRaises(ValueError):
+            archive.TarParser('./tests/data/clean.tar')
+        os.remove('./tests/data/clean.tar')
+
+    def test_tar_duplicate_file(self):
+        with tarfile.open('./tests/data/clean.tar', 'w') as zout:
+            for _ in range(3):
+                zout.add('./tests/data/dirty.png')
+                tarinfo = tarfile.TarInfo('./tests/data/dirty.jpg')
+                with open('./tests/data/dirty.jpg', 'rb') as f:
+                    zout.addfile(tarinfo=tarinfo, fileobj=f)
+        with self.assertRaises(ValueError):
+            archive.TarParser('./tests/data/clean.tar')
+        os.remove('./tests/data/clean.tar')
+
+    def test_tar_setuid(self):
+        with tarfile.open('./tests/data/clean.tar', 'w') as zout:
+            zout.add('./tests/data/dirty.png')
+            tarinfo = tarfile.TarInfo('./tests/data/dirty.jpg')
+            tarinfo.mode |= stat.S_ISUID
+            with open('./tests/data/dirty.jpg', 'rb') as f:
+                zout.addfile(tarinfo=tarinfo, fileobj=f)
+        with self.assertRaises(ValueError):
+            archive.TarParser('./tests/data/clean.tar')
+        os.remove('./tests/data/clean.tar')
+
+    def test_tar_setgid(self):
+        with tarfile.open('./tests/data/clean.tar', 'w') as zout:
+            zout.add('./tests/data/dirty.png')
+            tarinfo = tarfile.TarInfo('./tests/data/dirty.jpg')
+            tarinfo.mode |= stat.S_ISGID
+            with open('./tests/data/dirty.jpg', 'rb') as f:
+                zout.addfile(tarinfo=tarinfo, fileobj=f)
+        with self.assertRaises(ValueError):
+            archive.TarParser('./tests/data/clean.tar')
+        os.remove('./tests/data/clean.tar')
+
+    def test_tar_symlink_absolute(self):
+        os.symlink('/etc/passwd', './tests/data/symlink')
+        with tarfile.open('./tests/data/clean.tar', 'w') as zout:
+            zout.add('./tests/data/symlink')
+            tarinfo = tarfile.TarInfo('./tests/data/symlink')
+            tarinfo.linkname = '/etc/passwd'
+            tarinfo.type = tarfile.SYMTYPE
+            with open('./tests/data/dirty.jpg', 'rb') as f:
+                zout.addfile(tarinfo=tarinfo, fileobj=f)
+        with self.assertRaises(ValueError):
+            archive.TarParser('./tests/data/clean.tar')
+        os.remove('./tests/data/clean.tar')
+        os.remove('./tests/data/symlink')
+
+    def test_tar_symlink_ok(self):
+        shutil.copy('./tests/data/dirty.png', './tests/data/clean.png')
+        with tarfile.open('./tests/data/clean.tar', 'w') as zout:
+            zout.add('./tests/data/dirty.png')
+            t = tarfile.TarInfo('mydir')
+            t.type = tarfile.DIRTYPE
+            zout.addfile(t)
+            zout.add('./tests/data/clean.png')
+            t = tarfile.TarInfo('mylink')
+            t.type = tarfile.SYMTYPE
+            t.linkname = './tests/data/clean.png'
+            zout.addfile(t)
+            zout.add('./tests/data/dirty.jpg')
+        archive.TarParser('./tests/data/clean.tar')
+        os.remove('./tests/data/clean.tar')
+        os.remove('./tests/data/clean.png')
+
+    def test_tar_symlink_relative(self):
+        os.symlink('../../../etc/passwd', './tests/data/symlink')
+        with tarfile.open('./tests/data/clean.tar', 'w') as zout:
+            zout.add('./tests/data/symlink')
+            tarinfo = tarfile.TarInfo('./tests/data/symlink')
+            with open('./tests/data/dirty.jpg', 'rb') as f:
+                zout.addfile(tarinfo=tarinfo, fileobj=f)
+        with self.assertRaises(ValueError):
+            archive.TarParser('./tests/data/clean.tar')
+        os.remove('./tests/data/clean.tar')
+        os.remove('./tests/data/symlink')
+
+    def test_tar_device_file(self):
+        with tarfile.open('./tests/data/clean.tar', 'w') as zout:
+            zout.add('/dev/null')
+        with self.assertRaises(ValueError):
+            archive.TarParser('./tests/data/clean.tar')
+        os.remove('./tests/data/clean.tar')
+
+    def test_tar_hardlink(self):
+        shutil.copy('./tests/data/dirty.png', './tests/data/clean.png')
+        os.link('./tests/data/clean.png', './tests/data/hardlink.png')
+        with tarfile.open('./tests/data/cleaner.tar', 'w') as zout:
+            zout.add('tests/data/clean.png')
+            zout.add('tests/data/hardlink.png')
+        with self.assertRaises(ValueError):
+            archive.TarParser('./tests/data/cleaner.tar')
+        os.remove('./tests/data/cleaner.tar')
+        os.remove('./tests/data/clean.png')
+        os.remove('./tests/data/hardlink.png')
