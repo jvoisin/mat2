@@ -50,6 +50,7 @@ tests:debian:
 tests:debian_with_bubblewrap:
   image: $CONTAINER_REGISTRY:debian
   stage: test
+  allow_failure: true
   script:
     - python3-coverage run --branch -m unittest discover -s tests/
     - python3-coverage report --fail-under=100 -m --include 'libmat2/*'
