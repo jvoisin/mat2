@@ -32,7 +32,12 @@ def __check_file(filename: str, mode: int = os.R_OK) -> bool:
         print("[-] %s is not a regular file." % filename)
         return False
     elif not os.access(filename, mode):
-        print("[-] %s is not readable and writeable." % filename)
+        mode_str = []  # type: List[str]
+        if mode & os.R_OK:
+            mode_str += 'readable'
+        if mode & os.W_OK:
+            mode_str += 'writeable'
+        print("[-] %s is not %s." % (filename, 'nor '.join(mode_str)))
         return False
     return True
 
