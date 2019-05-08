@@ -2,6 +2,9 @@ import os
 import shutil
 import subprocess
 import unittest
+import glob
+
+from libmat2 import images, parser_factory
 
 
 mat2_binary = ['./mat2']
@@ -181,3 +184,39 @@ class TestControlCharInjection(unittest.TestCase):
                 stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
         self.assertIn(b'Comment: GQ\n', stdout)
+
+
+class TestCommandLineParallel(unittest.TestCase):
+    iterations = 24
+
+    def test_same(self):
+        for i in range(self.iterations):
+            shutil.copy('./tests/data/dirty.jpg', './tests/data/dirty_%d.jpg' % i)
+
+        proc = subprocess.Popen(mat2_binary + ['./tests/data/dirty_%d.jpg' % i for i in range(self.iterations)],
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+
+        for i in range(self.iterations):
+            path = './tests/data/dirty_%d.jpg' % i
+            p = images.JPGParser('./tests/data/dirty_%d.cleaned.jpg' % i)
+            self.assertEqual(p.get_meta(), {})
+            os.remove('./tests/data/dirty_%d.cleaned.jpg' % i)
+            os.remove(path)
+
+    def test_different(self):
+        shutil.copytree('./tests/data/', './tests/data/parallel')
+
+        proc = subprocess.Popen(mat2_binary + glob.glob('./tests/data/parallel/dirty.*'),
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+
+        for i in glob.glob('./test/data/parallel/dirty.cleaned.*'):
+            p, mime = parser_factory.get_parser(i)
+            self.assertIsNotNone(mime)
+            self.assertIsNotNone(p)
+            p = parser_factory.get_parser(p.output_filename)
+            self.assertEqual(p.get_meta(), {})
+            print('DELET: %s' % i)
+        shutil.rmtree('./tests/data/parallel')
+
