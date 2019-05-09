@@ -1,3 +1,4 @@
+import random
 import os
 import shutil
 import subprocess
@@ -217,6 +218,24 @@ class TestCommandLineParallel(unittest.TestCase):
             self.assertIsNotNone(p)
             p = parser_factory.get_parser(p.output_filename)
             self.assertEqual(p.get_meta(), {})
-            print('DELET: %s' % i)
         shutil.rmtree('./tests/data/parallel')
 
+    def test_faulty(self):
+        for i in range(self.iterations):
+            shutil.copy('./tests/data/dirty.jpg', './tests/data/dirty_%d.jpg' % i)
+            shutil.copy('./tests/data/dirty.torrent', './tests/data/dirty_%d.docx' % i)
+
+        to_process = ['./tests/data/dirty_%d.jpg' % i for i in range(self.iterations)]
+        to_process.extend(['./tests/data/dirty_%d.docx' % i for i in range(self.iterations)])
+        random.shuffle(to_process)
+        proc = subprocess.Popen(mat2_binary + to_process,
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+
+        for i in range(self.iterations):
+            path = './tests/data/dirty_%d.jpg' % i
+            p = images.JPGParser('./tests/data/dirty_%d.cleaned.jpg' % i)
+            self.assertEqual(p.get_meta(), {})
+            os.remove('./tests/data/dirty_%d.cleaned.jpg' % i)
+            os.remove(path)
+            os.remove('./tests/data/dirty_%d.docx' % i)
