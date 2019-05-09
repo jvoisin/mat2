@@ -35,12 +35,12 @@ class AbstractParser(abc.ABC):
 
     @abc.abstractmethod
     def get_meta(self) -> Dict[str, Union[str, dict]]:
-        pass  # pragma: no cover
+        """Return all the metadata of the current file"""
 
     @abc.abstractmethod
     def remove_all(self) -> bool:
         """
+        Remove all the metadata of the current file
+
         :raises RuntimeError: Raised if the cleaning process went wrong.
         """
-        # pylint: disable=unnecessary-pass
-        pass  # pragma: no cover

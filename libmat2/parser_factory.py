@@ -7,13 +7,10 @@ from typing import TypeVar, List, Tuple, Optional
 
 from . import abstract, UNSUPPORTED_EXTENSIONS
 
-assert Tuple  # make pyflakes happy
-
 T = TypeVar('T', bound='abstract.AbstractParser')
 
 mimetypes.add_type('application/epub+zip', '.epub')
-# EPUB Navigation Control XML File
-mimetypes.add_type('application/x-dtbncx+xml', '.ncx')
+mimetypes.add_type('application/x-dtbncx+xml', '.ncx')  # EPUB Navigation Control XML File
 
 
 def __load_all_parsers():
