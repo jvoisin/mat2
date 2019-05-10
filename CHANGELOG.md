@@ -1,3 +1,13 @@
+# 0.9.0 - 2019-05-10
+
+- Add tar/tar.gz/tar.bz2/tar.zx archives support
+- Add support for xhtml files
+- Improve handling of read-only files
+- Improve a bit the command line's documentation
+- Fix a confusing error message
+- Add even more tests
+- Usuals internal cleanups/refactorings
+
 # 0.8.0 - 2019-02-28
 
 - Add support for epub files
