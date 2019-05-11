@@ -14,11 +14,7 @@ from libmat2 import check_dependencies, video, archive, web, epub
 
 class TestCheckDependencies(unittest.TestCase):
     def test_deps(self):
-        try:
-            ret = check_dependencies()
-        except RuntimeError:
-            return   # this happens if not every dependency is installed
-
+        ret = check_dependencies()
         for key, value in ret.items():
             self.assertTrue(value, "The value for %s is False" % key)
 
