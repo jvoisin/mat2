@@ -30,35 +30,65 @@ UNSUPPORTED_EXTENSIONS = {
     }
 
 DEPENDENCIES = {
-    'Cairo': 'cairo',
-    'PyGobject': 'gi',
-    'GdkPixbuf from PyGobject': 'gi.repository.GdkPixbuf',
-    'Poppler from PyGobject': 'gi.repository.Poppler',
-    'GLib from PyGobject': 'gi.repository.GLib',
-    'Mutagen': 'mutagen',
-    }
+    'Cairo': {
+        'module': 'cairo',
+        'required': True,
+    },
+    'PyGobject': {
+        'module': 'gi',
+        'required': True,
+    },
+    'GdkPixbuf from PyGobject': {
+        'module': 'gi.repository.GdkPixbuf',
+        'required': True,
+    },
+    'Poppler from PyGobject': {
+        'module': 'gi.repository.Poppler',
+        'required': True,
+    },
+    'GLib from PyGobject': {
+        'module': 'gi.repository.GLib',
+        'required': True,
+    },
+    'Mutagen': {
+        'module': 'mutagen',
+        'required': True,
+    },
+}
 
 CMD_DEPENDENCIES = {
-    'Exiftool': exiftool._get_exiftool_path,
-    'Ffmpeg': video._get_ffmpeg_path,
-    }
+    'Exiftool': {
+        'cmd': exiftool._get_exiftool_path,
+        'required': False,
+    },
+    'Ffmpeg': {
+        'cmd': video._get_ffmpeg_path,
+        'required': False,
+    },
+}
 
-def check_dependencies() -> Dict[str, bool]:
+def check_dependencies() -> Dict[str, Dict[str, bool]]:
     ret = collections.defaultdict(bool)  # type: Dict[str, bool]
 
     for key, value in DEPENDENCIES.items():
-        ret[key] = True
+        ret[key] = {
+            'found': True,
+            'required': value['required'],
+        }
         try:
-            importlib.import_module(value)
+            importlib.import_module(value['module'])
         except ImportError:  # pragma: no cover
-            ret[key] = False  # pragma: no cover
+            ret[key]['found'] = False
 
     for k, v in CMD_DEPENDENCIES.items():
-        ret[k] = True
+        ret[k] = {
+            'found': True,
+            'required': v['required'],
+        }
         try:
-            v()
+            v['cmd']()
         except RuntimeError:  # pragma: no cover
-            ret[k] = False
+            ret[k]['found'] = False
 
     return ret
 

@@ -165,9 +165,10 @@ def main() -> int:
             show_parsers()
             return 0
         elif args.check_dependencies:
-            print("Dependencies required for MAT2 %s:" % __version__)
+            print("Dependencies for MAT2 %s:" % __version__)
             for key, value in sorted(check_dependencies().items()):
-                print('- %s: %s' % (key, 'yes' if value else 'no'))
+                print('- %s: %s %s' % (key, 'yes' if value['found'] else 'no',
+                                       '(optional)' if not value['required'] else ''))
         else:
             arg_parser.print_help()
         return 0

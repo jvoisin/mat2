@@ -16,7 +16,8 @@ class TestCheckDependencies(unittest.TestCase):
     def test_deps(self):
         ret = check_dependencies()
         for key, value in ret.items():
-            self.assertTrue(value, "The value for %s is False" % key)
+            if value['required']:
+                self.assertTrue(value['found'], "The value for %s is False" % key)
 
 
 class TestParserFactory(unittest.TestCase):
