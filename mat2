@@ -117,7 +117,7 @@ def clean_meta(filename: str, is_lightweight: bool, policy: UnknownMemberPolicy)
     p.lightweight_cleaning = is_lightweight
 
     try:
-        logging.debug('Cleaning %s…' % filename)
+        logging.debug('Cleaning %s…', filename)
         return p.remove_all()
     except RuntimeError as e:
         print("[-] %s can't be cleaned: %s" % (filename, e))
