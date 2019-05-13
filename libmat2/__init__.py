@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 
-import collections
 import enum
 import importlib
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 from . import exiftool, video
 
 # make pyflakes happy
 assert Dict
 assert Optional
+assert Union
 
 # A set of extension that aren't supported, despite matching a supported mimetype
 UNSUPPORTED_EXTENSIONS = {
@@ -68,7 +68,7 @@ CMD_DEPENDENCIES = {
 }
 
 def check_dependencies() -> Dict[str, Dict[str, bool]]:
-    ret = collections.defaultdict(bool)  # type: Dict[str, bool]
+    ret = dict()  # type: Dict[str, dict]
 
     for key, value in DEPENDENCIES.items():
         ret[key] = {
@@ -76,7 +76,7 @@ def check_dependencies() -> Dict[str, Dict[str, bool]]:
             'required': value['required'],
         }
         try:
-            importlib.import_module(value['module'])
+            importlib.import_module(value['module'])  # type: ignore
         except ImportError:  # pragma: no cover
             ret[key]['found'] = False
 
@@ -86,7 +86,7 @@ def check_dependencies() -> Dict[str, Dict[str, bool]]:
             'required': v['required'],
         }
         try:
-            v['cmd']()
+            v['cmd']()  # type: ignore
         except RuntimeError:  # pragma: no cover
             ret[k]['found'] = False
 
