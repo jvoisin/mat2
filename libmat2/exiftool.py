@@ -1,3 +1,4 @@
+import functools
 import json
 import logging
 import os
@@ -56,6 +57,7 @@ class ExiftoolParser(abstract.AbstractParser):
             return False
         return True
 
+@functools.lru_cache()
 def _get_exiftool_path() -> str:  # pragma: no cover
     possible_pathes = {
         '/usr/bin/exiftool',              # debian/fedora

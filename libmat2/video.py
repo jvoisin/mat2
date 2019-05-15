@@ -1,3 +1,4 @@
+import functools
 import os
 import logging
 
@@ -130,6 +131,7 @@ class MP4Parser(AbstractFFmpegParser):
     }
 
 
+@functools.lru_cache()
 def _get_ffmpeg_path() -> str:  # pragma: no cover
     ffmpeg_path = '/usr/bin/ffmpeg'
     if os.path.isfile(ffmpeg_path):
