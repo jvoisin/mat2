@@ -12,11 +12,16 @@ images in a PDF or an office document.
 Revisions handling
 ------------------
 
-Revisions are handled according to the principle of least astonishment: they are entirely removed.
+Revisions are handled according to the principle of least astonishment: they
+are entirely removed.
 
-- Either the users aren't aware of the revisions, are thus they should be deleted. For example journalists that are editing a document to erase mentions sources mentions.
+- Either the users aren't aware of the revisions, are thus they should be
+	deleted. For example journalists that are editing a document to erase
+	mentions sources mentions.
 
-- Or they are aware of it, and will likely not expect MAT2 to be able to keep the revisions, that are basically traces about how, when and who edited the document.
+- Or they are aware of it, and will likely not expect MAT2 to be able to keep
+	the revisions, that are basically traces about how, when and who edited the
+	document.
 
 
 Race conditions
@@ -37,8 +42,19 @@ against them
 Archives handling
 -----------------
 
-MAT2 doesn't support archives yet, because we haven't found an usable way to ask the user
-what to do when a non-supported files are encountered.
+By default, when cleaning a non-support file format in an archive,
+mat2 will abort with a detailed error message.
+While strongly discouraged, it's possible to override this behaviour to force
+the exclusion, or inclusion of unknown files into the cleaned archive.
+
+While Python's [zipfile](https://docs.python.org/3/library/zipfile.html) module
+provides *safe* way to extract members of a zip archive, the 
+[tarfile](https://docs.python.org/3/library/tarfile.html) one doesn't,
+meaning that it's up to mat2 to implement safety checks. Currently,
+it defends against path-traversal, both relative and absolute,
+symlink-related attacks, setuid/setgid attacks, duplicate members, block and
+char devices, … but there might still be dragons lurking there.
+
 
 PDF handling
 ------------
