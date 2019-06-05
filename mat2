@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
 import os
-from typing import Tuple, Generator, List, Union
+from typing import Tuple, List, Union, Set
 import sys
 import mimetypes
 import argparse
 import logging
 import unicodedata
+import concurrent.futures
 
 try:
     from libmat2 import parser_factory, UNSUPPORTED_EXTENSIONS
@@ -18,6 +19,7 @@ except ValueError as e:
 __version__ = '0.9.0'
 
 # Make pyflakes happy
+assert Set
 assert Tuple
 assert Union
 
@@ -142,16 +144,18 @@ def show_parsers():
     print('\n'.join(sorted(formats)))
 
 
-def __get_files_recursively(files: List[str]) -> Generator[str, None, None]:
+def __get_files_recursively(files: List[str]) -> List[str]:
+    ret = set()  # type: Set[str]
     for f in files:
         if os.path.isdir(f):
             for path, _, _files in os.walk(f):
                 for _f in _files:
                     fname = os.path.join(path, _f)
                     if __check_file(fname):
-                        yield fname
+                        ret.add(fname)
         elif __check_file(f):
-            yield f
+            ret.add(f)
+    return list(ret)
 
 def main() -> int:
     arg_parser = create_arg_parser()
@@ -184,9 +188,16 @@ def main() -> int:
             logging.warning('Keeping unknown member files may leak metadata in the resulting file!')
 
         no_failure = True
-        for f in __get_files_recursively(args.files):
-            if clean_meta(f, args.lightweight, policy) is False:
-                no_failure = False
+        files = __get_files_recursively(args.files)
+        # We have to use Processes instead of Threads, since
+        # we're using tempfile.mkdtemp, which isn't thread-safe.
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            futures = list()
+            for f in files:
+                future = executor.submit(clean_meta, f, args.lightweight, policy)
+                futures.append(future)
+            for future in concurrent.futures.as_completed(futures):
+                no_failure &= future.result()
         return 0 if no_failure is True else -1
 
 
