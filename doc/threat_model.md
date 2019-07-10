@@ -78,7 +78,7 @@ Requirements
     responsible for the information of the file.
 
     - MAT2 *must* warn when encountering an unknown
-    format. For example, in a zipfile, if MAT encounters an
+    format. For example, in a zipfile, if MAT2 encounters an
     unknown format, it should warn the user, and ask if the
     file should be added to the anonymised archive that is
     produced.
