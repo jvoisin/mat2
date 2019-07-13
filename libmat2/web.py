@@ -98,6 +98,8 @@ class _HTMLParser(parser.HTMLParser):
 
     def handle_starttag(self, tag: str, attrs: List[Tuple[str, Optional[str]]]):
         original_tag = self.get_starttag_text()
+        if not original_tag:  # empty tag
+            return
         self.__validation_queue.append(original_tag)
 
         if tag in self.tag_blocklist:
