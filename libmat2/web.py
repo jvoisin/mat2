@@ -1,5 +1,5 @@
 from html import parser, escape
-from typing import Dict, Any, List, Tuple, Set
+from typing import Dict, Any, List, Tuple, Set, Optional
 import re
 import string
 
@@ -96,7 +96,7 @@ class _HTMLParser(parser.HTMLParser):
         self.tag_required_blocklist = required_blocklisted_tags
         self.tag_blocklist = blocklisted_tags
 
-    def handle_starttag(self, tag: str, attrs: List[Tuple[str, str]]):
+    def handle_starttag(self, tag: str, attrs: List[Tuple[str, Optional[str]]]):
         original_tag = self.get_starttag_text()
         self.__validation_queue.append(original_tag)
 
