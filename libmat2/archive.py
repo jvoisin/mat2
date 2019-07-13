@@ -99,9 +99,8 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
     def _get_member_name(member: ArchiveMember) -> str:
         """Return the name of the given member."""
 
-    @staticmethod
-    @abc.abstractstaticmethod
-    def _add_file_to_archive(archive: ArchiveClass, member: ArchiveMember,
+    @abc.abstractmethod
+    def _add_file_to_archive(self, archive: ArchiveClass, member: ArchiveMember,
                              full_path: str):
         """Add the file at full_path to the archive, via the given member."""
 
@@ -313,8 +312,7 @@ class TarParser(ArchiveBasedAbstractParser):
             metadata['gname'] = member.gname
         return metadata
 
-    @staticmethod
-    def _add_file_to_archive(archive: ArchiveClass, member: ArchiveMember,
+    def _add_file_to_archive(self, archive: ArchiveClass, member: ArchiveMember,
                              full_path: str):
         assert isinstance(member, tarfile.TarInfo)  # please mypy
         assert isinstance(archive, tarfile.TarFile)  # please mypy
@@ -358,6 +356,7 @@ class ZipParser(ArchiveBasedAbstractParser):
         super().__init__(filename)
         self.archive_class = zipfile.ZipFile
         self.member_class = zipfile.ZipInfo
+        self.zip_compression_type = zipfile.ZIP_DEFLATED
 
     def is_archive_valid(self):
         try:
@@ -392,13 +391,13 @@ class ZipParser(ArchiveBasedAbstractParser):
 
         return metadata
 
-    @staticmethod
-    def _add_file_to_archive(archive: ArchiveClass, member: ArchiveMember,
+    def _add_file_to_archive(self, archive: ArchiveClass, member: ArchiveMember,
                              full_path: str):
         assert isinstance(archive, zipfile.ZipFile)  # please mypy
         assert isinstance(member, zipfile.ZipInfo)  # please mypy
         with open(full_path, 'rb') as f:
-            archive.writestr(member, f.read())
+            archive.writestr(member, f.read(),
+                             compress_type=self.zip_compression_type)
 
     @staticmethod
     def _get_all_members(archive: ArchiveClass) -> List[ArchiveMember]:
