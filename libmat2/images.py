@@ -1,17 +1,47 @@
 import imghdr
 import os
-from typing import Set
+from typing import Set, Dict, Union
 
 import cairo
 
 import gi
 gi.require_version('GdkPixbuf', '2.0')
-from gi.repository import GdkPixbuf, GLib
+gi.require_version('Rsvg', '2.0')
+from gi.repository import GdkPixbuf, GLib, Rsvg
 
 from . import exiftool
 
 # Make pyflakes happy
 assert Set
+
+class SVGParser(exiftool.ExiftoolParser):
+    mimetypes = {'image/svg+xml', }
+    meta_allowlist = {'Directory', 'ExifToolVersion', 'FileAccessDate',
+                      'FileInodeChangeDate', 'FileModifyDate', 'FileName',
+                      'FilePermissions', 'FileSize', 'FileType',
+                      'FileTypeExtension', 'ImageHeight', 'ImageWidth',
+                      'MIMEType', 'SVGVersion', 'SourceFile', 'ViewBox'
+                      }
+
+    def remove_all(self) -> bool:
+        svg = Rsvg.Handle.new_from_file(self.filename)
+        dimensions = svg.get_dimensions()
+        surface = cairo.SVGSurface(self.output_filename,
+                                   dimensions.height,
+                                   dimensions.width)
+        context = cairo.Context(surface)
+        svg.render_cairo(context)
+        surface.finish()
+        return True
+
+    def get_meta(self) -> Dict[str, Union[str, dict]]:
+        meta = super().get_meta()
+
+        # The namespace is mandatory, but thereis only one bossible.
+        ns = 'http://www.w3.org/2000/svg'
+        if meta.get('Xmlns', ns) == ns:
+            meta.pop('Xmlns')
+        return meta
 
 class PNGParser(exiftool.ExiftoolParser):
     mimetypes = {'image/png', }

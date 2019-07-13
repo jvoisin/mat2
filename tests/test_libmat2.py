@@ -73,13 +73,13 @@ class TestParameterInjection(unittest.TestCase):
 
 
 class TestUnsupportedEmbeddedFiles(unittest.TestCase):
-    def test_odt_with_svg(self):
+    def test_odt_with_py(self):
         shutil.copy('./tests/data/embedded.odt', './tests/data/clean.odt')
         p = office.LibreOfficeParser('./tests/data/clean.odt')
         self.assertFalse(p.remove_all())
         os.remove('./tests/data/clean.odt')
 
-    def test_docx_with_svg(self):
+    def test_docx_with_py(self):
         shutil.copy('./tests/data/embedded.docx', './tests/data/clean.docx')
         p = office.MSOfficeParser('./tests/data/clean.docx')
         self.assertFalse(p.remove_all())
@@ -862,3 +862,27 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/dirty.tar.xz')
         os.remove('./tests/data/dirty.cleaned.tar.xz')
         os.remove('./tests/data/dirty.cleaned.cleaned.tar.xz')
+
+    def test_svg(self):
+        shutil.copy('./tests/data/dirty.svg', './tests/data/clean.svg')
+        p = images.SVGParser('./tests/data/clean.svg')
+
+        meta = p.get_meta()
+        self.assertEqual(meta['WorkCreatorAgentTitle'], 'GNOME Design Team')
+        self.assertEqual(meta['WorkSubject'], ['mat2', 'logo', 'metadata'])
+        self.assertEqual(meta['ID'], 'svg11300')
+        self.assertEqual(meta['Output_extension'],
+                         'org.inkscape.output.svg.inkscape')
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = images.SVGParser('./tests/data/clean.cleaned.svg')
+        self.assertEqual(p.get_meta(), {})
+        self.assertTrue(p.remove_all())
+
+        os.remove('./tests/data/clean.svg')
+        os.remove('./tests/data/clean.cleaned.svg')
+        os.remove('./tests/data/clean.cleaned.cleaned.svg')
+
+

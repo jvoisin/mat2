@@ -30,6 +30,7 @@ metadata.
 - `python3-mutagen` for audio support
 - `python3-gi-cairo` and `gir1.2-poppler-0.18` for PDF support
 - `gir1.2-gdkpixbuf-2.0` for images support
+- `gir1.2-rsvg-2.0` for svg support
 - `FFmpeg`, optionally, for video support
 - `libimage-exiftool-perl` for everything else
 - `bubblewrap`, optionally, for sandboxing
