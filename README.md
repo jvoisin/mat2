@@ -25,6 +25,9 @@ Maybe you don't want to disclose those information.
 This is precisely the job of MAT2: getting rid, as much as possible, of
 metadata.
 
+MAT2 provides both a command line tool, and a graphical user interface
+via an extension for Nautilus, the default file manager of GNOME.
+
 # Requirements
 
 - `python3-mutagen` for audio support
