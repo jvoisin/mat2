@@ -10,3 +10,6 @@
 Simply copy the `mat2.py` file to `~/.local/share/nautilus-python/extensions`,
 and launch Nautilus; you should now have a "Remove metadata" item in the
 right-clic menu on supported files.
+
+Please note: This is not needed if using a distribution provided package. It
+only applies if installing from source.
