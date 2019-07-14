@@ -38,8 +38,7 @@ via an extension for Nautilus, the default file manager of GNOME.
 - `libimage-exiftool-perl` for everything else
 - `bubblewrap`, optionally, for sandboxing
 
-Please note that MAT2 requires at least Python3.5, meaning that it
-doesn't run on [Debian Jessie](https://packages.debian.org/jessie/python3).
+Please note that MAT2 requires at least Python3.5.
 
 # Running the test suite
 
