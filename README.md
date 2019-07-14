@@ -20,7 +20,7 @@ Metadata within a file can tell a lot about you.
 Cameras record data about when a picture was taken and what
 camera was used. Office documents like PDF or Office automatically adds
 author and company information to documents and spreadsheets.
-Maybe you don't want to disclose those information on the web.
+Maybe you don't want to disclose those information.
 
 This is precisely the job of MAT2: getting rid, as much as possible, of
 metadata.
