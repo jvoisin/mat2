@@ -83,7 +83,7 @@ def show_meta(filename: str):
 def __print_meta(filename: str, metadata: dict, depth: int = 1):
     padding = " " * depth*2
     if not metadata:
-        print(padding + "No metadata found")
+        print(padding + "No metadata found in %s." % filename)
         return
 
     print("[%s] Metadata for %s:" % ('+'*depth, filename))
