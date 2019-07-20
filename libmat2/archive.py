@@ -47,8 +47,9 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
     def __init__(self, filename):
         super().__init__(filename)
-        self.archive_class = None  #  type: Optional[ArchiveClass]
-        self.member_class = None  #  type: Optional[ArchiveMember]
+        # We ignore typing here because mypy is too stupid
+        self.archive_class = None  #  type: ignore
+        self.member_class = None  #  type: ignore
 
         # Those are the files that have a format that _isn't_
         # supported by MAT2, but that we want to keep anyway.
