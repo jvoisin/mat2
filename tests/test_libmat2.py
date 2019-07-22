@@ -885,4 +885,5 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/clean.cleaned.svg')
         os.remove('./tests/data/clean.cleaned.cleaned.svg')
 
-
+        p = images.SVGParser('./tests/data/weird.svg')
+        self.assertEqual(p.get_meta()['Xmlns'], 'http://www.w3.org/1337/svg')

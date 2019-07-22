@@ -37,7 +37,7 @@ class SVGParser(exiftool.ExiftoolParser):
     def get_meta(self) -> Dict[str, Union[str, dict]]:
         meta = super().get_meta()
 
-        # The namespace is mandatory, but thereis only one bossible.
+        # The namespace is mandatory, but only the …/2000/svg is valid.
         ns = 'http://www.w3.org/2000/svg'
         if meta.get('Xmlns', ns) == ns:
             meta.pop('Xmlns')
