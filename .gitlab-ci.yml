@@ -58,13 +58,11 @@ tests:debian:
   stage: test
   script:
     - apt-get -qqy purge bubblewrap
-    - python3-coverage run --branch -m unittest discover -s tests/
-    - python3-coverage report --fail-under=90 -m --include 'libmat2/*'
+    - python3 setup.py test
 
 tests:debian_with_bubblewrap:
   image: $CONTAINER_REGISTRY:debian
   stage: test
-  allow_failure: true
   <<: *prepare_env
   script:
     - su - mat2 -c "python3-coverage run --branch -m unittest discover -s tests/"
@@ -79,7 +77,6 @@ tests:fedora:
 tests:gentoo:
   image: $CONTAINER_REGISTRY:gentoo
   stage: test
-  allow_failure: true
   <<: *prepare_env
   script:
     - su - mat2 -c "python3 -m unittest discover -v"
