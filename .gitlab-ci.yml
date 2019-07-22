@@ -5,6 +5,11 @@ stages:
   - linting
   - test
 
+.prepare_env: &prepare_env
+  before_script:  # This is needed to not run the testsuite as root
+    - useradd --home-dir ${CI_PROJECT_DIR} mat2
+    - chown -R mat2 .
+
 linting:bandit:
   image: $CONTAINER_REGISTRY:linting 
   stage: linting
@@ -60,9 +65,10 @@ tests:debian_with_bubblewrap:
   image: $CONTAINER_REGISTRY:debian
   stage: test
   allow_failure: true
+  <<: *prepare_env
   script:
-    - python3-coverage run --branch -m unittest discover -s tests/
-    - python3-coverage report --fail-under=100 -m --include 'libmat2/*'
+    - su - mat2 -c "python3-coverage run --branch -m unittest discover -s tests/"
+    - su - mat2 -c "python3-coverage report --fail-under=100 -m --include 'libmat2/*'"
 
 tests:fedora:
   image: $CONTAINER_REGISTRY:fedora
@@ -74,5 +80,6 @@ tests:gentoo:
   image: $CONTAINER_REGISTRY:gentoo
   stage: test
   allow_failure: true
+  <<: *prepare_env
   script:
-    - python3 -m unittest discover -v
+    - su - mat2 -c "python3 -m unittest discover -v"
