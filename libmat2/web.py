@@ -97,10 +97,10 @@ class _HTMLParser(parser.HTMLParser):
         self.tag_blocklist = blocklisted_tags
 
     def handle_starttag(self, tag: str, attrs: List[Tuple[str, Optional[str]]]):
-        original_tag = self.get_starttag_text()
-        if not original_tag:  # empty tag
-            return
-        self.__validation_queue.append(original_tag)
+        # Ignore the type, because mypy is too stupid to infer
+        # that get_starttag_text() can't return None.
+        original_tag = self.get_starttag_text()  # type: ignore
+        self.__validation_queue.append(original_tag)  # type: ignore
 
         if tag in self.tag_blocklist:
             self.__in_dangerous_tag += 1
