@@ -13,6 +13,15 @@ linting:bandit:
     - bandit -r ./nautilus/ --format txt --skip B101
     - bandit -r ./libmat2 --format txt --skip B101,B404,B603,B405,B314
 
+linting:codespell:
+  image: $CONTAINER_REGISTRY:linting
+  stage: linting
+  script:
+    # Run codespell to check for spelling errors; ignore errors about binary
+    # files, use a config with ignored words and exclude the git directory,
+    # which might contain false positives
+    - codespell -q 2 -I utils/ci/codespell/ignored_words.txt -S .git
+  
 linting:pylint:
   image: $CONTAINER_REGISTRY:linting
   stage: linting

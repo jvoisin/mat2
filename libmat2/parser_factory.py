@@ -56,7 +56,7 @@ def get_parser(filename: str) -> Tuple[Optional[T], Optional[str]]:
             try:
                 return parser_class(filename), mtype
             except ValueError as e:
-                logging.info("Got an exception when trying to instanciate "
+                logging.info("Got an exception when trying to instantiate "
                              "%s for %s: %s", parser_class, filename, e)
                 return None, mtype
     return None, mtype
