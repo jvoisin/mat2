@@ -46,13 +46,7 @@ def __check_file(filename: str, mode: int = os.R_OK) -> bool:
 
 def create_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Metadata anonymisation toolkit 2')
-    parser.add_argument('files', nargs='*', help='the files to process')
-    parser.add_argument('-v', '--version', action='version',
-                        version='MAT2 %s' % __version__)
-    parser.add_argument('-l', '--list', action='store_true',
-                        help='list all supported fileformats')
-    parser.add_argument('--check-dependencies', action='store_true',
-                        help='check if MAT2 has all the dependencies it needs')
+
     parser.add_argument('-V', '--verbose', action='store_true',
                         help='show more verbose status information')
     parser.add_argument('--unknown-members', metavar='policy', default='abort',
@@ -60,12 +54,25 @@ def create_arg_parser() -> argparse.ArgumentParser:
                         'files (policy should be one of: %s) [Default: abort]' %
                         ', '.join(p.value for p in UnknownMemberPolicy))
 
+    excl_group = parser.add_mutually_exclusive_group()
+    excl_group.add_argument('files', nargs='*', help='the files to process',
+                            default=[])
+    excl_group.add_argument('-v', '--version', action='version',
+                            version='MAT2 %s' % __version__)
+    excl_group.add_argument('-l', '--list', action='store_true', default=False,
+                            help='list all supported fileformats')
+    excl_group.add_argument('--check-dependencies', action='store_true',
+                            default=False,
+                            help='check if MAT2 has all the dependencies it '
+                            'needs')
 
-    info = parser.add_mutually_exclusive_group()
-    info.add_argument('-s', '--show', action='store_true',
-                      help='list harmful metadata detectable by MAT2 without removing them')
-    info.add_argument('-L', '--lightweight', action='store_true',
-                      help='remove SOME metadata')
+    excl_group = parser.add_mutually_exclusive_group()
+    excl_group.add_argument('-L', '--lightweight', action='store_true',
+                            help='remove SOME metadata')
+    excl_group.add_argument('-s', '--show', action='store_true',
+                            help='list harmful metadata detectable by MAT2 '
+                            'without removing them')
+
     return parser
 
 

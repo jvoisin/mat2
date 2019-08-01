@@ -20,16 +20,18 @@ class TestHelp(unittest.TestCase):
     def test_help(self):
         proc = subprocess.Popen(mat2_binary + ['--help'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'usage: mat2 [-h] [-v] [-l] [--check-dependencies] [-V]',
+        self.assertIn(b'mat2 [-h] [-V] [--unknown-members policy] [-v] [-l]',
                       stdout)
-        self.assertIn(b'[--unknown-members policy] [-s | -L]', stdout)
+        self.assertIn(b'[--check-dependencies] [-L | -s]', stdout)
+        self.assertIn(b'[files [files ...]]', stdout)
 
     def test_no_arg(self):
         proc = subprocess.Popen(mat2_binary, stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'usage: mat2 [-h] [-v] [-l] [--check-dependencies] [-V]',
+        self.assertIn(b'mat2 [-h] [-V] [--unknown-members policy] [-v] [-l]',
                       stdout)
-        self.assertIn(b'[--unknown-members policy] [-s | -L]', stdout)
+        self.assertIn(b'[--check-dependencies] [-L | -s]', stdout)
+        self.assertIn(b'[files [files ...]]', stdout)
 
 
 class TestVersion(unittest.TestCase):
