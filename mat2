@@ -53,6 +53,8 @@ def create_arg_parser() -> argparse.ArgumentParser:
                         help='how to handle unknown members of archive-style '
                         'files (policy should be one of: %s) [Default: abort]' %
                         ', '.join(p.value for p in UnknownMemberPolicy))
+    parser.add_argument('--inplace', action='store_true',
+                        help='clean in place, without backup')
 
     excl_group = parser.add_mutually_exclusive_group()
     excl_group.add_argument('files', nargs='*', help='the files to process',
@@ -114,8 +116,10 @@ def __print_meta(filename: str, metadata: dict, depth: int = 1):
             print(padding + "  %s: harmful content" % k)
 
 
-def clean_meta(filename: str, is_lightweight: bool, policy: UnknownMemberPolicy) -> bool:
-    if not __check_file(filename, os.R_OK):
+def clean_meta(filename: str, is_lightweight: bool, inplace: bool,
+               policy: UnknownMemberPolicy) -> bool:
+    mode = (os.R_OK | os.W_OK) if inplace else os.R_OK
+    if not __check_file(filename, mode):
         return False
 
     p, mtype = parser_factory.get_parser(filename)  # type: ignore
@@ -127,7 +131,10 @@ def clean_meta(filename: str, is_lightweight: bool, policy: UnknownMemberPolicy)
 
     try:
         logging.debug('Cleaning %s…', filename)
-        return p.remove_all()
+        ret = p.remove_all()
+        if inplace is True:
+            os.rename(p.output_filename, filename)
+        return ret
     except RuntimeError as e:
         print("[-] %s can't be cleaned: %s" % (filename, e))
     return False
@@ -190,6 +197,7 @@ def main() -> int:
         return 0
 
     else:
+        inplace = args.inplace
         policy = UnknownMemberPolicy(args.unknown_members)
         if policy == UnknownMemberPolicy.KEEP:
             logging.warning('Keeping unknown member files may leak metadata in the resulting file!')
@@ -201,7 +209,8 @@ def main() -> int:
         with concurrent.futures.ProcessPoolExecutor() as executor:
             futures = list()
             for f in files:
-                future = executor.submit(clean_meta, f, args.lightweight, policy)
+                future = executor.submit(clean_meta, f, args.lightweight,
+                                         inplace, policy)
                 futures.append(future)
             for future in concurrent.futures.as_completed(futures):
                 no_failure &= future.result()
