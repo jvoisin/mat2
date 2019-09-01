@@ -63,7 +63,9 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
         # the archive?
         self.unknown_member_policy = UnknownMemberPolicy.ABORT  # type: UnknownMemberPolicy
 
-        self.is_archive_valid()
+        # The LGTM comment is to mask a false-positive,
+        # see https://lgtm.com/projects/g/jvoisin/mat2/
+        self.is_archive_valid()  # lgtm [py/init-calls-subclass]
 
     def is_archive_valid(self):
         """Raise a ValueError is the current archive isn't a valid one."""
