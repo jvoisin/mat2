@@ -62,9 +62,6 @@ class MSOfficeParser(ZipParser):
 
         # Do we want to keep the following ones?
         'application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml',
-
-        # See https://0xacab.org/jvoisin/mat2/issues/71
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml',  # /word/numbering.xml
     }
 
 
@@ -88,6 +85,7 @@ class MSOfficeParser(ZipParser):
             r'^word/printerSettings/',
             r'^word/theme',
             r'^word/people\.xml$',
+            r'^word/numbering\.xml$',
 
             # we have an allowlist in self.files_to_keep,
             # so we can trash everything else
@@ -124,7 +122,7 @@ class MSOfficeParser(ZipParser):
 
     @staticmethod
     def __remove_rsid(full_path: str) -> bool:
-        """ The method will remove "revision session ID".  We're '}rsid'
+        """ The method will remove "revision session ID".  We're using '}rsid'
         instead of proper parsing, since rsid can have multiple forms, like
         `rsidRDefault`, `rsidR`, `rsids`, …
 
@@ -137,7 +135,8 @@ class MSOfficeParser(ZipParser):
         """
         try:
             tree, namespace = _parse_xml(full_path)
-        except ET.ParseError:
+        except ET.ParseError as e:
+            logging.error("Unable to parse %s: %s", full_path, e)
             return False
 
         # rsid, tags or attributes, are always under the `w` namespace
@@ -160,6 +159,41 @@ class MSOfficeParser(ZipParser):
 
         tree.write(full_path, xml_declaration=True)
         return True
+
+    @staticmethod
+    def __remove_nsid(full_path: str) -> bool:
+        """
+        NSID are random identifiers that can be used
+        to ease the merging of some components of a document.
+        They can also be used for fingerprinting.
+
+        See the spec for more details: https://docs.microsoft.com/en-us/dotnet/api/documentformat.openxml.wordprocessing.nsid?view=openxml-2.8.1
+
+        In this function, we're changing the XML document in several
+        different times, since we don't want to change the tree we're currently
+        iterating on.
+        """
+        try:
+            tree, namespace = _parse_xml(full_path)
+        except ET.ParseError as e:  # pragma: no cover
+            logging.error("Unable to parse %s: %s", full_path, e)
+            return False
+
+        # The NSID tag is always under the `w` namespace
+        if 'w' not in namespace.keys():
+            return True
+
+        parent_map = {c:p for p in tree.iter() for c in p}
+
+        elements_to_remove = list()
+        for element in tree.iterfind('.//w:nsid', namespace):
+            elements_to_remove.append(element)
+        for element in elements_to_remove:
+            parent_map[element].remove(element)
+
+        tree.write(full_path, xml_declaration=True)
+        return True
+
 
     @staticmethod
     def __remove_revisions(full_path: str) -> bool:
@@ -208,7 +242,8 @@ class MSOfficeParser(ZipParser):
         """
         try:
             tree, namespace = _parse_xml(full_path)
-        except ET.ParseError:  # pragma: no cover
+        except ET.ParseError as e:  # pragma: no cover
+            logging.error("Unable to parse %s: %s", full_path, e)
             return False
 
         if len(namespace.items()) != 1:
@@ -268,6 +303,9 @@ class MSOfficeParser(ZipParser):
 
         if self.__remove_rsid(full_path) is False:
             return False
+
+        if self.__remove_nsid(full_path) is False:
+            return False  # pragma: no cover
 
         try:
             _sort_xml_attributes(full_path)
