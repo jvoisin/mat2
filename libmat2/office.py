@@ -44,6 +44,12 @@ def _sort_xml_attributes(full_path: str) -> bool:
 
 
 class MSOfficeParser(ZipParser):
+    """
+    The methods modifying XML documents are usually doing so in two loops:
+        1. finding the tag/attributes to remove;
+        2. actually editing the document
+    since it's tricky to modify the XML while iterating on it.
+    """
     mimetypes = {
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -126,9 +132,6 @@ class MSOfficeParser(ZipParser):
         instead of proper parsing, since rsid can have multiple forms, like
         `rsidRDefault`, `rsidR`, `rsids`, …
 
-        We're removing rsid tags in two times, because we can't modify
-        the xml while we're iterating on it.
-
         For more details, see
         - https://msdn.microsoft.com/en-us/library/office/documentformat.openxml.wordprocessing.previoussectionproperties.rsidrpr.aspx
         - https://blogs.msdn.microsoft.com/brian_jones/2006/12/11/whats-up-with-all-those-rsids/
@@ -163,15 +166,11 @@ class MSOfficeParser(ZipParser):
     @staticmethod
     def __remove_nsid(full_path: str) -> bool:
         """
-        NSID are random identifiers that can be used
-        to ease the merging of some components of a document.
-        They can also be used for fingerprinting.
+        nsid are random identifiers that can be used to ease the merging of
+        some components of a document.  They can also be used for
+        fingerprinting.
 
         See the spec for more details: https://docs.microsoft.com/en-us/dotnet/api/documentformat.openxml.wordprocessing.nsid?view=openxml-2.8.1
-
-        In this function, we're changing the XML document in several
-        different times, since we don't want to change the tree we're currently
-        iterating on.
         """
         try:
             tree, namespace = _parse_xml(full_path)
@@ -179,7 +178,7 @@ class MSOfficeParser(ZipParser):
             logging.error("Unable to parse %s: %s", full_path, e)
             return False
 
-        # The NSID tag is always under the `w` namespace
+        # The nsid tag is always under the `w` namespace
         if 'w' not in namespace.keys():
             return True
 
@@ -197,10 +196,6 @@ class MSOfficeParser(ZipParser):
 
     @staticmethod
     def __remove_revisions(full_path: str) -> bool:
-        """ In this function, we're changing the XML document in several
-        different times, since we don't want to change the tree we're currently
-        iterating on.
-        """
         try:
             tree, namespace = _parse_xml(full_path)
         except ET.ParseError as e:
