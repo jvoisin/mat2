@@ -1,6 +1,7 @@
 import imghdr
 import os
-from typing import Set, Dict, Union
+import re
+from typing import Set, Dict, Union, Any
 
 import cairo
 
@@ -9,10 +10,11 @@ gi.require_version('GdkPixbuf', '2.0')
 gi.require_version('Rsvg', '2.0')
 from gi.repository import GdkPixbuf, GLib, Rsvg
 
-from . import exiftool
+from . import exiftool, abstract
 
 # Make pyflakes happy
 assert Set
+assert Any
 
 class SVGParser(exiftool.ExiftoolParser):
     mimetypes = {'image/svg+xml', }
@@ -138,3 +140,23 @@ class TiffParser(GdkPixbufAbstractParser):
                       'FilePermissions', 'FileSize', 'FileType',
                       'FileTypeExtension', 'ImageHeight', 'ImageSize',
                       'ImageWidth', 'MIMEType', 'Megapixels', 'SourceFile'}
+
+class PPMParser(abstract.AbstractParser):
+    mimetypes = {'image/x-portable-pixmap'}
+
+    def get_meta(self) -> Dict[str, Union[str, dict]]:
+        meta = {}  # type: Dict[str, Union[str, Dict[Any, Any]]]
+        with open(self.filename) as f:
+            for idx, line in enumerate(f):
+                if line.lstrip().startswith('#'):
+                    meta[str(idx)] = line.lstrip().rstrip()
+        return meta
+
+    def remove_all(self) -> bool:
+        with open(self.filename) as fin:
+            with open(self.output_filename, 'w') as fout:
+                for line in fin:
+                    if not line.lstrip().startswith('#'):
+                        line = re.sub(r"\s+", "", line, flags=re.UNICODE)
+                        fout.write(line)
+        return True

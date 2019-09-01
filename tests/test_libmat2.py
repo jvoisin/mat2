@@ -113,6 +113,14 @@ class TestGetMeta(unittest.TestCase):
         meta = p.get_meta()
         self.assertEqual(meta['Comment'], 'Created with GIMP')
 
+    def test_ppm(self):
+        p = images.PPMParser('./tests/data/dirty.ppm')
+        meta = p.get_meta()
+        self.assertEqual(meta['1'], '# A metadata')
+        self.assertEqual(meta['4'], '# And an other one')
+        self.assertEqual(meta['6'], '# and a final one here')
+
+
     def test_tiff(self):
         p = images.TiffParser('./tests/data/dirty.tiff')
         meta = p.get_meta()
@@ -887,3 +895,24 @@ class TestCleaning(unittest.TestCase):
 
         p = images.SVGParser('./tests/data/weird.svg')
         self.assertEqual(p.get_meta()['Xmlns'], 'http://www.w3.org/1337/svg')
+
+    def test_ppm(self):
+        shutil.copy('./tests/data/dirty.ppm', './tests/data/clean.ppm')
+        p = images.PPMParser('./tests/data/clean.ppm')
+
+        meta = p.get_meta()
+        print(meta)
+        self.assertEqual(meta['1'], '# A metadata')
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = images.PPMParser('./tests/data/clean.cleaned.ppm')
+        self.assertEqual(p.get_meta(), {})
+        self.assertTrue(p.remove_all())
+
+        os.remove('./tests/data/clean.ppm')
+        os.remove('./tests/data/clean.cleaned.ppm')
+        os.remove('./tests/data/clean.cleaned.cleaned.ppm')
+
+
