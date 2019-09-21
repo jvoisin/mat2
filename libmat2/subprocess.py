@@ -49,8 +49,14 @@ def _get_bwrap_args(tempdir: str,
 
     args = ro_bind_args + \
         ['--dev', '/dev',
+         '--proc', '/proc',
          '--chdir', cwd,
-         '--unshare-all',
+         '--unshare-user-try',
+         '--unshare-ipc',
+         '--unshare-pid',
+         '--unshare-net',
+         '--unshare-uts',
+         '--unshare-cgroup-try',
          '--new-session',
          # XXX: enable --die-with-parent once all supported platforms have
          # a bubblewrap recent enough to support it.
