@@ -29,8 +29,7 @@ class ExiftoolParser(abstract.AbstractParser):
 
     def _lightweight_cleanup(self) -> bool:
         if os.path.exists(self.output_filename):
-            try:
-                # exiftool can't force output to existing files
+            try:  # exiftool can't force output to existing files
                 os.remove(self.output_filename)
             except OSError as e:  # pragma: no cover
                 logging.error("The output file %s is already existing and \

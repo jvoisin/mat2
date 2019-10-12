@@ -120,7 +120,6 @@ class TestGetMeta(unittest.TestCase):
         self.assertEqual(meta['4'], '# And an other one')
         self.assertEqual(meta['6'], '# and a final one here')
 
-
     def test_tiff(self):
         p = images.TiffParser('./tests/data/dirty.tiff')
         meta = p.get_meta()
@@ -222,6 +221,10 @@ class TestGetMeta(unittest.TestCase):
         self.assertEqual(meta['./tests/data/dirty.docx']['word/media/image1.png']['Comment'], 'This is a comment, be careful!')
         os.remove('./tests/data/dirty.tar')
 
+    def test_svg(self):
+        p = images.SVGParser('./tests/data/weird.svg')
+        self.assertEqual(p.get_meta()['Xmlns'], 'http://www.w3.org/1337/svg')
+
 
 class TestRemovingThumbnails(unittest.TestCase):
     def test_odt(self):
@@ -281,367 +284,215 @@ class TestRevisionsCleaning(unittest.TestCase):
         os.remove('./tests/data/revision_clean.docx')
         os.remove('./tests/data/revision_clean.cleaned.docx')
 
+
 class TestCleaning(unittest.TestCase):
-    def test_pdf(self):
-        shutil.copy('./tests/data/dirty.pdf', './tests/data/clean.pdf')
-        p = pdf.PDFParser('./tests/data/clean.pdf')
+    data = [{
+        'name': 'pdf',
+        'parser': pdf.PDFParser,
+        'meta': {'producer': 'pdfTeX-1.40.14'},
+        'expected_meta': {'creation-date': -1, 'format': 'PDF-1.5', 'mod-date': -1},
+        }, {
+            'name': 'png',
+            'parser': images.PNGParser,
+            'meta': {'Comment': 'This is a comment, be careful!'},
+            'expected_meta': {},
+        }, {
+            'name': 'jpg',
+            'parser': images.JPGParser,
+            'meta': {'Comment': 'Created with GIMP'},
+            'expected_meta': {},
+        }, {
+            'name': 'mp3',
+            'parser': audio.MP3Parser,
+            'meta': {'TXXX:I am a': 'various comment'},
+            'expected_meta': {},
+        }, {
+            'name': 'ogg',
+            'parser': audio.OGGParser,
+            'meta': {'title': 'I am so'},
+            'expected_meta': {},
+        }, {
+            'name': 'flac',
+            'parser': audio.FLACParser,
+            'meta': {'title': 'I am so'},
+            'expected_meta': {},
+        }, {
+            'name': 'docx',
+            'parser': office.MSOfficeParser,
+            'meta': {'word/media/image1.png' :
+               {'Comment': 'This is a comment, be careful!',
+                'ModifyDate': '2018:03:20 21:59:25',
+                'PixelUnits': 'meters',
+                'PixelsPerUnitX': 2835,
+                'PixelsPerUnitY': 2835,
+                'create_system': 'Weird',
+                'date_time': '2018-03-31 13:15:38'} ,
+               },
+            'expected_meta': {},
+        }, {
+            'name': 'odt',
+            'parser': office.LibreOfficeParser,
+            'meta': {
+                'Pictures/1000000000000032000000311EC5314D.png': {
+                    'create_system': 'Weird',
+                    'date_time': '2011-07-26 02:40:16',
+                    'PixelsPerUnitX': 4847,
+                    'PixelsPerUnitY': 4760,
+                    'PixelUnits': 'meters',
+                    },
+                },
+            'expected_meta': {},
+        },{
+            'name': 'tiff',
+            'parser': images.TiffParser,
+            'meta': {'Model': 'C7070WZ'},
+            'expected_meta':
+             {'Orientation': 'Horizontal (normal)',
+                  'ResolutionUnit': 'inches',
+                  'XResolution': 72,
+                  'YResolution': 72}
+        },{
+            'name': 'bmp',
+            'parser': harmless.HarmlessParser,
+            'meta': {},
+            'expected_meta': {},
+        },{
+            'name': 'torrent',
+            'parser': torrent.TorrentParser,
+            'meta': {'created by': b'mktorrent 1.0', 'creation date': 1522397702},
+            'expected_meta': {},
+        }, {
+            'name': 'odf',
+            'parser': office.LibreOfficeParser,
+            'meta': {'meta.xml': {'create_system': 'Weird', 'date_time':
+                '2018-04-22 22:20:24', 'meta:initial-creator': 'Julien Voisin',
+                'meta:creation-date': '2018-04-23T00:18:59.438231281',
+                'dc:date': '2018-04-23T00:20:23.978564933', 'dc:creator':
+                'Julien Voisin', 'meta:editing-duration': 'PT1M24S',
+                'meta:editing-cycles': '1', 'meta:generator':
+                'LibreOffice/5.4.6.2$Linux_X86_64 LibreOffice_project/40m0$Build-2'}},
+            'expected_meta': {},
+        }, {
+            'name': 'odg',
+            'parser': office.LibreOfficeParser,
+            'meta': {'meta.xml': {'create_system': 'Weird', 'date_time':
+                '2018-04-22 22:26:58', 'meta:initial-creator': 'Julien Voisin',
+                'meta:creation-date': '2018-04-23T00:25:59.953271949',
+                'dc:date': '2018-04-23T00:26:59.385838550', 'dc:creator':
+                'Julien Voisin', 'meta:editing-duration': 'PT59S',
+                'meta:editing-cycles': '1', 'meta:generator':
+                'LibreOffice/5.4.6.2$Linux_X86_64 LibreOffice_project/40m0$Build-2'}},
+            'expected_meta': {},
+        }, {
+            'name': 'txt',
+            'parser': harmless.HarmlessParser,
+            'meta': {},
+            'expected_meta': {},
+        },{
+            'name': 'gif',
+            'parser': images.GIFParser,
+            'meta': {'Comment': 'this is a test comment'},
+            'expected_meta': {},
+        },{
+            'name': 'css',
+            'parser': web.CSSParser,
+            'meta': {
+                'harmful data': 'underline is cool',
+                'version': '1.0',
+                'author': 'jvoisin'
+            },
+            'expected_meta': {},
+        },{
+            'name': 'svg',
+            'parser': images.SVGParser,
+            'meta': {
+                'WorkDescription': "This is a test svg image for mat2's testsuite",
+            },
+            'expected_meta': {},
+        } ,{
+            'name': 'ppm',
+            'parser': images.PPMParser,
+            'meta': {
+                '1': '# A metadata',
+            },
+            'expected_meta': {},
+        } ,{
+            'name': 'avi',
+            'ffmpeg': 1,
+            'parser': video.AVIParser,
+            'meta': {
+                'Software': 'MEncoder SVN-r33148-4.0.1',
+            },
+            'expected_meta': {},
+        } ,{
+            'name': 'mp4',
+            'ffmpeg': 1,
+            'parser': video.MP4Parser,
+            'meta': {
+                'Encoder':  'HandBrake 0.9.4 2009112300',
+            },
+            'expected_meta':
+            {'CompatibleBrands': ['isom', 'iso2', 'avc1', 'mp41'],
+                'CompressorID': 'avc1',
+                'GraphicsMode': 'srcCopy',
+                'HandlerDescription': 'SoundHandler',
+                'HandlerType': 'Metadata',
+                'HandlerVendorID': 'Apple',
+                'MajorBrand': 'MP4  Base Media v1 [IS0 14496-12:2003]',
+                'MediaHeaderVersion': 0,
+                'MinorVersion': '0.2.0',
+                'MovieDataOffset': 48,
+                'MovieHeaderVersion': 0,
+                'NextTrackID': 3,
+                'PreferredRate': 1,
+                'Rotation': 0,
+                'TimeScale': 1000,
+                'TrackHeaderVersion': 0,
+                'TrackID': 1,
+                'TrackLayer': 0},
+        },{
+            'name': 'wmv',
+            'ffmpeg': 1,
+            'parser': video.WMVParser,
+            'meta': {
+                'EncodingSettings': 'Lavf52.103.0',
+            },
+            'expected_meta': {},
+        }
+        ]
+
+    def test_all_parametred(self):
+        for case in self.data:
+            if 'ffmpeg' in case:
+                try:
+                    video._get_ffmpeg_path()
+                except RuntimeError:
+                    raise unittest.SkipTest
+
+            print('[+] Testing %s' % case['name'])
+            target = './tests/data/clean.' + case['name']
+            shutil.copy('./tests/data/dirty.' + case['name'], target)
+            p1 = case['parser'](target)
+
+            meta = p1.get_meta()
+            for k, v in case['meta'].items():
+                if isinstance(v, dict):
+                    for _k, _v in v.items():
+                        self.assertEqual(meta[k][_k], _v)
+                else:
+                    self.assertEqual(meta[k], v)
+
+            p1.lightweight_cleaning = True
+            self.assertTrue(p1.remove_all())
+
+            p2 = case['parser'](p1.output_filename)
+            self.assertEqual(p2.get_meta(), case['expected_meta'])
+            self.assertTrue(p2.remove_all())
+
+            os.remove(target)
+            os.remove(p1.output_filename)
+            os.remove(p2.output_filename)
 
-        meta = p.get_meta()
-        self.assertEqual(meta['producer'], 'pdfTeX-1.40.14')
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = pdf.PDFParser('./tests/data/clean.cleaned.pdf')
-        expected_meta = {'creation-date': -1, 'format': 'PDF-1.5', 'mod-date': -1}
-        self.assertEqual(p.get_meta(), expected_meta)
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/clean.pdf')
-        os.remove('./tests/data/clean.cleaned.pdf')
-        os.remove('./tests/data/clean.cleaned.cleaned.pdf')
-
-    def test_png(self):
-        shutil.copy('./tests/data/dirty.png', './tests/data/clean.png')
-        p = images.PNGParser('./tests/data/clean.png')
-
-        meta = p.get_meta()
-        self.assertEqual(meta['Comment'], 'This is a comment, be careful!')
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = images.PNGParser('./tests/data/clean.cleaned.png')
-        self.assertEqual(p.get_meta(), {})
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/clean.png')
-        os.remove('./tests/data/clean.cleaned.png')
-        os.remove('./tests/data/clean.cleaned.cleaned.png')
-
-    def test_jpg(self):
-        shutil.copy('./tests/data/dirty.jpg', './tests/data/clean.jpg')
-        p = images.JPGParser('./tests/data/clean.jpg')
-
-        meta = p.get_meta()
-        self.assertEqual(meta['Comment'], 'Created with GIMP')
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = images.JPGParser('./tests/data/clean.cleaned.jpg')
-        self.assertEqual(p.get_meta(), {})
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/clean.jpg')
-        os.remove('./tests/data/clean.cleaned.jpg')
-        os.remove('./tests/data/clean.cleaned.cleaned.jpg')
-
-    def test_mp3(self):
-        shutil.copy('./tests/data/dirty.mp3', './tests/data/clean.mp3')
-        p = audio.MP3Parser('./tests/data/clean.mp3')
-
-        meta = p.get_meta()
-        self.assertEqual(meta['TXXX:I am a'], 'various comment')
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = audio.MP3Parser('./tests/data/clean.cleaned.mp3')
-        self.assertEqual(p.get_meta(), {})
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/clean.mp3')
-        os.remove('./tests/data/clean.cleaned.mp3')
-        os.remove('./tests/data/clean.cleaned.cleaned.mp3')
-
-    def test_ogg(self):
-        shutil.copy('./tests/data/dirty.ogg', './tests/data/clean.ogg')
-        p = audio.OGGParser('./tests/data/clean.ogg')
-
-        meta = p.get_meta()
-        self.assertEqual(meta['title'], 'I am so')
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = audio.OGGParser('./tests/data/clean.cleaned.ogg')
-        self.assertEqual(p.get_meta(), {})
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/clean.ogg')
-        os.remove('./tests/data/clean.cleaned.ogg')
-        os.remove('./tests/data/clean.cleaned.cleaned.ogg')
-
-    def test_flac(self):
-        shutil.copy('./tests/data/dirty.flac', './tests/data/clean.flac')
-        p = audio.FLACParser('./tests/data/clean.flac')
-
-        meta = p.get_meta()
-        self.assertEqual(meta['title'], 'I am so')
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = audio.FLACParser('./tests/data/clean.cleaned.flac')
-        self.assertEqual(p.get_meta(), {})
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/clean.flac')
-        os.remove('./tests/data/clean.cleaned.flac')
-        os.remove('./tests/data/clean.cleaned.cleaned.flac')
-
-    def test_office(self):
-        shutil.copy('./tests/data/dirty.docx', './tests/data/clean.docx')
-        p = office.MSOfficeParser('./tests/data/clean.docx')
-
-        meta = p.get_meta()
-        self.assertIsNotNone(meta)
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = office.MSOfficeParser('./tests/data/clean.cleaned.docx')
-        self.assertEqual(p.get_meta(), {})
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/clean.docx')
-        os.remove('./tests/data/clean.cleaned.docx')
-        os.remove('./tests/data/clean.cleaned.cleaned.docx')
-
-    def test_libreoffice(self):
-        shutil.copy('./tests/data/dirty.odt', './tests/data/clean.odt')
-        p = office.LibreOfficeParser('./tests/data/clean.odt')
-
-        meta = p.get_meta()
-        self.assertIsNotNone(meta)
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = office.LibreOfficeParser('./tests/data/clean.cleaned.odt')
-        self.assertEqual(p.get_meta(), {})
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/clean.odt')
-        os.remove('./tests/data/clean.cleaned.odt')
-        os.remove('./tests/data/clean.cleaned.cleaned.odt')
-
-    def test_tiff(self):
-        shutil.copy('./tests/data/dirty.tiff', './tests/data/clean.tiff')
-        p = images.TiffParser('./tests/data/clean.tiff')
-
-        meta = p.get_meta()
-        self.assertEqual(meta['Model'], 'C7070WZ')
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = images.TiffParser('./tests/data/clean.cleaned.tiff')
-        self.assertEqual(p.get_meta(), {})
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/clean.tiff')
-        os.remove('./tests/data/clean.cleaned.tiff')
-        os.remove('./tests/data/clean.cleaned.cleaned.tiff')
-
-    def test_bmp(self):
-        shutil.copy('./tests/data/dirty.bmp', './tests/data/clean.bmp')
-        p = harmless.HarmlessParser('./tests/data/clean.bmp')
-
-        meta = p.get_meta()
-        self.assertEqual(meta, {})  # bmp has no meta :)
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = harmless.HarmlessParser('./tests/data/clean.cleaned.bmp')
-        self.assertEqual(p.get_meta(), {})
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/clean.bmp')
-        os.remove('./tests/data/clean.cleaned.bmp')
-        os.remove('./tests/data/clean.cleaned.cleaned.bmp')
-
-    def test_torrent(self):
-        shutil.copy('./tests/data/dirty.torrent', './tests/data/clean.torrent')
-        p = torrent.TorrentParser('./tests/data/clean.torrent')
-
-        meta = p.get_meta()
-        self.assertEqual(meta, {'created by': b'mktorrent 1.0', 'creation date': 1522397702})
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = torrent.TorrentParser('./tests/data/clean.cleaned.torrent')
-        self.assertEqual(p.get_meta(), {})
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/clean.torrent')
-        os.remove('./tests/data/clean.cleaned.torrent')
-        os.remove('./tests/data/clean.cleaned.cleaned.torrent')
-
-    def test_odf(self):
-        shutil.copy('./tests/data/dirty.odf', './tests/data/clean.odf')
-        p = office.LibreOfficeParser('./tests/data/clean.odf')
-
-        meta = p.get_meta()
-        self.assertEqual(meta['meta.xml']['meta:creation-date'], '2018-04-23T00:18:59.438231281')
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = office.LibreOfficeParser('./tests/data/clean.cleaned.odf')
-        self.assertEqual(p.get_meta(), {})
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/clean.odf')
-        os.remove('./tests/data/clean.cleaned.odf')
-        os.remove('./tests/data/clean.cleaned.cleaned.odf')
-
-    def test_odg(self):
-        shutil.copy('./tests/data/dirty.odg', './tests/data/clean.odg')
-        p = office.LibreOfficeParser('./tests/data/clean.odg')
-
-        meta = p.get_meta()
-        self.assertEqual(meta['meta.xml']['dc:date'], '2018-04-23T00:26:59.385838550')
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = office.LibreOfficeParser('./tests/data/clean.cleaned.odg')
-        self.assertEqual(p.get_meta(), {})
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/clean.odg')
-        os.remove('./tests/data/clean.cleaned.odg')
-        os.remove('./tests/data/clean.cleaned.cleaned.odg')
-
-    def test_txt(self):
-        shutil.copy('./tests/data/dirty.txt', './tests/data/clean.txt')
-        p = harmless.HarmlessParser('./tests/data/clean.txt')
-
-        meta = p.get_meta()
-        self.assertEqual(meta, {})
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = harmless.HarmlessParser('./tests/data/clean.cleaned.txt')
-        self.assertEqual(p.get_meta(), {})
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/clean.txt')
-        os.remove('./tests/data/clean.cleaned.txt')
-        os.remove('./tests/data/clean.cleaned.cleaned.txt')
-
-    def test_avi(self):
-        try:
-            video._get_ffmpeg_path()
-        except RuntimeError:
-            raise unittest.SkipTest
-
-        shutil.copy('./tests/data/dirty.avi', './tests/data/clean.avi')
-        p = video.AVIParser('./tests/data/clean.avi')
-
-        meta = p.get_meta()
-        self.assertEqual(meta['Software'], 'MEncoder SVN-r33148-4.0.1')
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = video.AVIParser('./tests/data/clean.cleaned.avi')
-        self.assertEqual(p.get_meta(), {})
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/clean.avi')
-        os.remove('./tests/data/clean.cleaned.avi')
-        os.remove('./tests/data/clean.cleaned.cleaned.avi')
-
-    def test_zip(self):
-        with zipfile.ZipFile('./tests/data/dirty.zip', 'w') as zout:
-            zout.write('./tests/data/dirty.flac')
-            zout.write('./tests/data/dirty.docx')
-            zout.write('./tests/data/dirty.jpg')
-        p = archive.ZipParser('./tests/data/dirty.zip')
-        meta = p.get_meta()
-        self.assertEqual(meta['tests/data/dirty.docx']['word/media/image1.png']['Comment'], 'This is a comment, be careful!')
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = archive.ZipParser('./tests/data/dirty.cleaned.zip')
-        self.assertEqual(p.get_meta(), {})
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/dirty.zip')
-        os.remove('./tests/data/dirty.cleaned.zip')
-        os.remove('./tests/data/dirty.cleaned.cleaned.zip')
-
-
-    def test_mp4(self):
-        try:
-            video._get_ffmpeg_path()
-        except RuntimeError:
-            raise unittest.SkipTest
-
-        shutil.copy('./tests/data/dirty.mp4', './tests/data/clean.mp4')
-        p = video.MP4Parser('./tests/data/clean.mp4')
-
-        meta = p.get_meta()
-        self.assertEqual(meta['Encoder'], 'HandBrake 0.9.4 2009112300')
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = video.MP4Parser('./tests/data/clean.cleaned.mp4')
-        self.assertNotIn('Encoder', p.get_meta())
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/clean.mp4')
-        os.remove('./tests/data/clean.cleaned.mp4')
-        os.remove('./tests/data/clean.cleaned.cleaned.mp4')
-
-    def test_wmv(self):
-        try:
-            video._get_ffmpeg_path()
-        except RuntimeError:
-            raise unittest.SkipTest
-
-        shutil.copy('./tests/data/dirty.wmv', './tests/data/clean.wmv')
-        p = video.WMVParser('./tests/data/clean.wmv')
-
-        meta = p.get_meta()
-        self.assertEqual(meta['EncodingSettings'], 'Lavf52.103.0')
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = video.WMVParser('./tests/data/clean.cleaned.wmv')
-        self.assertNotIn('EncodingSettings', p.get_meta())
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/clean.wmv')
-        os.remove('./tests/data/clean.cleaned.wmv')
-        os.remove('./tests/data/clean.cleaned.cleaned.wmv')
-
-    def test_gif(self):
-        shutil.copy('./tests/data/dirty.gif', './tests/data/clean.gif')
-        p = images.GIFParser('./tests/data/clean.gif')
-
-        meta = p.get_meta()
-        self.assertEqual(meta['Comment'], 'this is a test comment')
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = images.GIFParser('./tests/data/clean.cleaned.gif')
-        self.assertNotIn('EncodingSettings', p.get_meta())
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/clean.gif')
-        os.remove('./tests/data/clean.cleaned.gif')
-        os.remove('./tests/data/clean.cleaned.cleaned.gif')
 
     def test_html(self):
         shutil.copy('./tests/data/dirty.html', './tests/data/clean.html')
@@ -688,7 +539,6 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/clean.html')
         os.remove('./tests/data/clean.cleaned.html')
 
-
     def test_epub(self):
         shutil.copy('./tests/data/dirty.epub', './tests/data/clean.epub')
         p = epub.EPUBParser('./tests/data/clean.epub')
@@ -711,25 +561,26 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/clean.cleaned.cleaned.epub')
 
 
-    def test_css(self):
-        shutil.copy('./tests/data/dirty.css', './tests/data/clean.css')
-        p = web.CSSParser('./tests/data/clean.css')
-
-        self.assertEqual(p.get_meta(), {
-            'harmful data': 'underline is cool',
-            'version': '1.0',
-            'author': 'jvoisin'})
+class TestCleaningArchives(unittest.TestCase):
+    def test_zip(self):
+        with zipfile.ZipFile('./tests/data/dirty.zip', 'w') as zout:
+            zout.write('./tests/data/dirty.flac')
+            zout.write('./tests/data/dirty.docx')
+            zout.write('./tests/data/dirty.jpg')
+        p = archive.ZipParser('./tests/data/dirty.zip')
+        meta = p.get_meta()
+        self.assertEqual(meta['tests/data/dirty.docx']['word/media/image1.png']['Comment'], 'This is a comment, be careful!')
 
         ret = p.remove_all()
         self.assertTrue(ret)
 
-        p = web.CSSParser('./tests/data/clean.cleaned.css')
+        p = archive.ZipParser('./tests/data/dirty.cleaned.zip')
         self.assertEqual(p.get_meta(), {})
         self.assertTrue(p.remove_all())
 
-        os.remove('./tests/data/clean.css')
-        os.remove('./tests/data/clean.cleaned.css')
-        os.remove('./tests/data/clean.cleaned.cleaned.css')
+        os.remove('./tests/data/dirty.zip')
+        os.remove('./tests/data/dirty.cleaned.zip')
+        os.remove('./tests/data/dirty.cleaned.cleaned.zip')
 
     def test_tar(self):
         with tarfile.TarFile.open('./tests/data/dirty.tar', 'w') as zout:
@@ -870,49 +721,3 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/dirty.tar.xz')
         os.remove('./tests/data/dirty.cleaned.tar.xz')
         os.remove('./tests/data/dirty.cleaned.cleaned.tar.xz')
-
-    def test_svg(self):
-        shutil.copy('./tests/data/dirty.svg', './tests/data/clean.svg')
-        p = images.SVGParser('./tests/data/clean.svg')
-
-        meta = p.get_meta()
-        self.assertEqual(meta['WorkCreatorAgentTitle'], 'GNOME Design Team')
-        self.assertEqual(meta['WorkSubject'], ['mat2', 'logo', 'metadata'])
-        self.assertEqual(meta['ID'], 'svg11300')
-        self.assertEqual(meta['Output_extension'],
-                         'org.inkscape.output.svg.inkscape')
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = images.SVGParser('./tests/data/clean.cleaned.svg')
-        self.assertEqual(p.get_meta(), {})
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/clean.svg')
-        os.remove('./tests/data/clean.cleaned.svg')
-        os.remove('./tests/data/clean.cleaned.cleaned.svg')
-
-        p = images.SVGParser('./tests/data/weird.svg')
-        self.assertEqual(p.get_meta()['Xmlns'], 'http://www.w3.org/1337/svg')
-
-    def test_ppm(self):
-        shutil.copy('./tests/data/dirty.ppm', './tests/data/clean.ppm')
-        p = images.PPMParser('./tests/data/clean.ppm')
-
-        meta = p.get_meta()
-        print(meta)
-        self.assertEqual(meta['1'], '# A metadata')
-
-        ret = p.remove_all()
-        self.assertTrue(ret)
-
-        p = images.PPMParser('./tests/data/clean.cleaned.ppm')
-        self.assertEqual(p.get_meta(), {})
-        self.assertTrue(p.remove_all())
-
-        os.remove('./tests/data/clean.ppm')
-        os.remove('./tests/data/clean.cleaned.ppm')
-        os.remove('./tests/data/clean.cleaned.cleaned.ppm')
-
-
