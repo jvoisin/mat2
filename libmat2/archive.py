@@ -83,22 +83,22 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
         return {}  # pragma: no cover
 
     @staticmethod
-    @abc.abstractstaticmethod
+    @abc.abstractmethod
     def _get_all_members(archive: ArchiveClass) -> List[ArchiveMember]:
         """Return all the members of the archive."""
 
     @staticmethod
-    @abc.abstractstaticmethod
+    @abc.abstractmethod
     def _clean_member(member: ArchiveMember) -> ArchiveMember:
         """Remove all the metadata for a given member."""
 
     @staticmethod
-    @abc.abstractstaticmethod
+    @abc.abstractmethod
     def _get_member_meta(member: ArchiveMember) -> Dict[str, str]:
         """Return all the metadata of a given member."""
 
     @staticmethod
-    @abc.abstractstaticmethod
+    @abc.abstractmethod
     def _get_member_name(member: ArchiveMember) -> str:
         """Return the name of the given member."""
 
