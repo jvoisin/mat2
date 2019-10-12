@@ -721,3 +721,43 @@ class TestCleaningArchives(unittest.TestCase):
         os.remove('./tests/data/dirty.tar.xz')
         os.remove('./tests/data/dirty.cleaned.tar.xz')
         os.remove('./tests/data/dirty.cleaned.cleaned.tar.xz')
+
+class TestNoSandbox(unittest.TestCase):
+    def test_avi_nosandbox(self):
+        shutil.copy('./tests/data/dirty.avi', './tests/data/clean.avi')
+        p = video.AVIParser('./tests/data/clean.avi')
+        p.sandbox = False
+
+        meta = p.get_meta()
+        self.assertEqual(meta['Software'], 'MEncoder SVN-r33148-4.0.1')
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = video.AVIParser('./tests/data/clean.cleaned.avi')
+        self.assertEqual(p.get_meta(), {})
+        self.assertTrue(p.remove_all())
+
+        os.remove('./tests/data/clean.avi')
+        os.remove('./tests/data/clean.cleaned.avi')
+        os.remove('./tests/data/clean.cleaned.cleaned.avi')
+
+    def test_png_nosandbox(self):
+        shutil.copy('./tests/data/dirty.png', './tests/data/clean.png')
+        p = images.PNGParser('./tests/data/clean.png')
+        p.sandbox = False
+        p.lightweight_cleaning = True
+
+        meta = p.get_meta()
+        self.assertEqual(meta['Comment'], 'This is a comment, be careful!')
+
+        ret = p.remove_all()
+        self.assertTrue(ret)
+
+        p = images.PNGParser('./tests/data/clean.cleaned.png')
+        self.assertEqual(p.get_meta(), {})
+        self.assertTrue(p.remove_all())
+
+        os.remove('./tests/data/clean.png')
+        os.remove('./tests/data/clean.cleaned.png')
+        os.remove('./tests/data/clean.cleaned.cleaned.png')

@@ -2,10 +2,11 @@ import functools
 import json
 import logging
 import os
+import subprocess
 from typing import Dict, Union, Set
 
 from . import abstract
-from . import subprocess
+from . import bubblewrap
 
 # Make pyflakes happy
 assert Set
@@ -19,9 +20,13 @@ class ExiftoolParser(abstract.AbstractParser):
     meta_allowlist = set()  # type: Set[str]
 
     def get_meta(self) -> Dict[str, Union[str, dict]]:
-        out = subprocess.run([_get_exiftool_path(), '-json', self.filename],
-                             input_filename=self.filename,
-                             check=True, stdout=subprocess.PIPE).stdout
+        if self.sandbox:
+            out = bubblewrap.run([_get_exiftool_path(), '-json', self.filename],
+                                 input_filename=self.filename,
+                                 check=True, stdout=subprocess.PIPE).stdout
+        else:
+            out = subprocess.run([_get_exiftool_path(), '-json', self.filename],
+                                 check=True, stdout=subprocess.PIPE).stdout
         meta = json.loads(out.decode('utf-8'))[0]
         for key in self.meta_allowlist:
             meta.pop(key, None)
@@ -48,9 +53,12 @@ class ExiftoolParser(abstract.AbstractParser):
                '-o', self.output_filename,
                self.filename]
         try:
-            subprocess.run(cmd, check=True,
-                           input_filename=self.filename,
-                           output_filename=self.output_filename)
+            if self.sandbox:
+                bubblewrap.run(cmd, check=True,
+                               input_filename=self.filename,
+                               output_filename=self.output_filename)
+            else:
+                subprocess.run(cmd, check=True)
         except subprocess.CalledProcessError as e:  # pragma: no cover
             logging.error("Something went wrong during the processing of %s: %s", self.filename, e)
             return False

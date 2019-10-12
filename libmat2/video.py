@@ -1,3 +1,4 @@
+import subprocess
 import functools
 import os
 import logging
@@ -5,7 +6,7 @@ import logging
 from typing import Dict, Union
 
 from . import exiftool
-from . import subprocess
+from . import bubblewrap
 
 
 class AbstractFFmpegParser(exiftool.ExiftoolParser):
@@ -33,9 +34,12 @@ class AbstractFFmpegParser(exiftool.ExiftoolParser):
                '-flags:a', '+bitexact',  # don't add any metadata
                self.output_filename]
         try:
-            subprocess.run(cmd, check=True,
-                           input_filename=self.filename,
-                           output_filename=self.output_filename)
+            if self.sandbox:
+                bubblewrap.run(cmd, check=True,
+                               input_filename=self.filename,
+                               output_filename=self.output_filename)
+            else:
+                subprocess.run(cmd, check=True)
         except subprocess.CalledProcessError as e:
             logging.error("Something went wrong during the processing of %s: %s", self.filename, e)
             return False

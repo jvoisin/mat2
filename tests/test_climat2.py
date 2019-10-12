@@ -20,17 +20,17 @@ class TestHelp(unittest.TestCase):
     def test_help(self):
         proc = subprocess.Popen(mat2_binary + ['--help'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'mat2 [-h] [-V] [--unknown-members policy] [--inplace] [-v] [-l]',
+        self.assertIn(b'mat2 [-h] [-V] [--unknown-members policy] [--inplace] [--no-sandbox]',
                       stdout)
-        self.assertIn(b'[--check-dependencies] [-L | -s]', stdout)
+        self.assertIn(b' [-v] [-l] [--check-dependencies] [-L | -s]', stdout)
         self.assertIn(b'[files [files ...]]', stdout)
 
     def test_no_arg(self):
         proc = subprocess.Popen(mat2_binary, stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'mat2 [-h] [-V] [--unknown-members policy] [--inplace] [-v] [-l]',
+        self.assertIn(b'mat2 [-h] [-V] [--unknown-members policy] [--inplace] [--no-sandbox]',
                       stdout)
-        self.assertIn(b'[--check-dependencies] [-L | -s]', stdout)
+        self.assertIn(b' [-v] [-l] [--check-dependencies] [-L | -s]', stdout)
         self.assertIn(b'[files [files ...]]', stdout)
 
 
@@ -40,11 +40,13 @@ class TestVersion(unittest.TestCase):
         stdout, _ = proc.communicate()
         self.assertTrue(stdout.startswith(b'MAT2 '))
 
+
 class TestDependencies(unittest.TestCase):
     def test_dependencies(self):
         proc = subprocess.Popen(mat2_binary + ['--check-dependencies'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
         self.assertTrue(b'MAT2' in stdout)
+
 
 class TestReturnValue(unittest.TestCase):
     def test_nonzero(self):
@@ -97,6 +99,25 @@ class TestCleanMeta(unittest.TestCase):
         shutil.copy('./tests/data/dirty.jpg', './tests/data/clean.jpg')
 
         proc = subprocess.Popen(mat2_binary + ['--show', './tests/data/clean.jpg'],
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+        self.assertIn(b'Comment: Created with GIMP', stdout)
+
+        proc = subprocess.Popen(mat2_binary + ['./tests/data/clean.jpg'],
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+
+        proc = subprocess.Popen(mat2_binary + ['--show', './tests/data/clean.cleaned.jpg'],
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+        self.assertNotIn(b'Comment: Created with GIMP', stdout)
+
+        os.remove('./tests/data/clean.jpg')
+
+    def test_jpg_nosandbox(self):
+        shutil.copy('./tests/data/dirty.jpg', './tests/data/clean.jpg')
+
+        proc = subprocess.Popen(mat2_binary + ['--show', '--no-sandbox', './tests/data/clean.jpg'],
                 stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
         self.assertIn(b'Comment: Created with GIMP', stdout)
@@ -181,6 +202,7 @@ class TestGetMeta(unittest.TestCase):
         self.assertIn(b'i am a : various comment', stdout)
         self.assertIn(b'artist: jvoisin', stdout)
 
+
 class TestControlCharInjection(unittest.TestCase):
     def test_jpg(self):
         proc = subprocess.Popen(mat2_binary + ['--show', './tests/data/control_chars.jpg'],
@@ -241,6 +263,7 @@ class TestCommandLineParallel(unittest.TestCase):
             os.remove('./tests/data/dirty_%d.cleaned.jpg' % i)
             os.remove(path)
             os.remove('./tests/data/dirty_%d.docx' % i)
+
 
 class TestInplaceCleaning(unittest.TestCase):
     def test_cleaning(self):
