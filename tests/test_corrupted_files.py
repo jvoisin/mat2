@@ -194,10 +194,9 @@ class TestCorruptedFiles(unittest.TestCase):
         os.remove('./tests/data/clean.jpg')
 
     def test_png_lightweight(self):
-        return
         shutil.copy('./tests/data/dirty.torrent', './tests/data/clean.png')
-        p = images.PNGParser('./tests/data/clean.png')
-        self.assertTrue(p.remove_all())
+        with self.assertRaises(ValueError):
+            p = images.PNGParser('./tests/data/clean.png')
         os.remove('./tests/data/clean.png')
 
     def test_avi(self):
