@@ -199,7 +199,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                             logging.warning("In file %s, keeping unknown element %s (format: %s)",
                                             self.filename, member_name, mtype)
                         else:
-                            logging.error("In file %s, element %s's format (%s) " \
+                            logging.error("In file %s, element %s's format (%s) "
                                           "isn't supported",
                                           self.filename, member_name, mtype)
                             abort = True
