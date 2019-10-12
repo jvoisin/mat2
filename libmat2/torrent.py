@@ -33,7 +33,7 @@ class TorrentParser(abstract.AbstractParser):
         return True
 
 
-class _BencodeHandler():
+class _BencodeHandler:
     """
     Since bencode isn't that hard to parse,
     MAT2 comes with its own parser, based on the spec
