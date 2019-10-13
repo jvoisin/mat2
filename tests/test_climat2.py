@@ -1,6 +1,7 @@
 import random
 import os
 import shutil
+import stat
 import subprocess
 import unittest
 import glob
@@ -132,6 +133,33 @@ class TestCleanMeta(unittest.TestCase):
         self.assertNotIn(b'Comment: Created with GIMP', stdout)
 
         os.remove('./tests/data/clean.jpg')
+        os.remove('./tests/data/clean.cleaned.jpg')
+
+
+class TestCopyPermissions(unittest.TestCase):
+    def test_jpg_777(self):
+        shutil.copy('./tests/data/dirty.jpg', './tests/data/clean.jpg')
+        os.chmod('./tests/data/clean.jpg', 0o777)
+
+        proc = subprocess.Popen(mat2_binary + ['--show', './tests/data/clean.jpg'],
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+        self.assertIn(b'Comment: Created with GIMP', stdout)
+
+        proc = subprocess.Popen(mat2_binary + ['./tests/data/clean.jpg'],
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+
+        proc = subprocess.Popen(mat2_binary + ['--show', './tests/data/clean.cleaned.jpg'],
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+        self.assertNotIn(b'Comment: Created with GIMP', stdout)
+
+        permissions = os.stat('./tests/data/clean.cleaned.jpg')[stat.ST_MODE]
+        self.assertEqual(permissions, 0o100777)
+
+        os.remove('./tests/data/clean.jpg')
+        os.remove('./tests/data/clean.cleaned.jpg')
 
 
 class TestIsSupported(unittest.TestCase):

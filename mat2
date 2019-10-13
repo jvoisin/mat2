@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import shutil
 from typing import Tuple, List, Union, Set
 import sys
 import mimetypes
@@ -136,6 +137,7 @@ def clean_meta(filename: str, is_lightweight: bool, inplace: bool, sandbox: bool
     try:
         logging.debug('Cleaning %s…', filename)
         ret = p.remove_all()
+        shutil.copymode(filename, p.output_filename)
         if inplace is True:
             os.rename(p.output_filename, filename)
         return ret
