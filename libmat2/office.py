@@ -77,25 +77,26 @@ class MSOfficeParser(ZipParser):
         self.files_to_keep = set(map(re.compile, {  # type: ignore
             r'^\[Content_Types\]\.xml$',
             r'^_rels/\.rels$',
-            r'^word/_rels/document\.xml\.rels$',
-            r'^word/_rels/footer[0-9]*\.xml\.rels$',
-            r'^word/_rels/header[0-9]*\.xml\.rels$',
+            r'^(?:word|ppt)/_rels/document\.xml\.rels$',
+            r'^(?:word|ppt)/_rels/footer[0-9]*\.xml\.rels$',
+            r'^(?:word|ppt)/_rels/header[0-9]*\.xml\.rels$',
+            r'^ppt/slideLayouts/_rels/slideLayout[0-9]+\.xml\.rels$',
 
             # https://msdn.microsoft.com/en-us/library/dd908153(v=office.12).aspx
-            r'^word/stylesWithEffects\.xml$',
+            r'^(?:word|ppt)/stylesWithEffects\.xml$',
         }))
         self.files_to_omit = set(map(re.compile, {  # type: ignore
             r'^customXml/',
             r'webSettings\.xml$',
             r'^docProps/custom\.xml$',
-            r'^word/printerSettings/',
-            r'^word/theme',
-            r'^word/people\.xml$',
-            r'^word/numbering\.xml$',
+            r'^(?:word|ppt)/printerSettings/',
+            r'^(?:word|ppt)/theme',
+            r'^(?:word|ppt)/people\.xml$',
+            r'^(?:word|ppt)/numbering\.xml$',
 
             # we have an allowlist in self.files_to_keep,
             # so we can trash everything else
-            r'^word/_rels/',
+            r'^(?:word|ppt)/_rels/',
         }))
 
         if self.__fill_files_to_keep_via_content_types() is False:
