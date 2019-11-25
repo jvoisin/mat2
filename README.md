@@ -137,8 +137,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-Copyright 2018 Julien (jvoisin) Voisin <julien.voisin+mat2@dustri.org>
-Copyright 2016 Marie Rose for MAT2's logo
+Copyright 2018 Julien (jvoisin) Voisin <julien.voisin+mat2@dustri.org>  
+Copyright 2016 Marie-Rose for MAT2's logo
 
 The `tests/data/dirty_with_nsid.docx` file is licensed under GPLv3,
 and was borrowed from the Calibre project: https://calibre-ebook.com/downloads/demos/demo.docx
