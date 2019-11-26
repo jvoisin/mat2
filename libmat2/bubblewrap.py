@@ -18,6 +18,8 @@ __all__ = ['PIPE', 'run', 'CalledProcessError']
 PIPE = subprocess.PIPE
 CalledProcessError = subprocess.CalledProcessError
 
+# pylint: disable=subprocess-run-check
+
 
 def _get_bwrap_path() -> str:
     bwrap_path = '/usr/bin/bwrap'
