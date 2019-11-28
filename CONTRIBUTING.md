@@ -1,6 +1,6 @@
-# Contributing to MAT2
+# Contributing to mat2
 
-The main repository for MAT2 is on [0xacab]( https://0xacab.org/jvoisin/mat2 ),
+The main repository for mat2 is on [0xacab]( https://0xacab.org/jvoisin/mat2 ),
 but you can send patches to jvoisin by [email](https://dustri.org/) if you prefer.
 
 Do feel free to pick up [an issue]( https://0xacab.org/jvoisin/mat2/issues )
@@ -16,7 +16,7 @@ If you're adding a new fileformat, please add tests for:
 2. Cleaning metadata
 3. Raising `ValueError` upon a corrupted file
 
-Since MAT2 is written in Python3, please conform as much as possible to the
+Since mat2 is written in Python3, please conform as much as possible to the
 [pep8]( https://pep8.org/ ) style; except where it makes no sense of course.
 
 # Doing a release

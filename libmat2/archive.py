@@ -52,7 +52,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
         self.member_class = None  #  type: ignore
 
         # Those are the files that have a format that _isn't_
-        # supported by MAT2, but that we want to keep anyway.
+        # supported by mat2, but that we want to keep anyway.
         self.files_to_keep = set()  # type: Set[Pattern]
 
         # Those are the files that we _do not_ want to keep,

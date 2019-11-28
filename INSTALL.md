@@ -14,7 +14,7 @@ pip3 install mat2
 ## Optional dependencies
 
 When [bubblewrap](https://github.com/projectatomic/bubblewrap) is
-installed, MAT2 uses it to sandbox any external processes it invokes.
+installed, mat2 uses it to sandbox any external processes it invokes.
 
 ## Arch Linux
 
@@ -48,4 +48,4 @@ dnf -y install mat2 mat2-nautilus
 
 ## Gentoo
 
-MAT2 is available in the [torbrowser overlay](https://github.com/MeisterP/torbrowser-overlay).
+mat2 is available in the [torbrowser overlay](https://github.com/MeisterP/torbrowser-overlay).

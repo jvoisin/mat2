@@ -67,12 +67,12 @@
 
 # 0.3.1 - 2018-09-01
 
-- Document how to install MAT2 for various distributions
+- Document how to install mat2 for various distributions
 - Fix various typos in the documentation/comments
-- Add ArchLinux to the CI to ensure that MAT2 is running on it
+- Add ArchLinux to the CI to ensure that mat2 is running on it
 - Fix the handling of files with a name ending in `.JPG`
 - Improve the detection of unsupported extensions in upper-case
-- Streamline MAT2's logging
+- Streamline mat2's logging
 
 
 # 0.3.0 - 2018-08-03
@@ -92,14 +92,14 @@
 - Simplify various code-paths
 - Remove superfluous debug message
 - Remove the `--check` option that never was implemented anyway
-- Add a `-c` option to check for MAT2's dependencies
+- Add a `-c` option to check for mat2's dependencies
 
 
 # 0.1.3 - 2018-07-06
 
-- Improve MAT2 resilience against corrupted images
+- Improve mat2 resilience against corrupted images
 - Check that the minimal version of Poppler is available
-- Simplify how MAT2 deals with office files
+- Simplify how mat2 deals with office files
 - Improve cleaning of office files
 	- Thumbnails are removed
 	- Revisions are removed
@@ -111,8 +111,8 @@
 - Rename some files to ease the packaging
 - Add linters to the CI (mypy, bandit and pyflakes)
 - Prevent exitftool-related parameters injections
-- Improve MAT2's resilience against corrupted files
-- Make MAT2 work on fedora, thanks to @atenart
+- Improve mat2's resilience against corrupted files
+- Make mat2 work on fedora, thanks to @atenart
 - Tighten the threat model
 - Simplify and improve how office files are handled
 

@@ -36,7 +36,7 @@ class TorrentParser(abstract.AbstractParser):
 class _BencodeHandler:
     """
     Since bencode isn't that hard to parse,
-    MAT2 comes with its own parser, based on the spec
+    mat2 comes with its own parser, based on the spec
     https://wiki.theory.org/index.php/BitTorrentSpecification#Bencoding
     """
     def __init__(self):

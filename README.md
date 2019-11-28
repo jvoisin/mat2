@@ -22,10 +22,10 @@ camera was used. Office documents like PDF or Office automatically adds
 author and company information to documents and spreadsheets.
 Maybe you don't want to disclose those information.
 
-This is precisely the job of MAT2: getting rid, as much as possible, of
+This is precisely the job of mat2: getting rid, as much as possible, of
 metadata.
 
-MAT2 provides both a command line tool, and a graphical user interface
+mat2 provides both a command line tool, and a graphical user interface
 via an extension for Nautilus, the default file manager of GNOME.
 
 # Requirements
@@ -38,7 +38,7 @@ via an extension for Nautilus, the default file manager of GNOME.
 - `libimage-exiftool-perl` for everything else
 - `bubblewrap`, optionally, for sandboxing
 
-Please note that MAT2 requires at least Python3.5.
+Please note that mat2 requires at least Python3.5.
 
 # Running the test suite
 
@@ -53,7 +53,7 @@ $ python3-coverage run --branch -m unittest discover -s tests/
 $ python3-coverage report --include -m --include /libmat2/*'
 ```
 
-# How to use MAT2
+# How to use mat2
 
 ```bash
 usage: mat2 [-h] [-v] [-l] [--check-dependencies] [-V]
@@ -69,25 +69,25 @@ optional arguments:
   -h, --help            show this help message and exit
   -v, --version         show program's version number and exit
   -l, --list            list all supported fileformats
-  --check-dependencies  check if MAT2 has all the dependencies it needs
+  --check-dependencies  check if mat2 has all the dependencies it needs
   -V, --verbose         show more verbose status information
   --unknown-members policy
                         how to handle unknown members of archive-style files
                         (policy should be one of: abort, omit, keep) [Default:
                         abort]
-  -s, --show            list harmful metadata detectable by MAT2 without
+  -s, --show            list harmful metadata detectable by mat2 without
                         removing them
   -L, --lightweight     remove SOME metadata
 ```
 
-Note that MAT2 **will not** clean files in-place, but will produce, for
+Note that mat2 **will not** clean files in-place, but will produce, for
 example, with a file named "myfile.png" a cleaned version named
 "myfile.cleaned.png".
 
 # Notes about detecting metadata
 
-While MAT2 is doing its very best to display metadata when the `--show` flag is
-passed, it doesn't mean that a file is clean from any metadata if MAT2 doesn't
+While mat2 is doing its very best to display metadata when the `--show` flag is
+passed, it doesn't mean that a file is clean from any metadata if mat2 doesn't
 show any. There is no reliable way to detect every single possible metadata for
 complex file formats.
 
@@ -138,14 +138,14 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Copyright 2018 Julien (jvoisin) Voisin <julien.voisin+mat2@dustri.org>  
-Copyright 2016 Marie-Rose for MAT2's logo
+Copyright 2016 Marie-Rose for mat2's logo
 
 The `tests/data/dirty_with_nsid.docx` file is licensed under GPLv3,
 and was borrowed from the Calibre project: https://calibre-ebook.com/downloads/demos/demo.docx
 
 # Thanks
 
-MAT2 wouldn't exist without:
+mat2 wouldn't exist without:
 
 - the [Google Summer of Code](https://summerofcode.withgoogle.com/);
 - the fine people from [Tails]( https://tails.boum.org);

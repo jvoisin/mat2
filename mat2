@@ -63,19 +63,19 @@ def create_arg_parser() -> argparse.ArgumentParser:
     excl_group.add_argument('files', nargs='*', help='the files to process',
                             default=[])
     excl_group.add_argument('-v', '--version', action='version',
-                            version='MAT2 %s' % __version__)
+                            version='mat2 %s' % __version__)
     excl_group.add_argument('-l', '--list', action='store_true', default=False,
                             help='list all supported fileformats')
     excl_group.add_argument('--check-dependencies', action='store_true',
                             default=False,
-                            help='check if MAT2 has all the dependencies it '
+                            help='check if mat2 has all the dependencies it '
                             'needs')
 
     excl_group = parser.add_mutually_exclusive_group()
     excl_group.add_argument('-L', '--lightweight', action='store_true',
                             help='remove SOME metadata')
     excl_group.add_argument('-s', '--show', action='store_true',
-                            help='list harmful metadata detectable by MAT2 '
+                            help='list harmful metadata detectable by mat2 '
                             'without removing them')
 
     return parser
@@ -190,7 +190,7 @@ def main() -> int:
             show_parsers()
             return 0
         elif args.check_dependencies:
-            print("Dependencies for MAT2 %s:" % __version__)
+            print("Dependencies for mat2 %s:" % __version__)
             for key, value in sorted(check_dependencies().items()):
                 print('- %s: %s %s' % (key, 'yes' if value['found'] else 'no',
                                        '(optional)' if not value['required'] else ''))

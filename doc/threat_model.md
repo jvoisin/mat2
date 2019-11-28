@@ -3,7 +3,7 @@ Threat Model
 
 The Metadata Anonymisation Toolkit 2 adversary has a number
 of goals, capabilities, and counter-attack types that can be
-used to guide us towards a set of requirements for the MAT2.
+used to guide us towards a set of requirements for the mat2.
 
 This is an overhaul of MAT's (the first iteration of the software) one.
 
@@ -53,7 +53,7 @@ Adversary
     user. This is the strongest position for the adversary to
     have. In this case, the adversary is capable of inserting
     arbitrary, custom watermarks specifically for tracking
-    the user. In general, MAT2 cannot defend against this
+    the user. In general, mat2 cannot defend against this
     adversary, but we list it for completeness' sake.
 
     - The adversary created the document for a group of users.
@@ -65,7 +65,7 @@ Adversary
 		- The adversary did not create the document, the weakest
 		position for the adversary to have. The file format is
 		(most of the time) standard, nothing custom is added:
-		MAT2 must be able to remove all metadata from the file.
+		mat2 must be able to remove all metadata from the file.
 
 
 Requirements
@@ -73,28 +73,28 @@ Requirements
 
 * Processing
 
-    - MAT2 *should* avoid interactions with information.
+    - mat2 *should* avoid interactions with information.
     Its goal is to remove metadata, and the user is solely
     responsible for the information of the file.
 
-    - MAT2 *must* warn when encountering an unknown
-    format. For example, in a zipfile, if MAT2 encounters an
+    - mat2 *must* warn when encountering an unknown
+    format. For example, in a zipfile, if mat2 encounters an
     unknown format, it should warn the user, and ask if the
     file should be added to the anonymised archive that is
     produced.
 
-    - MAT2 *must* not add metadata, since its purpose is to
+    - mat2 *must* not add metadata, since its purpose is to
     anonymise files: every added items of metadata decreases
     anonymity.
 
-    - MAT2 *should* handle unknown/hidden metadata fields,
+    - mat2 *should* handle unknown/hidden metadata fields,
     like proprietary extensions of open formats.
 
-		- MAT2 *must not* fail silently. Upon failure,
-		MAT2 *must not* modify the file in any way.
+		- mat2 *must not* fail silently. Upon failure,
+		mat2 *must not* modify the file in any way.
 
-		- MAT2 *might* leak the fact that MAT2 was used on the file,
+		- mat2 *might* leak the fact that mat2 was used on the file,
 		since it might be uncommon for some file formats to come
 		without any kind of metadata, an adversary might suspect that
-		the user used MAT2 on certain files.
+		the user used mat2 on certain files.
 

@@ -40,14 +40,14 @@ class TestVersion(unittest.TestCase):
     def test_version(self):
         proc = subprocess.Popen(mat2_binary + ['--version'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertTrue(stdout.startswith(b'MAT2 '))
+        self.assertTrue(stdout.startswith(b'mat2 '))
 
 
 class TestDependencies(unittest.TestCase):
     def test_dependencies(self):
         proc = subprocess.Popen(mat2_binary + ['--check-dependencies'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertTrue(b'MAT2' in stdout)
+        self.assertTrue(b'mat2' in stdout)
 
 
 class TestReturnValue(unittest.TestCase):

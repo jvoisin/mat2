@@ -235,7 +235,7 @@ class Mat2Extension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationWid
             return None
 
         item = Nautilus.MenuItem(
-            name="MAT2::Remove_metadata",
+            name="mat2::Remove_metadata",
             label="Remove metadata",
             tip="Remove metadata"
         )

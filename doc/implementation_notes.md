@@ -4,7 +4,7 @@ Implementation notes
 Lightweight cleaning mode
 -------------------------
 
-Due to *popular* request, MAT2 is providing a *lightweight* cleaning mode,
+Due to *popular* request, mat2 is providing a *lightweight* cleaning mode,
 that only cleans the superficial metadata of your file, but not
 the ones that might be in **embedded** resources. Like for example,
 images in a PDF or an office document.
@@ -19,7 +19,7 @@ are entirely removed.
 	deleted. For example journalists that are editing a document to erase
 	mentions sources mentions.
 
-- Or they are aware of it, and will likely not expect MAT2 to be able to keep
+- Or they are aware of it, and will likely not expect mat2 to be able to keep
 	the revisions, that are basically traces about how, when and who edited the
 	document.
 
@@ -27,15 +27,15 @@ are entirely removed.
 Race conditions
 ---------------
 
-MAT2 does its very best to avoid crashing at runtime. This is why it's checking
-if the file is valid __at parser creation__. MAT2 doesn't take any measure to
+mat2 does its very best to avoid crashing at runtime. This is why it's checking
+if the file is valid __at parser creation__. mat2 doesn't take any measure to
 ensure that the file is not changed between the time the parser is
 instantiated, and the call to clean or show the metadata.
 
 Symlink attacks
 ---------------
 
-MAT2 output predictable filenames (like yourfile.jpg.cleaned).
+mat2 output predictable filenames (like yourfile.jpg.cleaned).
 This may lead to symlink attack. Please check if you OS prevent
 against them
 
@@ -65,10 +65,10 @@ didn't remove any *deep metadata*, like the ones in embedded pictures. This was
 on of the reason MAT was abandoned: the absence of satisfying solution to
 handle PDF. But apparently, people are ok with [pdf redact
 tools](https://github.com/firstlookmedia/pdf-redact-tools), that simply
-transform the PDF into images. So this is what's MAT2 is doing too.
+transform the PDF into images. So this is what's mat2 is doing too.
 
 Of course, it would be possible to detect images in PDf file, and process them
-with MAT2, but since a PDF can contain a lot of things, like images, videos,
+with mat2, but since a PDF can contain a lot of things, like images, videos,
 javascript, pdf, blobs, … this is the easiest and safest way to clean them.
 
 Images handling
@@ -81,7 +81,7 @@ XML attacks
 -----------
 
 Since our threat model conveniently excludes files crafted to specifically
-bypass MAT2, fileformats containing harmful XML are out of our scope.
-But since MAT2 is using [etree](https://docs.python.org/3/library/xml.html#xml-vulnerabilities)
+bypass mat2, fileformats containing harmful XML are out of our scope.
+But since mat2 is using [etree](https://docs.python.org/3/library/xml.html#xml-vulnerabilities)
 to process XML, it's "only" vulnerable to DoS, and not memory corruption:
 odds are that the user will notice that the cleaning didn't succeed.
