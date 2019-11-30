@@ -1,3 +1,4 @@
+import sys
 import random
 import os
 import shutil
@@ -258,7 +259,16 @@ class TestCommandLineParallel(unittest.TestCase):
             os.remove(path)
 
     def test_different(self):
-        shutil.copytree('./tests/data/', './tests/data/parallel')
+        src = './tests/data/'
+        dst = './tests/data/parallel'
+        if sys.version_info >= (3, 8):
+            with os.scandir(src) as itr:
+                    entries = list(itr)
+            shutil._copytree(entries=entries, src=src, dst=dst, symlinks=False,
+                    ignore=None, copy_function=shutil.copy2,
+                    ignore_dangling_symlinks=False)
+        else:
+            shutil.copytree(src, dst)
 
         proc = subprocess.Popen(mat2_binary + glob.glob('./tests/data/parallel/dirty.*'),
                 stdout=subprocess.PIPE)
