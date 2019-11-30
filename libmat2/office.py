@@ -93,6 +93,11 @@ class MSOfficeParser(ZipParser):
             r'^(?:word|ppt)/theme',
             r'^(?:word|ppt)/people\.xml$',
             r'^(?:word|ppt)/numbering\.xml$',
+            # View properties like view mode, last viewed slide etc
+            r'^(?:word|ppt)/viewProps\.xml$',
+            # Additional presentation-wide properties like printing properties,
+            # presentation show properties etc.
+            r'^(?:word|ppt)/presProps\.xml$',
 
             # we have an allowlist in self.files_to_keep,
             # so we can trash everything else
