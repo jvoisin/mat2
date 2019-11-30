@@ -1,4 +1,4 @@
-.TH mat2 "1" "May 2019" "mat2 0.9.0" "User Commands"
+.TH mat2 "1" "November 2019" "mat2 0.10.0" "User Commands"
 
 .SH NAME
 mat2 \- the metadata anonymisation toolkit 2
@@ -41,11 +41,16 @@ show more verbose status information
 how to handle unknown members of archive-style files (policy should be one of: abort, omit, keep)
 .TP
 \fB\-s\fR, \fB\-\-show\fR
-list harmful metadata detectable by mat2 without
-removing them
+list harmful metadata detectable by mat2 without removing them
 .TP
 \fB\-L\fR, \fB\-\-lightweight\fR
 remove SOME metadata
+.TP
+\fB\--no-sandbox\fR
+disable bubblewrap's sandboxing
+.TP
+\fB\--inplace\fR
+clean in place, without backup
 
 .SH EXAMPLES
 To remove all the metadata from a PDF file:

@@ -1,3 +1,21 @@
+# 0.10.0 - 2019-11-30
+
+- Make mat2 work on Python3.8
+- Minor improvement of ppt handling
+- Minor improvement of odt handling
+- Add an integration KDE's file manager: Dolphin
+- mat2 now copies file permissions on the cleaned files
+- Add a flag to disable sandboxing
+- Tighten a bit the sandboxing
+- Improve handling of MSOffice documents
+- Add support for inplace cleaning
+- Better handling of mutually-exclusive arguments in the command line
+- Add support for svg
+- Add support for ppm
+- Cleaned zip files are compressed by default
+- Minor performances improvement when dealing with images/video files
+- Better handling of optional dependencies
+
 # 0.9.0 - 2019-05-10
 
 - Add tar/tar.gz/tar.bz2/tar.zx archives support
