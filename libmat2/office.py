@@ -371,6 +371,7 @@ class LibreOfficeParser(ZipParser):
         }))
         self.files_to_omit = set(map(re.compile, {  # type: ignore
             r'^meta\.xml$',
+            r'^layout-cache$',
             r'^Configurations2/',
             r'^Thumbnails/',
         }))
