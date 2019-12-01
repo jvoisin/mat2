@@ -51,14 +51,14 @@ tests:archlinux:
   image: $CONTAINER_REGISTRY:archlinux
   stage: test
   script:
-    - python3 setup.py test
+    - python3 -m unittest discover -v
   
 tests:debian:
   image: $CONTAINER_REGISTRY:debian
   stage: test
   script:
     - apt-get -qqy purge bubblewrap
-    - python3 setup.py test
+    - python3 -m unittest discover -v
 
 tests:debian_with_bubblewrap:
   image: $CONTAINER_REGISTRY:debian
@@ -72,7 +72,7 @@ tests:fedora:
   image: $CONTAINER_REGISTRY:fedora
   stage: test
   script:
-    - python3 setup.py test
+    - python3 -m unittest discover -v
 
 tests:gentoo:
   image: $CONTAINER_REGISTRY:gentoo
