@@ -25,8 +25,9 @@ Maybe you don't want to disclose those information.
 This is precisely the job of mat2: getting rid, as much as possible, of
 metadata.
 
-mat2 provides both a command line tool, and a graphical user interface
-via an extension for Nautilus, the default file manager of GNOME.
+mat2 provides a command line tool, and graphical user interfaces via a service
+menu for Dolphin, the default file manager of KDE, and an extension for
+Nautilus, the default file manager of GNOME.
 
 # Requirements
 
