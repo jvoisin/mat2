@@ -62,6 +62,16 @@ mat2 ./myfile.pdf
 .fi
 .PP
 
+.SH NOTES ABOUT METADATA
+
+While mat2 is doing its very best to display metadata when the --show flag is
+passed, it doesn't mean that a file is clean from any metadata if mat2 doesn't
+show any. There is no reliable way to detect every single possible metadata for
+complex file formats.
+.PP
+This is why you shouldn't rely on metadata's presence to decide if your file must
+be cleaned or not.
+
 .SH BUGS
 
 While mat2 does its very best to remove every single metadata,
