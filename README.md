@@ -56,9 +56,9 @@ $ python3-coverage report --include -m --include /libmat2/*'
 
 # How to use mat2
 
-```bash
-usage: mat2 [-h] [-v] [-l] [--check-dependencies] [-V]
-            [--unknown-members policy] [-s | -L]
+```
+usage: mat2 [-h] [-V] [--unknown-members policy] [--inplace] [--no-sandbox]
+            [-v] [-l] [--check-dependencies] [-L | -s]
             [files [files ...]]
 
 Metadata anonymisation toolkit 2
@@ -68,17 +68,19 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  -v, --version         show program's version number and exit
-  -l, --list            list all supported fileformats
-  --check-dependencies  check if mat2 has all the dependencies it needs
   -V, --verbose         show more verbose status information
   --unknown-members policy
                         how to handle unknown members of archive-style files
                         (policy should be one of: abort, omit, keep) [Default:
                         abort]
+  --inplace             clean in place, without backup
+  --no-sandbox          Disable bubblewrap's sandboxing.
+  -v, --version         show program's version number and exit
+  -l, --list            list all supported fileformats
+  --check-dependencies  check if mat2 has all the dependencies it needs
+  -L, --lightweight     remove SOME metadata
   -s, --show            list harmful metadata detectable by mat2 without
                         removing them
-  -L, --lightweight     remove SOME metadata
 ```
 
 Note that mat2 **will not** clean files in-place, but will produce, for
