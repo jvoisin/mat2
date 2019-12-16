@@ -187,6 +187,15 @@ class TestCorruptedFiles(unittest.TestCase):
             audio.MP3Parser('./tests/data/clean.mp3')
         os.remove('./tests/data/clean.mp3')
 
+    def test_wrong_tif(self):
+        shutil.copy('./tests/data/dirty.tiff', './tests/data/clean.tif')
+        p = images.TiffParser('./tests/data/clean.tif')
+        p.remove_all()
+        p = images.TiffParser('./tests/data/clean.cleaned.tif')
+        self.assertEqual(p.get_meta(), {})
+        os.remove('./tests/data/clean.tif')
+        os.remove('./tests/data/clean.cleaned.tif')
+
     def test_jpg(self):
         shutil.copy('./tests/data/dirty.mp3', './tests/data/clean.jpg')
         with self.assertRaises(ValueError):
