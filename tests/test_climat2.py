@@ -22,16 +22,22 @@ class TestHelp(unittest.TestCase):
     def test_help(self):
         proc = subprocess.Popen(mat2_binary + ['--help'], stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'mat2 [-h] [-V] [--unknown-members policy] [--inplace] [--no-sandbox]',
-                      stdout)
-        self.assertIn(b' [-v] [-l] [--check-dependencies] [-L | -s]', stdout)
+        self.assertIn(b'mat2 [-h] [-V]', stdout)
+        self.assertIn(b'[--unknown-members policy]', stdout)
+        self.assertIn(b'[--inplace]', stdout)
+        self.assertIn(b'[--no-sandbox]', stdout)
+        self.assertIn(b' [-v] [-l]', stdout)
+        self.assertIn(b'[--check-dependencies]', stdout)
+        self.assertIn(b'[-L | -s]', stdout)
         self.assertIn(b'[files [files ...]]', stdout)
 
     def test_no_arg(self):
         proc = subprocess.Popen(mat2_binary, stdout=subprocess.PIPE)
         stdout, _ = proc.communicate()
-        self.assertIn(b'mat2 [-h] [-V] [--unknown-members policy] [--inplace] [--no-sandbox]',
-                      stdout)
+        self.assertIn(b'mat2 [-h] [-V]', stdout)
+        self.assertIn(b'[--unknown-members policy]', stdout)
+        self.assertIn(b'[--inplace]', stdout)
+        self.assertIn(b'[--no-sandbox]', stdout)
         self.assertIn(b' [-v] [-l] [--check-dependencies] [-L | -s]', stdout)
         self.assertIn(b'[files [files ...]]', stdout)
 
