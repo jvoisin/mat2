@@ -159,7 +159,8 @@ class _HTMLParser(parser.HTMLParser):
                 if data.strip():
                     self.__textrepr += escape(data)
 
-    def handle_startendtag(self, tag: str, attrs: List[Tuple[str, str]]):
+    def handle_startendtag(self, tag: str,
+                           attrs: List[Tuple[str, Optional[str]]]):
         if tag in self.tag_required_blocklist | self.tag_blocklist:
             meta = {k:v for k, v in attrs}
             name = meta.get('name', 'harmful metadata')
