@@ -127,6 +127,11 @@ class TestGetMeta(unittest.TestCase):
         self.assertEqual(meta['Model'], 'C7070WZ')
         self.assertEqual(meta['ModifyDate'], '2005:12:26 17:09:35')
 
+    def test_wav(self):
+        p = audio.WAVParser('./tests/data/dirty.wav')
+        meta = p.get_meta()
+        self.assertEqual(meta['Artist'], 'jvoisin')
+
     def test_mp3(self):
         p = audio.MP3Parser('./tests/data/dirty.mp3')
         meta = p.get_meta()
@@ -300,6 +305,11 @@ class TestCleaning(unittest.TestCase):
             'name': 'jpg',
             'parser': images.JPGParser,
             'meta': {'Comment': 'Created with GIMP'},
+            'expected_meta': {},
+        }, {
+            'name': 'wav',
+            'parser': audio.WAVParser,
+            'meta': {'Comment': 'Zomg, a comment!'},
             'expected_meta': {},
         }, {
             'name': 'mp3',

@@ -6,7 +6,7 @@ from typing import Dict, Union
 
 import mutagen
 
-from . import abstract, parser_factory
+from . import abstract, parser_factory, video
 
 
 class MutagenParser(abstract.AbstractParser):
@@ -77,3 +77,14 @@ class FLACParser(MutagenParser):
             meta[name] = p.get_meta() if p else 'harmful data'  # type: ignore
             os.remove(fname)
         return meta
+
+
+class WAVParser(video.AbstractFFmpegParser):
+    mimetypes = {'audio/x-wav', }
+    meta_allowlist = {'AvgBytesPerSec', 'BitsPerSample', 'Directory',
+                      'Duration', 'Encoding', 'ExifToolVersion',
+                      'FileAccessDate', 'FileInodeChangeDate',
+                      'FileModifyDate', 'FileName', 'FilePermissions',
+                      'FileSize', 'FileType', 'FileTypeExtension',
+                      'MIMEType', 'NumChannels', 'SampleRate', 'SourceFile',
+                     }
