@@ -484,13 +484,15 @@ class TestCleaning(unittest.TestCase):
             shutil.copy('./tests/data/dirty.' + case['name'], target)
             p1 = case['parser'](target)
 
-            meta = p1.get_meta()
-            for k, v in case['meta'].items():
+            for k, v in p1.get_meta().items():
+                if k not in case['meta']:
+                    continue
                 if isinstance(v, dict):
                     for _k, _v in v.items():
-                        self.assertEqual(meta[k][_k], _v)
+                        if _k in case['meta'][k]:
+                            self.assertEqual(_v, case['meta'][k][_k])
                 else:
-                    self.assertEqual(meta[k], v)
+                    self.assertEqual(v, case['meta'][k])
 
             p1.lightweight_cleaning = True
             self.assertTrue(p1.remove_all())
