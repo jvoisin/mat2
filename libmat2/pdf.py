@@ -122,6 +122,17 @@ class PDFParser(abstract.AbstractParser):
         document.set_creator('')
         document.set_creation_date(-1)
         document.save('file://' + os.path.abspath(out_file))
+
+        # Cairo adds "/Producer" and "/CreationDate", and Poppler sometimes
+        # fails to remove them, we have to use this terrible regex.
+        # It should(tm) be alright though, because cairo's output format
+        # for metadata is fixed.
+        with open(out_file, 'rb') as f:
+            out = re.sub(rb'<<[\s\n]*/Producer.*?>>', b' << >>', f.read(), 0,
+                         re.DOTALL | re.IGNORECASE)
+        with open(out_file, 'wb') as f:
+            f.write(out)
+
         return True
 
     @staticmethod
