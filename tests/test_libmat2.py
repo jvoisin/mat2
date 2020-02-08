@@ -441,14 +441,16 @@ class TestCleaning(unittest.TestCase):
             'meta': {
                 'Encoder':  'HandBrake 0.9.4 2009112300',
             },
-            'expected_meta':
-            {'CompatibleBrands': ['isom', 'iso2', 'avc1', 'mp41'],
+            'expected_meta': {
+                'CompatibleBrands': ['isom', 'iso2', 'avc1', 'mp41'],
                 'CompressorID': 'avc1',
                 'GraphicsMode': 'srcCopy',
                 'HandlerDescription': 'SoundHandler',
                 'HandlerType': 'Metadata',
                 'HandlerVendorID': 'Apple',
                 'MajorBrand': 'MP4  Base Media v1 [IS0 14496-12:2003]',
+                'MediaDataOffset': 48,
+                'MediaDataSize': 379872,
                 'MediaHeaderVersion': 0,
                 'MinorVersion': '0.2.0',
                 'MovieDataOffset': 48,
@@ -498,7 +500,9 @@ class TestCleaning(unittest.TestCase):
             self.assertTrue(p1.remove_all())
 
             p2 = case['parser'](p1.output_filename)
-            self.assertEqual(p2.get_meta(), case['expected_meta'])
+            for k, v in p2.get_meta().items():
+                self.assertIn(k, case['expected_meta'])
+                self.assertEqual(v, case['expected_meta'][k])
             self.assertTrue(p2.remove_all())
 
             os.remove(target)
