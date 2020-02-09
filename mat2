@@ -17,7 +17,7 @@ except ValueError as e:
     print(e)
     sys.exit(1)
 
-__version__ = '0.10.0'
+__version__ = '0.10.1'
 
 # Make pyflakes happy
 assert Set

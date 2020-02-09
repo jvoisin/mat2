@@ -1,3 +1,12 @@
+# 0.10.1 - 2020-02-09
+
+- Improve the documentation and the manpage
+- Improve the robustness of css, html, png, gdk-based, exiftool-based parsers
+- Future-proof a bit the testsuite
+- Handle tiff files with a .tif extension
+- Improve the sandbox' usability
+- Add support for wav files
+
 # 0.10.0 - 2019-11-30
 
 - Make mat2 work on Python3.8
