@@ -2,6 +2,7 @@ import functools
 import json
 import logging
 import os
+import shutil
 import subprocess
 from typing import Dict, Union, Set
 
@@ -71,14 +72,12 @@ class ExiftoolParser(abstract.AbstractParser):
 
 @functools.lru_cache()
 def _get_exiftool_path() -> str:  # pragma: no cover
-    possible_pathes = {
-        '/usr/bin/exiftool',              # debian/fedora
-        '/usr/bin/vendor_perl/exiftool',  # archlinux
-    }
+    which_path = shutil.which('exiftool')
+    if which_path:
+        return which_path
 
-    for possible_path in possible_pathes:
-        if os.path.isfile(possible_path):
-            if os.access(possible_path, os.X_OK):
-                return possible_path
+    # Exiftool on Arch Linux has a weird path
+    if os.access('/usr/bin/vendor_perl/exiftool', os.X_OK):
+        return '/usr/bin/vendor_perl/exiftool'
 
     raise RuntimeError("Unable to find exiftool")
