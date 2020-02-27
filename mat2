@@ -57,7 +57,7 @@ def create_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument('--inplace', action='store_true',
                         help='clean in place, without backup')
     parser.add_argument('--no-sandbox', dest='sandbox', action='store_true',
-                        default=False, help='Disable bubblewrap\'s sandboxing.')
+                        default=False, help='Disable bubblewrap\'s sandboxing')
 
     excl_group = parser.add_mutually_exclusive_group()
     excl_group.add_argument('files', nargs='*', help='the files to process',

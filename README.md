@@ -80,7 +80,7 @@ optional arguments:
                         (policy should be one of: abort, omit, keep) [Default:
                         abort]
   --inplace             clean in place, without backup
-  --no-sandbox          Disable bubblewrap's sandboxing.
+  --no-sandbox          Disable bubblewrap's sandboxing
   -v, --version         show program's version number and exit
   -l, --list            list all supported fileformats
   --check-dependencies  check if mat2 has all the dependencies it needs
