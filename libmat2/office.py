@@ -1,3 +1,4 @@
+import uuid
 import logging
 import os
 import re
@@ -82,7 +83,7 @@ class MSOfficeParser(ZipParser):
             r'^(?:word|ppt)/_rels/header[0-9]*\.xml\.rels$',
             r'^ppt/slideLayouts/_rels/slideLayout[0-9]+\.xml\.rels$',
             r'^ppt/slideLayouts/slideLayout[0-9]+\.xml$',
-
+            r'^(?:word|ppt)/tableStyles\.xml$',
             # https://msdn.microsoft.com/en-us/library/dd908153(v=office.12).aspx
             r'^(?:word|ppt)/stylesWithEffects\.xml$',
         }))
@@ -302,6 +303,13 @@ class MSOfficeParser(ZipParser):
                 f.write(b'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>')
                 f.write(b'<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">')
                 f.write(b'</cp:coreProperties>')
+        elif full_path.endswith('/ppt/tableStyles.xml'):  # pragma: no cover
+            # This file must be present and valid,
+            # so we're removing as much as we can.
+            with open(full_path, 'wb') as f:
+                f.write(b'<?xml version="1.0">')
+                uid = str(uuid.uuid4()).encode('utf-8')
+                f.write(b'<a:tblStyleLst def="{%s}" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"/>' % uid)
 
         if self.__remove_rsid(full_path) is False:
             return False
