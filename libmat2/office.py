@@ -307,7 +307,7 @@ class MSOfficeParser(ZipParser):
             # This file must be present and valid,
             # so we're removing as much as we can.
             with open(full_path, 'wb') as f:
-                f.write(b'<?xml version="1.0">')
+                f.write(b'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>')
                 uid = str(uuid.uuid4()).encode('utf-8')
                 f.write(b'<a:tblStyleLst def="{%s}" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"/>' % uid)
 
