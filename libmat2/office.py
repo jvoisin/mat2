@@ -81,6 +81,7 @@ class MSOfficeParser(ZipParser):
             r'^(?:word|ppt)/_rels/footer[0-9]*\.xml\.rels$',
             r'^(?:word|ppt)/_rels/header[0-9]*\.xml\.rels$',
             r'^ppt/slideLayouts/_rels/slideLayout[0-9]+\.xml\.rels$',
+            r'^ppt/slideLayouts/slideLayout[0-9]+\.xml$',
 
             # https://msdn.microsoft.com/en-us/library/dd908153(v=office.12).aspx
             r'^(?:word|ppt)/stylesWithEffects\.xml$',
