@@ -82,6 +82,13 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
         # pylint: disable=unused-argument,no-self-use
         return {}  # pragma: no cover
 
+    def _final_checks(self) -> bool:
+        """ This method is invoked after the file has been cleaned,
+        allowing to run final verifications.
+        """
+        # pylint: disable=unused-argument,no-self-use
+        return True
+
     @staticmethod
     @abc.abstractmethod
     def _get_all_members(archive: ArchiveClass) -> List[ArchiveMember]:
@@ -223,6 +230,8 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
         if abort:
             os.remove(self.output_filename)
             return False
+        if not self._final_checks():
+            return False  # pragma: no cover
         return True
 
 

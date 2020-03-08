@@ -152,6 +152,8 @@ Copyright 2016 Marie-Rose for mat2's logo
 The `tests/data/dirty_with_nsid.docx` file is licensed under GPLv3,
 and was borrowed from the Calibre project: https://calibre-ebook.com/downloads/demos/demo.docx
 
+The `narrated_powerpoint_presentation.pptx` file is in the public domain.
+
 # Thanks
 
 mat2 wouldn't exist without:

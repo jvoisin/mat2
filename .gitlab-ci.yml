@@ -16,7 +16,7 @@ linting:bandit:
   script:  # TODO: remove B405 and B314
     - bandit ./mat2 --format txt --skip B101
     - bandit -r ./nautilus/ --format txt --skip B101
-    - bandit -r ./libmat2 --format txt --skip B101,B404,B603,B405,B314,B108
+    - bandit -r ./libmat2 --format txt --skip B101,B404,B603,B405,B314,B108,B311
 
 linting:codespell:
   image: $CONTAINER_REGISTRY:linting

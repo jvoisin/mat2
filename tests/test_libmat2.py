@@ -777,3 +777,13 @@ class TestNoSandbox(unittest.TestCase):
         os.remove('./tests/data/clean.png')
         os.remove('./tests/data/clean.cleaned.png')
         os.remove('./tests/data/clean.cleaned.cleaned.png')
+
+class TestComplexOfficeFiles(unittest.TestCase):
+    def test_complex_pptx(self):
+        target = './tests/data/clean.pptx'
+        shutil.copy('./tests/data/narrated_powerpoint_presentation.pptx', target)
+        p = office.MSOfficeParser(target)
+        self.assertTrue(p.remove_all())
+
+        os.remove(target)
+        os.remove(p.output_filename)
