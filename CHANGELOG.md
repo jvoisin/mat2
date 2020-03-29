@@ -1,3 +1,8 @@
+# 0.11.0 - 2020-03-29
+
+- Improve significantly MS Office formats support
+- Refactor how mat2 looks for executables
+
 # 0.10.1 - 2020-02-09
 
 - Improve the documentation and the manpage
