@@ -87,16 +87,16 @@ class MSOfficeParser(ZipParser):
         self.files_to_keep = set(map(re.compile, {  # type: ignore
             r'^\[Content_Types\]\.xml$',
             r'^_rels/\.rels$',
-            r'^(?:word|ppt)/_rels/document\.xml\.rels$',
-            r'^(?:word|ppt)/_rels/footer[0-9]*\.xml\.rels$',
-            r'^(?:word|ppt)/_rels/header[0-9]*\.xml\.rels$',
+            r'^(?:word|ppt|xl)/_rels/document\.xml\.rels$',
+            r'^(?:word|ppt|xl)/_rels/footer[0-9]*\.xml\.rels$',
+            r'^(?:word|ppt|xl)/_rels/header[0-9]*\.xml\.rels$',
             r'^ppt/slideLayouts/_rels/slideLayout[0-9]+\.xml\.rels$',
             r'^ppt/slideLayouts/slideLayout[0-9]+\.xml$',
-            r'^(?:word|ppt)/tableStyles\.xml$',
+            r'^(?:word|ppt|xl)/tableStyles\.xml$',
             r'^ppt/slides/_rels/slide[0-9]*\.xml\.rels$',
             r'^ppt/slides/slide[0-9]*\.xml$',
             # https://msdn.microsoft.com/en-us/library/dd908153(v=office.12).aspx
-            r'^(?:word|ppt)/stylesWithEffects\.xml$',
+            r'^(?:word|ppt|xl)/stylesWithEffects\.xml$',
             r'^ppt/presentation\.xml$',
             # TODO: check if p:bgRef can be randomized
             r'^ppt/slideMasters/slideMaster[0-9]+\.xml',
@@ -106,20 +106,20 @@ class MSOfficeParser(ZipParser):
             r'^customXml/',
             r'webSettings\.xml$',
             r'^docProps/custom\.xml$',
-            r'^(?:word|ppt)/printerSettings/',
-            r'^(?:word|ppt)/theme',
-            r'^(?:word|ppt)/people\.xml$',
-            r'^(?:word|ppt)/numbering\.xml$',
-            r'^(?:word|ppt)/tags/',
+            r'^(?:word|ppt|xl)/printerSettings/',
+            r'^(?:word|ppt|xl)/theme',
+            r'^(?:word|ppt|xl)/people\.xml$',
+            r'^(?:word|ppt|xl)/numbering\.xml$',
+            r'^(?:word|ppt|xl)/tags/',
             # View properties like view mode, last viewed slide etc
-            r'^(?:word|ppt)/viewProps\.xml$',
+            r'^(?:word|ppt|xl)/viewProps\.xml$',
             # Additional presentation-wide properties like printing properties,
             # presentation show properties etc.
-            r'^(?:word|ppt)/presProps\.xml$',
+            r'^(?:word|ppt|xl)/presProps\.xml$',
 
             # we have an allowlist in self.files_to_keep,
             # so we can trash everything else
-            r'^(?:word|ppt)/_rels/',
+            r'^(?:word|ppt|xl)/_rels/',
         }))
 
         if self.__fill_files_to_keep_via_content_types() is False:
