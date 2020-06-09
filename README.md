@@ -93,6 +93,13 @@ Note that mat2 **will not** clean files in-place, but will produce, for
 example, with a file named "myfile.png" a cleaned version named
 "myfile.cleaned.png".
 
+# Supported formats
+
+The following formats are supported: avi, bmp, css, epub/ncx, flac, gif, jpeg,
+m4a/mp2/mp3/…, mp4, odc/odf/odg/odi/odp/ods/odt/…, off/opus/oga/spx/…, pdf,
+png, ppm, pptx/xlsx/docx/…, svg/svgz/…, tar/tar.gz/tar.bz2/tar.xz/…, tiff,
+torrent, wav, wmv, zip, …
+  
 # Notes about detecting metadata
 
 While mat2 is doing its very best to display metadata when the `--show` flag is
