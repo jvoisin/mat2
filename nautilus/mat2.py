@@ -2,7 +2,7 @@
 
 """
 Because writing GUI is non-trivial (cf. https://0xacab.org/jvoisin/mat2/issues/3),
-we decided to write a Nautilus extensions instead
+we decided to write a Nautilus extension instead
 (cf. https://0xacab.org/jvoisin/mat2/issues/2).
 
 The code is a little bit convoluted because Gtk isn't thread-safe,
@@ -36,7 +36,7 @@ def _remove_metadata(fpath) -> Tuple[bool, Optional[str]]:
     return parser.remove_all(), mtype
 
 class Mat2Extension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationWidgetProvider):
-    """ This class adds an item to the right-clic menu in Nautilus. """
+    """ This class adds an item to the right-click menu in Nautilus. """
 
     def __init__(self):
         super().__init__()
