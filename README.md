@@ -138,6 +138,10 @@ Should a more private contact be needed (eg. for reporting security issues),
 you can email Julien (jvoisin) Voisin at `julien.voisin+mat2@dustri.org`,
 using the gpg key `9FCDEE9E1A381F311EA62A7404D041E8171901CC`.
 
+# Donations
+
+If you want to donate some money, please give it to [Tails]( https://tails.boum.org/donate/?r=contribute ).
+
 # License
 
 This program is free software: you can redistribute it and/or modify
