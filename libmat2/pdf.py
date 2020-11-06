@@ -84,6 +84,9 @@ class PDFParser(abstract.AbstractParser):
 
         for pagenum in range(pages_count):
             page = document.get_page(pagenum)
+            if page is None:
+                logging.error("Unable to get PDF pages")
+                return False
             page_width, page_height = page.get_size()
             logging.info("Rendering page %d/%d", pagenum + 1, pages_count)
 
