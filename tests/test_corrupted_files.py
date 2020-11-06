@@ -89,9 +89,8 @@ class TestExplicitelyUnsupportedFiles(unittest.TestCase):
 class TestWrongContentTypesFileOffice(unittest.TestCase):
     def test_office_incomplete(self):
         shutil.copy('./tests/data/malformed_content_types.docx', './tests/data/clean.docx')
-        p = office.MSOfficeParser('./tests/data/clean.docx')
-        self.assertIsNotNone(p)
-        self.assertFalse(p.remove_all())
+        with self.assertRaises(ValueError):
+            office.MSOfficeParser('./tests/data/clean.docx')
         os.remove('./tests/data/clean.docx')
 
     def test_office_broken(self):
