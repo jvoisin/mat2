@@ -93,8 +93,8 @@ class MSOfficeParser(ZipParser):
             r'^(?:word|ppt|xl)/styles\.xml$',
             # TODO: randomize axId ( https://docs.microsoft.com/en-us/openspecs/office_standards/ms-oi29500/089f849f-fcd6-4fa0-a281-35aa6a432a16 )
             r'^(?:word|ppt|xl)/charts/chart[0-9]*\.xml$',
-            r'^xl//workbook.xml$',
-            r'^xl//worksheets/sheet[0-9]+.xml$',
+            r'^xl/workbook\.xml$',
+            r'^xl/worksheets/sheet[0-9]+\.xml$',
             r'^ppt/slideLayouts/_rels/slideLayout[0-9]+\.xml\.rels$',
             r'^ppt/slideLayouts/slideLayout[0-9]+\.xml$',
             r'^(?:word|ppt|xl)/tableStyles\.xml$',
