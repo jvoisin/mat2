@@ -271,7 +271,7 @@ class MSOfficeParser(ZipParser):
             return False
 
         if len(namespace.items()) != 1:
-            return False  # there should be only one namespace for Types
+            logging.debug("Got several namespaces for Types: %s", namespace.items())
 
         removed_fnames = set()
         with zipfile.ZipFile(self.filename) as zin:
