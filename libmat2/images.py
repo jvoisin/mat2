@@ -41,7 +41,7 @@ class SVGParser(exiftool.ExiftoolParser):
 
         # The namespace is mandatory, but only the …/2000/svg is valid.
         ns = 'http://www.w3.org/2000/svg'
-        if meta.get('Xmlns', ns) == ns:
+        if meta.get('Xmlns') == ns:
             meta.pop('Xmlns')
         return meta
 
