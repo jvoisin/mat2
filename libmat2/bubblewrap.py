@@ -37,7 +37,7 @@ def _get_bwrap_args(tempdir: str,
 
     # XXX: use --ro-bind-try once all supported platforms
     # have a bubblewrap recent enough to support it.
-    ro_bind_dirs = ['/usr', '/lib', '/lib64', '/bin', '/sbin', cwd]
+    ro_bind_dirs = ['/usr', '/lib', '/lib64', '/bin', '/sbin', '/etc/alternatives', cwd]
     for bind_dir in ro_bind_dirs:
         if os.path.isdir(bind_dir):  # pragma: no cover
             ro_bind_args.extend(['--ro-bind', bind_dir, bind_dir])
