@@ -147,7 +147,7 @@ class MSOfficeParser(ZipParser):
         except ET.ParseError:
             return False
         for c in tree:
-            if 'PartName' not in c.attrib or 'ContentType' not in c.attrib:
+            if 'PartName' not in c.attrib or 'ContentType' not in c.attrib:  # pragma: no cover
                 continue
             elif c.attrib['ContentType'] in self.content_types_to_keep:
                 fname = c.attrib['PartName'][1:]  # remove leading `/`
@@ -270,7 +270,7 @@ class MSOfficeParser(ZipParser):
             logging.error("Unable to parse %s: %s", full_path, e)
             return False
 
-        if len(namespace.items()) != 1:
+        if len(namespace.items()) != 1:  # pragma: no cover
             logging.debug("Got several namespaces for Types: %s", namespace.items())
 
         removed_fnames = set()
@@ -361,7 +361,7 @@ class MSOfficeParser(ZipParser):
         if full_path.endswith('/[Content_Types].xml'):
             # this file contains references to files that we might
             # remove, and MS Office doesn't like dangling references
-            if self.__remove_content_type_members(full_path) is False:
+            if self.__remove_content_type_members(full_path) is False:  # pragma: no cover
                 return False
         elif full_path.endswith('/word/document.xml'):
             # this file contains the revisions
