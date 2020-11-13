@@ -29,7 +29,7 @@ class TestHelp(unittest.TestCase):
         self.assertIn(b' [-v] [-l]', stdout)
         self.assertIn(b'[--check-dependencies]', stdout)
         self.assertIn(b'[-L | -s]', stdout)
-        self.assertIn(b'[files [files ...]]', stdout)
+        self.assertIn(b'[files ...]', stdout)
 
     def test_no_arg(self):
         proc = subprocess.Popen(mat2_binary, stdout=subprocess.PIPE)
@@ -39,7 +39,7 @@ class TestHelp(unittest.TestCase):
         self.assertIn(b'[--inplace]', stdout)
         self.assertIn(b'[--no-sandbox]', stdout)
         self.assertIn(b' [-v] [-l] [--check-dependencies] [-L | -s]', stdout)
-        self.assertIn(b'[files [files ...]]', stdout)
+        self.assertIn(b'[files ...]', stdout)
 
 
 class TestVersion(unittest.TestCase):
