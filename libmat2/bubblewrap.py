@@ -29,7 +29,6 @@ def _get_bwrap_path() -> str:
     raise RuntimeError("Unable to find bwrap")  # pragma: no cover
 
 
-# pylint: disable=bad-whitespace
 def _get_bwrap_args(tempdir: str,
                     input_filename: str,
                     output_filename: Optional[str] = None) -> List[str]:
@@ -77,7 +76,6 @@ def _get_bwrap_args(tempdir: str,
     return args
 
 
-# pylint: disable=bad-whitespace
 def run(args: List[str],
         input_filename: str,
         output_filename: Optional[str] = None,
