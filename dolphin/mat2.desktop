@@ -1,6 +1,6 @@
 [Desktop Entry]
 X-KDE-ServiceTypes=KonqPopupMenu/Plugin
-MimeType=application/pdf;application/vnd.oasis.opendocument.chart ;application/vnd.oasis.opendocument.formula ;application/vnd.oasis.opendocument.graphics ;application/vnd.oasis.opendocument.image ;application/vnd.oasis.opendocument.presentation ;application/vnd.oasis.opendocument.spreadsheet ;application/vnd.oasis.opendocument.text ;application/vnd.openxmlformats-officedocument.presentationml.presentation ;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet ;application/vnd.openxmlformats-officedocument.wordprocessingml.document ;application/x-bittorrent ;application/zip ;audio/flac ;audio/mpeg ;audio/ogg ;audio/x-flac ;image/jpeg ;image/png ;image/tiff ;image/x-ms-bmp ;text/plain ;video/mp4 ;video/x-msvideo;
+MimeType=application/pdf;application/vnd.oasis.opendocument.chart;application/vnd.oasis.opendocument.formula;application/vnd.oasis.opendocument.graphics;application/vnd.oasis.opendocument.image;application/vnd.oasis.opendocument.presentation;application/vnd.oasis.opendocument.spreadsheet;application/vnd.oasis.opendocument.text;application/vnd.openxmlformats-officedocument.presentationml.presentation;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;application/vnd.openxmlformats-officedocument.wordprocessingml.document;application/x-bittorrent;application/zip;audio/flac;audio/mpeg;audio/ogg;audio/x-flac;image/jpeg;image/png;image/tiff;image/x-ms-bmp;text/plain;video/mp4;video/x-msvideo;
 Actions=cleanMetadata;
 Type=Service
 
