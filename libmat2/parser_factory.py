@@ -40,7 +40,10 @@ def _get_parsers() -> List[T]:
 
 
 def get_parser(filename: str) -> Tuple[Optional[T], Optional[str]]:
-    """ Return the appropriate parser for a given filename. """
+    """ Return the appropriate parser for a given filename.
+
+        :raises ValueError: Raised if the instantiation of the parser went wrong.
+    """
     mtype, _ = mimetypes.guess_type(filename)
 
     _, extension = os.path.splitext(filename)
@@ -53,10 +56,6 @@ def get_parser(filename: str) -> Tuple[Optional[T], Optional[str]]:
 
     for parser_class in _get_parsers():  # type: ignore
         if mtype in parser_class.mimetypes:
-            try:
-                return parser_class(filename), mtype
-            except ValueError as e:
-                logging.info("Got an exception when trying to instantiate "
-                             "%s for %s: %s", parser_class, filename, e)
-                return None, mtype
+            # This instantiation might raise a ValueError on malformed files
+            return parser_class(filename), mtype
     return None, mtype

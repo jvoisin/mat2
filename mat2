@@ -85,7 +85,11 @@ def show_meta(filename: str, sandbox: bool):
     if not __check_file(filename):
         return
 
-    p, mtype = parser_factory.get_parser(filename)  # type: ignore
+    try:
+        p, mtype = parser_factory.get_parser(filename)  # type: ignore
+    except ValueError as e:
+        print("[-] something went wrong when processing %s: %s" % (filename, e))
+        return
     if p is None:
         print("[-] %s's format (%s) is not supported" % (filename, mtype))
         return
@@ -126,7 +130,11 @@ def clean_meta(filename: str, is_lightweight: bool, inplace: bool, sandbox: bool
     if not __check_file(filename, mode):
         return False
 
-    p, mtype = parser_factory.get_parser(filename)  # type: ignore
+    try:
+        p, mtype = parser_factory.get_parser(filename)  # type: ignore
+    except ValueError as e:
+        print("[-] something went wrong when cleaning %s: %s" % (filename, e))
+        return False
     if p is None:
         print("[-] %s's format (%s) is not supported" % (filename, mtype))
         return False
