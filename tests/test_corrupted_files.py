@@ -65,8 +65,10 @@ class TestCorruptedEmbedded(unittest.TestCase):
     def test_docx(self):
         shutil.copy('./tests/data/embedded_corrupted.docx', './tests/data/clean.docx')
         parser, _ = parser_factory.get_parser('./tests/data/clean.docx')
-        self.assertFalse(parser.remove_all())
-        self.assertIsNotNone(parser.get_meta())
+        with self.assertRaises(ValueError):
+            parser.remove_all()
+        with self.assertRaises(ValueError):
+            self.assertIsNotNone(parser.get_meta())
         os.remove('./tests/data/clean.docx')
 
     def test_odt(self):
@@ -120,8 +122,8 @@ class TestCorruptedFiles(unittest.TestCase):
 
     def test_png2(self):
         shutil.copy('./tests/test_libmat2.py', './tests/clean.png')
-        parser, _ = parser_factory.get_parser('./tests/clean.png')
-        self.assertIsNone(parser)
+        with self.assertRaises(ValueError):
+            parser_factory.get_parser('./tests/clean.png')
         os.remove('./tests/clean.png')
 
     def test_torrent(self):
@@ -237,10 +239,10 @@ class TestCorruptedFiles(unittest.TestCase):
             zout.write('./tests/data/embedded_corrupted.docx')
         p, mimetype = parser_factory.get_parser('./tests/data/clean.zip')
         self.assertEqual(mimetype, 'application/zip')
-        meta = p.get_meta()
-        self.assertEqual(meta['tests/data/dirty.flac']['comments'], 'Thank you for using MAT !')
-        self.assertEqual(meta['tests/data/dirty.docx']['word/media/image1.png']['Comment'], 'This is a comment, be careful!')
-        self.assertFalse(p.remove_all())
+        with self.assertRaises(ValueError):
+            p.get_meta()
+        with self.assertRaises(ValueError):
+            self.assertFalse(p.remove_all())
         os.remove('./tests/data/clean.zip')
 
     def test_html(self):
@@ -315,10 +317,10 @@ class TestCorruptedFiles(unittest.TestCase):
                 zout.addfile(tarinfo, f)
         p, mimetype = parser_factory.get_parser('./tests/data/clean.tar')
         self.assertEqual(mimetype, 'application/x-tar')
-        meta = p.get_meta()
-        self.assertEqual(meta['./tests/data/dirty.flac']['comments'], 'Thank you for using MAT !')
-        self.assertEqual(meta['./tests/data/dirty.docx']['word/media/image1.png']['Comment'], 'This is a comment, be careful!')
-        self.assertFalse(p.remove_all())
+        with self.assertRaises(ValueError):
+            p.get_meta()
+        with self.assertRaises(ValueError):
+            self.assertFalse(p.remove_all())
         os.remove('./tests/data/clean.tar')
 
         shutil.copy('./tests/data/dirty.png', './tests/data/clean.tar')
