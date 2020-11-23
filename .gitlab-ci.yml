@@ -66,7 +66,7 @@ tests:debian_with_bubblewrap:
   <<: *prepare_env
   script:
     - su - mat2 -c "python3-coverage run --branch -m unittest discover -s tests/"
-    - su - mat2 -c "python3-coverage report --fail-under=100 -m --include 'libmat2/*'"
+    - su - mat2 -c "python3-coverage report --fail-under=95 -m --include 'libmat2/*'"
 
 tests:fedora:
   image: $CONTAINER_REGISTRY:fedora
