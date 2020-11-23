@@ -1,4 +1,3 @@
-import logging
 import glob
 import os
 import mimetypes
