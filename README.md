@@ -93,6 +93,11 @@ Note that mat2 **will not** clean files in-place, but will produce, for
 example, with a file named "myfile.png" a cleaned version named
 "myfile.cleaned.png".
 
+## Web interface
+
+It's possible to run mat2 as a web service, via
+[mat2-web](https://0xacab.org/jvoisin/mat2-web).
+
 # Supported formats
 
 The following formats are supported: avi, bmp, css, epub/ncx, flac, gif, jpeg,
