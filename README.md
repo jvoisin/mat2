@@ -98,6 +98,11 @@ example, with a file named "myfile.png" a cleaned version named
 It's possible to run mat2 as a web service, via
 [mat2-web](https://0xacab.org/jvoisin/mat2-web).
 
+## Desktop GUI
+
+For GNU/Linux desktops, it's possible to use the
+[Metadata Cleaner](https://gitlab.com/rmnvgr/metadata-cleaner) GTK application.
+
 # Supported formats
 
 The following formats are supported: avi, bmp, css, epub/ncx, flac, gif, jpeg,
@@ -179,4 +184,3 @@ mat2 wouldn't exist without:
 - friends
 
 Many thanks to them!
-
