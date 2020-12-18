@@ -1,3 +1,13 @@
+# 0.12.0 - 2020-12-18
+
+- Improve significantly MS Office formats support
+- Fix some typos in the Nautilus extension
+- Improve reliability of the mp3, pdf and svg parsers
+- Improve compatibility with ffmpeg when sandboxing is used
+- Improve the dolphin extension usability
+- libmat2 now raises a ValueError on malformed files while trying to 
+  find the right parser, instead of returning None
+
 # 0.11.0 - 2020-03-29
 
 - Improve significantly MS Office formats support
