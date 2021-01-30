@@ -15,11 +15,12 @@ class EPUBParser(archive.ZipParser):
             'META-INF/container.xml',
             'mimetype',
             'OEBPS/content.opf',
+            'content.opf',
             }))
         self.uniqid = uuid.uuid4()
 
     def _specific_get_meta(self, full_path, file_path):
-        if file_path != 'OEBPS/content.opf':
+        if not file_path.endswith('content.opf'):
             return {}
 
         with open(full_path, encoding='utf-8') as f:
@@ -31,7 +32,7 @@ class EPUBParser(archive.ZipParser):
                 return {file_path: 'harmful content', }
 
     def _specific_cleanup(self, full_path: str):
-        if full_path.endswith('OEBPS/content.opf'):
+        if full_path.endswith('content.opf'):
             return self.__handle_contentopf(full_path)
         elif full_path.endswith('OEBPS/toc.ncx'):
             return self.__handle_tocncx(full_path)
