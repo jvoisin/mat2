@@ -16,11 +16,17 @@ class EPUBParser(archive.ZipParser):
             'mimetype',
             'OEBPS/content.opf',
             'content.opf',
+            'hmh.opf',
+            'OPS/.+.xml'
             }))
+        self.files_to_omit = set(map(re.compile, {  # type: ignore
+            'iTunesMetadata.plist'
+            'META-INF/calibre_bookmarks.txt'
+             }))
         self.uniqid = uuid.uuid4()
 
     def _specific_get_meta(self, full_path, file_path):
-        if not file_path.endswith('content.opf'):
+        if not file_path.endswith('.opf'):
             return {}
 
         with open(full_path, encoding='utf-8') as f:
@@ -32,11 +38,29 @@ class EPUBParser(archive.ZipParser):
                 return {file_path: 'harmful content', }
 
     def _specific_cleanup(self, full_path: str):
-        if full_path.endswith('content.opf'):
+        if full_path.endswith('hmh.opf') or full_path.endswith('content.opf'):
             return self.__handle_contentopf(full_path)
         elif full_path.endswith('OEBPS/toc.ncx'):
             return self.__handle_tocncx(full_path)
+        elif re.search('/OPS/[^/]+.xml$', full_path):
+            return self.__handle_ops_xml(full_path)
         return True
+
+    def __handle_ops_xml(self, full_path: str):
+        try:
+            tree, namespace = office._parse_xml(full_path)
+        except ET.ParseError:  # pragma: nocover
+            logging.error("Unable to parse %s in %s.", full_path, self.filename)
+            return False
+
+        for item in tree.iterfind('.//', namespace):  # pragma: nocover
+            if item.tag.strip().lower().endswith('head'):
+                item.clear()
+                break
+        tree.write(full_path, xml_declaration=True, encoding='utf-8',
+                   short_empty_elements=False)
+        return True
+
 
     def __handle_tocncx(self, full_path: str):
         try:
