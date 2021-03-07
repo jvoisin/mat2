@@ -2,6 +2,7 @@ import logging
 import re
 import uuid
 import xml.etree.ElementTree as ET  # type: ignore
+from typing import Dict, Any
 
 from . import archive, office
 
@@ -38,7 +39,7 @@ class EPUBParser(archive.ZipParser):
             except (TypeError, UnicodeDecodeError):
                 return {file_path: 'harmful content', }
 
-    def _specific_cleanup(self, full_path: str):
+    def _specific_cleanup(self, full_path: str) -> bool:
         if full_path.endswith('hmh.opf') or full_path.endswith('content.opf'):
             return self.__handle_contentopf(full_path)
         elif full_path.endswith('OEBPS/toc.ncx'):
@@ -47,7 +48,7 @@ class EPUBParser(archive.ZipParser):
             return self.__handle_ops_xml(full_path)
         return True
 
-    def __handle_ops_xml(self, full_path: str):
+    def __handle_ops_xml(self, full_path: str) -> bool:
         try:
             tree, namespace = office._parse_xml(full_path)
         except ET.ParseError:  # pragma: nocover
@@ -63,7 +64,7 @@ class EPUBParser(archive.ZipParser):
         return True
 
 
-    def __handle_tocncx(self, full_path: str):
+    def __handle_tocncx(self, full_path: str) -> bool:
         try:
             tree, namespace = office._parse_xml(full_path)
         except ET.ParseError:  # pragma: nocover
@@ -79,7 +80,7 @@ class EPUBParser(archive.ZipParser):
                    short_empty_elements=False)
         return True
 
-    def __handle_contentopf(self, full_path: str):
+    def __handle_contentopf(self, full_path: str) -> bool:
         try:
             tree, namespace = office._parse_xml(full_path)
         except ET.ParseError:
