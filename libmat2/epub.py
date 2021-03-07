@@ -1,6 +1,7 @@
 import logging
 import re
 import uuid
+import zipfile
 import xml.etree.ElementTree as ET  # type: ignore
 from typing import Dict, Any
 
@@ -27,7 +28,16 @@ class EPUBParser(archive.ZipParser):
              }))
         self.uniqid = uuid.uuid4()
 
-    def _specific_get_meta(self, full_path, file_path):
+
+    def is_archive_valid(self):
+        super().is_archive_valid()
+        with zipfile.ZipFile(self.filename) as zin:
+            for item in self._get_all_members(zin):
+                member_name = self._get_member_name(item)
+                if member_name.endswith('META-INF/encryption.xml'):
+                    raise ValueError('the file contains encrypted fonts')
+
+    def _specific_get_meta(self, full_path, file_path) -> Dict[str, Any]:
         if not file_path.endswith('.opf'):
             return {}
 
