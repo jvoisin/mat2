@@ -20,8 +20,8 @@ class EPUBParser(archive.ZipParser):
             'OPS/.+.xml'
             }))
         self.files_to_omit = set(map(re.compile, {  # type: ignore
-            'iTunesMetadata.plist'
-            'META-INF/calibre_bookmarks.txt'
+            'iTunesMetadata.plist',
+            'META-INF/calibre_bookmarks.txt',
              }))
         self.uniqid = uuid.uuid4()
 
