@@ -87,6 +87,7 @@ class MSOfficeParser(ZipParser):
         self.files_to_keep = set(map(re.compile, {  # type: ignore
             r'^\[Content_Types\]\.xml$',
             r'^_rels/\.rels$',
+            r'^xl/sharedStrings\.xml$',  # https://docs.microsoft.com/en-us/office/open-xml/working-with-the-shared-string-table
             r'^(?:word|ppt|xl)/_rels/document\.xml\.rels$',
             r'^(?:word|ppt|xl)/_rels/footer[0-9]*\.xml\.rels$',
             r'^(?:word|ppt|xl)/_rels/header[0-9]*\.xml\.rels$',
