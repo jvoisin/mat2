@@ -108,6 +108,7 @@ class MSOfficeParser(ZipParser):
             r'^ppt/slideMasters/_rels/slideMaster[0-9]+\.xml\.rels',
         }))
         self.files_to_omit = set(map(re.compile, {  # type: ignore
+            r'^\[trash\]/',
             r'^customXml/',
             r'webSettings\.xml$',
             r'^docProps/custom\.xml$',
