@@ -1,3 +1,8 @@
+# 0.12.1 - 2021-03-19
+
+- Improve epub support
+- Improve MS Office support
+
 # 0.12.0 - 2020-12-18
 
 - Improve significantly MS Office formats support
