@@ -230,6 +230,11 @@ class TestGetMeta(unittest.TestCase):
         p = images.SVGParser('./tests/data/weird.svg')
         self.assertEqual(p.get_meta()['Xmlns'], 'http://www.w3.org/1337/svg')
 
+    def test_aiff(self):
+        p = audio.AIFFParser('./tests/data/dirty.aiff')
+        meta = p.get_meta()
+        self.assertEqual(meta['Name'], 'I am so')
+
 
 class TestRemovingThumbnails(unittest.TestCase):
     def test_odt(self):
@@ -312,6 +317,12 @@ class TestCleaning(unittest.TestCase):
             'meta': {'Comment': 'Zomg, a comment!'},
             'expected_meta': {},
         }, {
+            'name': 'aiff',
+            'parser': audio.AIFFParser,
+            'meta': {'Annotation': 'Thank you for using MAT !'},
+            'expected_meta': {},
+        },
+        {
             'name': 'mp3',
             'parser': audio.MP3Parser,
             'meta': {'TXXX:I am a': 'various comment'},

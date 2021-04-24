@@ -90,3 +90,14 @@ class WAVParser(video.AbstractFFmpegParser):
                       'FileSize', 'FileType', 'FileTypeExtension',
                       'MIMEType', 'NumChannels', 'SampleRate', 'SourceFile',
                      }
+
+class AIFFParser(video.AbstractFFmpegParser):
+    mimetypes = {'audio/aiff', 'audio/x-aiff'}
+    meta_allowlist = {'AvgBytesPerSec', 'BitsPerSample', 'Directory',
+                      'Duration', 'Encoding', 'ExifToolVersion',
+                      'FileAccessDate', 'FileInodeChangeDate',
+                      'FileModifyDate', 'FileName', 'FilePermissions',
+                      'FileSize', 'FileType', 'FileTypeExtension',
+                      'MIMEType', 'NumChannels', 'SampleRate', 'SourceFile',
+                      'NumSampleFrames', 'SampleSize',
+                     }
