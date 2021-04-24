@@ -231,7 +231,7 @@ class Mat2Extension(GObject.GObject, Nautilus.MenuProvider, Nautilus.LocationWid
         """
         # Do not show the menu item if not a single file has a chance to be
         # processed by mat2.
-        if not any([is_valid for (is_valid, _) in map(self.__validate, files)]):
+        if not any((is_valid for (is_valid, _) in map(self.__validate, files))):
             return None
 
         item = Nautilus.MenuItem(
