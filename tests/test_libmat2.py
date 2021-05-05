@@ -453,7 +453,7 @@ class TestCleaning(unittest.TestCase):
                 'Encoder':  'HandBrake 0.9.4 2009112300',
             },
             'expected_meta': {
-                'BufferSize': '1337',
+                'BufferSize': 0,
                 'CompatibleBrands': ['isom', 'iso2', 'avc1', 'mp41'],
                 'ColorRepresentation': 'nclx 1 1 1',
                 'CompressorID': 'avc1',
