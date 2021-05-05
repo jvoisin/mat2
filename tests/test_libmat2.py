@@ -453,7 +453,7 @@ class TestCleaning(unittest.TestCase):
                 'Encoder':  'HandBrake 0.9.4 2009112300',
             },
             'expected_meta': {
-                'AverageBitrate': 1337,
+                'AverageBitrate': 465641,
                 'BufferSize': 0,
                 'CompatibleBrands': ['isom', 'iso2', 'avc1', 'mp41'],
                 'ColorRepresentation': 'nclx 1 1 1',
@@ -515,6 +515,7 @@ class TestCleaning(unittest.TestCase):
             self.assertTrue(p1.remove_all())
 
             p2 = case['parser'](p1.output_filename)
+            print('META: %s' % p2.get_meta().items())
             for k, v in p2.get_meta().items():
                 self.assertIn(k, case['expected_meta'])
                 self.assertEqual(v, case['expected_meta'][k])
