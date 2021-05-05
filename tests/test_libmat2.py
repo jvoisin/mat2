@@ -462,7 +462,7 @@ class TestCleaning(unittest.TestCase):
                 'HandlerType': 'Metadata',
                 'HandlerVendorID': 'Apple',
                 'MajorBrand': 'MP4  Base Media v1 [IS0 14496-12:2003]',
-                'MaxBitrate': 1337,
+                'MaxBitrate': 465641,
                 'MediaDataOffset': 48,
                 'MediaDataSize': 379872,
                 'MediaHeaderVersion': 0,
