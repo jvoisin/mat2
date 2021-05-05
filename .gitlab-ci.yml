@@ -63,6 +63,7 @@ tests:debian:
 tests:debian_with_bubblewrap:
   image: $CONTAINER_REGISTRY:debian
   stage: test
+  allow_failure: true
   <<: *prepare_env
   script:
     - su - mat2 -c "python3-coverage run --branch -m unittest discover -s tests/"
