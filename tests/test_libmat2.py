@@ -454,7 +454,7 @@ class TestCleaning(unittest.TestCase):
             },
             'expected_meta': {
                 'CompatibleBrands': ['isom', 'iso2', 'avc1', 'mp41'],
-                'ColorRepresentation': '1337',
+                'ColorRepresentation': 'nclx 1 1 1',
                 'CompressorID': 'avc1',
                 'GraphicsMode': 'srcCopy',
                 'HandlerDescription': 'SoundHandler',
