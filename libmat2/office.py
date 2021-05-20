@@ -107,6 +107,7 @@ class MSOfficeParser(ZipParser):
             # TODO: check if p:bgRef can be randomized
             r'^ppt/slideMasters/slideMaster[0-9]+\.xml',
             r'^ppt/slideMasters/_rels/slideMaster[0-9]+\.xml\.rels',
+            r'^xl/worksheets/_rels/sheet[0-9]+\.xml\.rels',
         }))
         self.files_to_omit = set(map(re.compile, {  # type: ignore
             r'^\[trash\]/',
