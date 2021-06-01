@@ -6,6 +6,8 @@ Type=Service
 
 [Desktop Action cleanMetadata]
 Name=Clean metadata
+Name[de]=Metadaten löschen
 Name[es]=Limpiar metadatos
 Icon=/usr/share/icons/hicolor/scalable/apps/mat2.svg
 Exec=kdialog --yesno  "$( mat2 -s %U )" --title "Clean Metadata?" && mat2 %U
+Exec[de]=kdialog --yesno  "$( mat2 -s %U )" --title "Metadaten löschen?" && mat2 %U
