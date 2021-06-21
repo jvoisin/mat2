@@ -63,7 +63,7 @@ class PNGParser(exiftool.ExiftoolParser):
 
         try:  # better fail here than later
             cairo.ImageSurface.create_from_png(self.filename)
-        except Exception:  # pragma: no cover
+        except:  # pragma: no cover
             # Cairo is returning some weird exceptions :/
             raise ValueError
 
