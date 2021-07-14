@@ -88,6 +88,7 @@ class MSOfficeParser(ZipParser):
             r'^\[Content_Types\]\.xml$',
             r'^_rels/\.rels$',
             r'^xl/sharedStrings\.xml$',  # https://docs.microsoft.com/en-us/office/open-xml/working-with-the-shared-string-table
+            r'^xl/calcChain\.xml$',
             r'^(?:word|ppt|xl)/_rels/document\.xml\.rels$',
             r'^(?:word|ppt|xl)/_rels/footer[0-9]*\.xml\.rels$',
             r'^(?:word|ppt|xl)/_rels/header[0-9]*\.xml\.rels$',
@@ -108,6 +109,8 @@ class MSOfficeParser(ZipParser):
             r'^ppt/slideMasters/slideMaster[0-9]+\.xml',
             r'^ppt/slideMasters/_rels/slideMaster[0-9]+\.xml\.rels',
             r'^xl/worksheets/_rels/sheet[0-9]+\.xml\.rels',
+            r'^xl/drawings/vmlDrawing[0-9]+\.vml',
+            r'^xl/drawings/drawing[0-9]+\.xml',
         }))
         self.files_to_omit = set(map(re.compile, {  # type: ignore
             r'^\[trash\]/',
@@ -124,6 +127,7 @@ class MSOfficeParser(ZipParser):
             # Additional presentation-wide properties like printing properties,
             # presentation show properties etc.
             r'^(?:word|ppt|xl)/presProps\.xml$',
+            r'^(?:word|ppt|xl)/comments[0-9]+\.xml$',
 
             # we have an allowlist in self.files_to_keep,
             # so we can trash everything else
