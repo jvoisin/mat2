@@ -108,7 +108,6 @@ class PDFParser(abstract.AbstractParser):
             if cairo.version_info < (1, 12, 0):
                 pdf_surface.set_size(width, height)
             else:
-                print("lol")
                 pdf_surface.set_size(page_width, page_height)
                 pdf_surface.set_device_scale(1 / self.__scale, 1 / self.__scale)
             pdf_context.set_source_surface(img, 0, 0)
