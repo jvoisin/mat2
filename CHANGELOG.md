@@ -1,3 +1,10 @@
+# 0.12.2 - 2021-08-29
+
+- Add support for aiff files
+- Improve MS Office support
+- Improve compatibility with newer/older version of mat2's dependencies
+- Fix possible issues with the resolution of processed pdf
+
 # 0.12.1 - 2021-03-19
 
 - Improve epub support
