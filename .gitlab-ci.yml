@@ -56,9 +56,11 @@ tests:archlinux:
 tests:debian:
   image: $CONTAINER_REGISTRY:debian
   stage: test
+  <<: *prepare_env
   script:
     - apt-get -qqy purge bubblewrap
-    - python3 -m unittest discover -v
+    - su - mat2 -c "python3-coverage run --branch -m unittest discover -s tests/"
+    - su - mat2 -c "python3-coverage report --fail-under=95 -m --include 'libmat2/*'"
 
 tests:debian_with_bubblewrap:
   image: $CONTAINER_REGISTRY:debian
@@ -66,8 +68,8 @@ tests:debian_with_bubblewrap:
   allow_failure: true
   <<: *prepare_env
   script:
-    - su - mat2 -c "python3-coverage run --branch -m unittest discover -s tests/"
-    - su - mat2 -c "python3-coverage report --fail-under=95 -m --include 'libmat2/*'"
+    - apt-get -qqy install bubblewrap
+    - python3 -m unittest discover -v
 
 tests:fedora:
   image: $CONTAINER_REGISTRY:fedora
