@@ -108,7 +108,7 @@ class EPUBParser(archive.ZipParser):
                 item.append(uniqid)
 
                 # items without mandatory content
-                for name in {'language', 'title'}:
+                for name in ['language', 'title']:
                     uniqid = ET.Element(self.metadata_namespace + name)
                     item.append(uniqid)
                 break  # there is only a single <metadata> block

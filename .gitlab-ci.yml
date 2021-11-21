@@ -31,7 +31,7 @@ linting:pylint:
   image: $CONTAINER_REGISTRY:linting
   stage: linting
   script:
-    - pylint --disable=no-else-return,no-else-raise,no-else-continue,unnecessary-comprehension,raise-missing-from,unsubscriptable-object --extension-pkg-whitelist=cairo,gi ./libmat2 ./mat2
+    - pylint --disable=no-else-return,no-else-raise,no-else-continue,unnecessary-comprehension,raise-missing-from,unsubscriptable-object,use-dict-literal,unspecified-encoding,consider-using-f-string,use-list-literal --extension-pkg-whitelist=cairo,gi ./libmat2 ./mat2
     # Once nautilus-python is in Debian, decomment it form the line below
     - pylint --disable=no-else-return,no-else-raise,no-else-continue,unnecessary-comprehension,raise-missing-from,unsubscriptable-object --extension-pkg-whitelist=Nautilus,GObject,Gtk,Gio,GLib,gi ./nautilus/mat2.py
 

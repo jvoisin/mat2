@@ -50,7 +50,7 @@ class AbstractFFmpegParser(exiftool.ExiftoolParser):
 
         ret = dict()  # type: Dict[str, Union[str, dict]]
         for key, value in meta.items():
-            if key in self.meta_key_value_allowlist.keys():
+            if key in self.meta_key_value_allowlist:
                 if value == self.meta_key_value_allowlist[key]:
                     continue
             ret[key] = value
