@@ -6,9 +6,6 @@
 
 ```
 
-This software is currently in **beta**, please don't use it for anything
-critical.
-
 # Metadata and privacy
 
 Metadata consist of information that characterizes data.
