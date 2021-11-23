@@ -13,8 +13,8 @@ import concurrent.futures
 try:
     from libmat2 import parser_factory, UNSUPPORTED_EXTENSIONS
     from libmat2 import check_dependencies, UnknownMemberPolicy
-except ValueError as e:
-    print(e)
+except ValueError as ex:
+    print(ex)
     sys.exit(1)
 
 __version__ = '0.12.2'

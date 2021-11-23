@@ -372,7 +372,8 @@ class ZipParser(ArchiveBasedAbstractParser):
 
     def is_archive_valid(self):
         try:
-            zipfile.ZipFile(self.filename)
+            with zipfile.ZipFile(self.filename):
+                pass
         except zipfile.BadZipFile:
             raise ValueError
 
