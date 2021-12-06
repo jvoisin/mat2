@@ -120,6 +120,18 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
         # pylint: disable=unused-argument
         return member
 
+    @staticmethod
+    def _get_member_compression(member: ArchiveMember):
+        """Get the compression of the archive member."""
+        # pylint: disable=unused-argument
+        return None
+
+    @staticmethod
+    def _set_member_compression(member: ArchiveMember, compression) -> ArchiveMember:
+        """Set the compression of the archive member."""
+        # pylint: disable=unused-argument
+        return member
+
     def get_meta(self) -> Dict[str, Union[str, dict]]:
         meta = dict()  # type: Dict[str, Union[str, dict]]
 
@@ -184,6 +196,8 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                 original_permissions = os.stat(full_path).st_mode
                 os.chmod(full_path, original_permissions | stat.S_IWUSR | stat.S_IRUSR)
 
+                original_compression = self._get_member_compression(item)
+
                 if self._specific_cleanup(full_path) is False:
                     logging.warning("Something went wrong during deep cleaning of %s",
                                     member_name)
@@ -223,6 +237,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
                 zinfo = self.member_class(member_name)  # type: ignore
                 zinfo = self._set_member_permissions(zinfo, original_permissions)
+                zinfo = self._set_member_compression(zinfo, original_compression)
                 clean_zinfo = self._clean_member(zinfo)
                 self._add_file_to_archive(zout, clean_zinfo, full_path)
 
@@ -368,7 +383,6 @@ class ZipParser(ArchiveBasedAbstractParser):
         super().__init__(filename)
         self.archive_class = zipfile.ZipFile
         self.member_class = zipfile.ZipInfo
-        self.zip_compression_type = zipfile.ZIP_DEFLATED
 
     def is_archive_valid(self):
         try:
@@ -410,7 +424,7 @@ class ZipParser(ArchiveBasedAbstractParser):
         assert isinstance(member, zipfile.ZipInfo)  # please mypy
         with open(full_path, 'rb') as f:
             archive.writestr(member, f.read(),
-                             compress_type=self.zip_compression_type)
+                             compress_type=member.compress_type)
 
     @staticmethod
     def _get_all_members(archive: ArchiveClass) -> List[ArchiveMember]:
@@ -421,3 +435,12 @@ class ZipParser(ArchiveBasedAbstractParser):
     def _get_member_name(member: ArchiveMember) -> str:
         assert isinstance(member, zipfile.ZipInfo)  # please mypy
         return member.filename
+
+    @staticmethod
+    def _get_member_compression(member: ArchiveMember):
+        return member.compress_type
+
+    @staticmethod
+    def _set_member_compression(member: ArchiveMember, compression) -> ArchiveMember:
+        member.compress_type = compression
+        return member

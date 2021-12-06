@@ -175,14 +175,30 @@ class TestGetMeta(unittest.TestCase):
 
     def test_zip(self):
         with zipfile.ZipFile('./tests/data/dirty.zip', 'w') as zout:
-            zout.write('./tests/data/dirty.flac')
-            zout.write('./tests/data/dirty.docx')
-            zout.write('./tests/data/dirty.jpg')
+            zout.write('./tests/data/dirty.flac',
+                       compress_type = zipfile.ZIP_STORED)
+            zout.write('./tests/data/dirty.docx',
+                       compress_type = zipfile.ZIP_DEFLATED)
+            zout.write('./tests/data/dirty.jpg',
+                       compress_type = zipfile.ZIP_BZIP2)
+            zout.write('./tests/data/dirty.txt',
+                       compress_type = zipfile.ZIP_LZMA)
         p, mimetype = parser_factory.get_parser('./tests/data/dirty.zip')
         self.assertEqual(mimetype, 'application/zip')
         meta = p.get_meta()
         self.assertEqual(meta['tests/data/dirty.flac']['comments'], 'Thank you for using MAT !')
         self.assertEqual(meta['tests/data/dirty.docx']['word/media/image1.png']['Comment'], 'This is a comment, be careful!')
+
+        with zipfile.ZipFile('./tests/data/dirty.zip') as zipin:
+            members = {
+                'tests/data/dirty.flac' : zipfile.ZIP_STORED,
+                'tests/data/dirty.docx': zipfile.ZIP_DEFLATED,
+                'tests/data/dirty.jpg' : zipfile.ZIP_BZIP2,
+                'tests/data/dirty.txt' : zipfile.ZIP_LZMA,
+            }
+            for k, v in members.items():
+                self.assertEqual(zipin.getinfo(k).compress_type, v)
+
         os.remove('./tests/data/dirty.zip')
 
     def test_wmv(self):
@@ -595,9 +611,14 @@ class TestCleaning(unittest.TestCase):
 class TestCleaningArchives(unittest.TestCase):
     def test_zip(self):
         with zipfile.ZipFile('./tests/data/dirty.zip', 'w') as zout:
-            zout.write('./tests/data/dirty.flac')
-            zout.write('./tests/data/dirty.docx')
-            zout.write('./tests/data/dirty.jpg')
+            zout.write('./tests/data/dirty.flac',
+                       compress_type = zipfile.ZIP_STORED)
+            zout.write('./tests/data/dirty.docx',
+                       compress_type = zipfile.ZIP_DEFLATED)
+            zout.write('./tests/data/dirty.jpg',
+                       compress_type = zipfile.ZIP_BZIP2)
+            zout.write('./tests/data/dirty.txt',
+                       compress_type = zipfile.ZIP_LZMA)
         p = archive.ZipParser('./tests/data/dirty.zip')
         meta = p.get_meta()
         self.assertEqual(meta['tests/data/dirty.docx']['word/media/image1.png']['Comment'], 'This is a comment, be careful!')
@@ -608,6 +629,16 @@ class TestCleaningArchives(unittest.TestCase):
         p = archive.ZipParser('./tests/data/dirty.cleaned.zip')
         self.assertEqual(p.get_meta(), {})
         self.assertTrue(p.remove_all())
+
+        with zipfile.ZipFile('./tests/data/dirty.zip') as zipin:
+            members = {
+                'tests/data/dirty.flac' : zipfile.ZIP_STORED,
+                'tests/data/dirty.docx': zipfile.ZIP_DEFLATED,
+                'tests/data/dirty.jpg' : zipfile.ZIP_BZIP2,
+                'tests/data/dirty.txt' : zipfile.ZIP_LZMA,
+            }
+            for k, v in members.items():
+                self.assertEqual(zipin.getinfo(k).compress_type, v)
 
         os.remove('./tests/data/dirty.zip')
         os.remove('./tests/data/dirty.cleaned.zip')
