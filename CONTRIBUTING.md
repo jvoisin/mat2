@@ -4,8 +4,14 @@ The main repository for mat2 is on [0xacab]( https://0xacab.org/jvoisin/mat2 ),
 but you can send patches to jvoisin by [email](https://dustri.org/) if you prefer.
 
 Do feel free to pick up [an issue]( https://0xacab.org/jvoisin/mat2/issues )
-and to send a pull-request. Please do check that everything is fine by running the
-testsuite with `python3 -m unittest discover -v` before submitting one :)
+and to send a pull-request.
+
+Before sending the pull-request, please do check that everything is fine by
+running the full test suite in GitLab. To do that, after forking mat2 in GitLab,
+you need to go in Settings -> CI/CD -> Runner and there enable shared runners.
+
+Mat2 also has unit tests (that are also run in the full test suite). You can run
+them with `python3 -m unittest discover -v`.
 
 If you're fixing a bug or adding a new feature, please add tests accordingly,
 this will greatly improve the odds of your merge-request getting merged.
