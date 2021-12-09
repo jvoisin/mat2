@@ -438,9 +438,11 @@ class ZipParser(ArchiveBasedAbstractParser):
 
     @staticmethod
     def _get_member_compression(member: ArchiveMember):
+        assert isinstance(member, zipfile.ZipInfo)  # please mypy
         return member.compress_type
 
     @staticmethod
     def _set_member_compression(member: ArchiveMember, compression) -> ArchiveMember:
+        assert isinstance(member, zipfile.ZipInfo)  # please mypy
         member.compress_type = compression
         return member
