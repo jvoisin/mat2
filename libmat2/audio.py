@@ -13,7 +13,8 @@ class MutagenParser(abstract.AbstractParser):
     def __init__(self, filename):
         super().__init__(filename)
         try:
-            mutagen.File(self.filename)
+            if mutagen.File(self.filename) is None:
+                raise ValueError
         except mutagen.MutagenError:
             raise ValueError
 

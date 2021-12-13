@@ -26,7 +26,10 @@ class SVGParser(exiftool.ExiftoolParser):
                       }
 
     def remove_all(self) -> bool:
-        svg = Rsvg.Handle.new_from_file(self.filename)
+        try:
+            svg = Rsvg.Handle.new_from_file(self.filename)
+        except GLib.GError:
+            raise ValueError
         dimensions = svg.get_dimensions()
         surface = cairo.SVGSurface(self.output_filename,
                                    dimensions.height,
