@@ -388,7 +388,7 @@ class ZipParser(ArchiveBasedAbstractParser):
         try:
             with zipfile.ZipFile(self.filename):
                 pass
-        except zipfile.BadZipFile:
+        except (zipfile.BadZipFile, OSError):
             raise ValueError
 
     @staticmethod
