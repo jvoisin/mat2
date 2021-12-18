@@ -41,6 +41,9 @@ class MP3Parser(MutagenParser):
         if not meta:
             return metadata
         for key in meta:
+            if isinstance(key, tuple):
+                metadata[key[0]] = key[1]
+                continue
             if not hasattr(meta[key], 'text'):  # pragma: no cover
                 continue
             metadata[key.rstrip(' \t\r\n\0')] = ', '.join(map(str, meta[key].text))
