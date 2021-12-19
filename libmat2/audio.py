@@ -27,8 +27,11 @@ class MutagenParser(abstract.AbstractParser):
     def remove_all(self) -> bool:
         shutil.copy(self.filename, self.output_filename)
         f = mutagen.File(self.output_filename)
-        f.delete()
-        f.save()
+        try:
+            f.delete()
+            f.save()
+        except mutagen.MutagenError:
+            raise ValueError
         return True
 
 
