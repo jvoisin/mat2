@@ -429,7 +429,7 @@ class TestCleaning(unittest.TestCase):
             'name': 'gif',
             'parser': images.GIFParser,
             'meta': {'Comment': 'this is a test comment'},
-            'expected_meta': {},
+            'expected_meta': {'TransparentColor': '5'},
         },{
             'name': 'css',
             'parser': web.CSSParser,
@@ -531,9 +531,11 @@ class TestCleaning(unittest.TestCase):
             self.assertTrue(p1.remove_all())
 
             p2 = case['parser'](p1.output_filename)
-            for k, v in p2.get_meta().items():
-                self.assertIn(k, case['expected_meta'])
-                self.assertIn(str(case['expected_meta'][k]), str(v))
+            meta = p2.get_meta()
+            if meta:
+                for k, v in p2.get_meta().items():
+                    self.assertIn(k, case['expected_meta'], '"%s" is not in "%s" (%s)' % (k, case['expected_meta'], case['name']))
+                    self.assertIn(str(case['expected_meta'][k]), str(v))
             self.assertTrue(p2.remove_all())
 
             os.remove(target)
