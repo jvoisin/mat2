@@ -179,7 +179,7 @@ class MSOfficeParser(ZipParser):
             return False
 
         # rsid, tags or attributes, are always under the `w` namespace
-        if 'w' not in namespace.keys():
+        if 'w' not in namespace:
             return True
 
         parent_map = {c:p for p in tree.iter() for c in p}
@@ -215,7 +215,7 @@ class MSOfficeParser(ZipParser):
             return False
 
         # The nsid tag is always under the `w` namespace
-        if 'w' not in namespace.keys():
+        if 'w' not in namespace:
             return True
 
         parent_map = {c:p for p in tree.iter() for c in p}
@@ -328,7 +328,7 @@ class MSOfficeParser(ZipParser):
             logging.error("Unable to parse %s: %s", full_path, e)
             return False
 
-        if 'p14' not in namespace.keys():
+        if 'p14' not in namespace:
             return True  # pragma: no cover
 
         for item in tree.iterfind('.//p14:creationId', namespace):
@@ -344,7 +344,7 @@ class MSOfficeParser(ZipParser):
             logging.error("Unable to parse %s: %s", full_path, e)
             return False
 
-        if 'p' not in namespace.keys():
+        if 'p' not in namespace:
             return True  # pragma: no cover
 
         for item in tree.iterfind('.//p:sldMasterId', namespace):
@@ -486,7 +486,7 @@ class LibreOfficeParser(ZipParser):
             logging.error("Unable to parse %s: %s", full_path, e)
             return False
 
-        if 'office' not in namespace.keys():  # no revisions in the current file
+        if 'office' not in namespace:  # no revisions in the current file
             return True
 
         for text in tree.getroot().iterfind('.//office:text', namespace):
