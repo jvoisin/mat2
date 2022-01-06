@@ -1,3 +1,11 @@
+# 0.12.3 - 2022-01-06
+
+- Implement code for internationalization
+- Keep individual files compression type in zip files
+- Increase the robustness of mat2 against weird/corrupted files
+- Fix the dolphin integration
+- Add a fuzzer
+
 # 0.12.2 - 2021-08-29
 
 - Add support for aiff files
