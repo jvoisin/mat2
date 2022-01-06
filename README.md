@@ -136,6 +136,8 @@ of the guarantee that mat2 won't modify the data of their files, there is the
 	watermarks from PDF.
 - [Scrambled Exif](https://f-droid.org/packages/com.jarsilio.android.scrambledeggsif/),
 	an open-source Android application to remove metadata from pictures.
+- [Dangerzone](https://dangerzone.rocks/), designed to sanitize harmful documents
+  into harmless ones.
 
 # Contact
 
