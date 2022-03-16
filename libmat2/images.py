@@ -30,12 +30,23 @@ class SVGParser(exiftool.ExiftoolParser):
             svg = Rsvg.Handle.new_from_file(self.filename)
         except GLib.GError:
             raise ValueError
-        dimensions = svg.get_dimensions()
-        surface = cairo.SVGSurface(self.output_filename,
-                                   dimensions.height,
-                                   dimensions.width)
+
+        try:
+            _, _, _, _, has_viewbox, viewbox = svg.get_intrinsic_dimensions()
+            if has_viewbox is False:
+                raise ValueError
+            _, width, height = svg.get_intrinsic_size_in_pixels()
+        except AttributeError:
+            dimensions = svg.get_dimensions()
+            height, width = dimensions.height, dimensions.width
+
+        surface = cairo.SVGSurface(self.output_filename, height, width)
         context = cairo.Context(surface)
-        svg.render_cairo(context)
+        try:
+            svg.render_document(context, viewbox)
+        except AttributeError:
+            svg.render_cairo(context)
+
         surface.finish()
         return True
 
