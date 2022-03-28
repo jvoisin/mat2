@@ -445,7 +445,10 @@ class TestCleaning(unittest.TestCase):
             'meta': {
                 'WorkDescription': "This is a test svg image for mat2's testsuite",
             },
-            'expected_meta': {},
+            'expected_meta': {
+                'ImageSize': '128x128',
+                'Megapixels': '0.016',
+            },
         } ,{
             'name': 'ppm',
             'parser': images.PPMParser,
@@ -506,41 +509,42 @@ class TestCleaning(unittest.TestCase):
 
     def test_all_parametred(self):
         for case in self.data:
-            if 'ffmpeg' in case:
-                try:
-                    video._get_ffmpeg_path()
-                except RuntimeError:
-                    raise unittest.SkipTest
+            with self.subTest(case=case):
+                if 'ffmpeg' in case:
+                    try:
+                        video._get_ffmpeg_path()
+                    except RuntimeError:
+                        raise unittest.SkipTest
 
-            print('[+] Testing %s' % case['name'])
-            target = './tests/data/clean.' + case['name']
-            shutil.copy('./tests/data/dirty.' + case['name'], target)
-            p1 = case['parser'](target)
+                print('[+] Testing %s' % case['name'])
+                target = './tests/data/clean.' + case['name']
+                shutil.copy('./tests/data/dirty.' + case['name'], target)
+                p1 = case['parser'](target)
 
-            for k, v in p1.get_meta().items():
-                if k not in case['meta']:
-                    continue
-                if isinstance(v, dict):
-                    for _k, _v in v.items():
-                        if _k in case['meta'][k]:
-                            self.assertEqual(_v, case['meta'][k][_k])
-                else:
-                    self.assertEqual(v, case['meta'][k])
+                for k, v in p1.get_meta().items():
+                    if k not in case['meta']:
+                        continue
+                    if isinstance(v, dict):
+                        for _k, _v in v.items():
+                            if _k in case['meta'][k]:
+                                self.assertEqual(_v, case['meta'][k][_k])
+                    else:
+                        self.assertEqual(v, case['meta'][k])
 
-            p1.lightweight_cleaning = True
-            self.assertTrue(p1.remove_all())
+                p1.lightweight_cleaning = True
+                self.assertTrue(p1.remove_all())
 
-            p2 = case['parser'](p1.output_filename)
-            meta = p2.get_meta()
-            if meta:
-                for k, v in p2.get_meta().items():
-                    self.assertIn(k, case['expected_meta'], '"%s" is not in "%s" (%s)' % (k, case['expected_meta'], case['name']))
-                    self.assertIn(str(case['expected_meta'][k]), str(v))
-            self.assertTrue(p2.remove_all())
+                p2 = case['parser'](p1.output_filename)
+                meta = p2.get_meta()
+                if meta:
+                    for k, v in p2.get_meta().items():
+                        self.assertIn(k, case['expected_meta'], '"%s" is not in "%s" (%s)' % (k, case['expected_meta'], case['name']))
+                        self.assertIn(str(case['expected_meta'][k]), str(v))
+                self.assertTrue(p2.remove_all())
 
-            os.remove(target)
-            os.remove(p1.output_filename)
-            os.remove(p2.output_filename)
+                os.remove(target)
+                os.remove(p1.output_filename)
+                os.remove(p2.output_filename)
 
 
     def test_html(self):
