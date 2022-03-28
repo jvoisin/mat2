@@ -22,6 +22,7 @@ if LooseVersion(poppler_version) < LooseVersion('0.46'):  # pragma: no cover
     raise ValueError("mat2 needs at least Poppler version 0.46 to work. \
 The installed version is %s." % poppler_version)  # pragma: no cover
 
+FIXED_PDF_VERSION = cairo.PDFVersion.VERSION_1_5
 
 class PDFParser(abstract.AbstractParser):
     mimetypes = {'application/pdf', }
@@ -52,6 +53,7 @@ class PDFParser(abstract.AbstractParser):
 
         tmp_path = tempfile.mkstemp()[1]
         pdf_surface = cairo.PDFSurface(tmp_path, 10, 10)  # resized later anyway
+        pdf_surface.restrict_to_version(FIXED_PDF_VERSION)
         pdf_context = cairo.Context(pdf_surface)  # context draws on the surface
 
         for pagenum in range(pages_count):
@@ -80,6 +82,7 @@ class PDFParser(abstract.AbstractParser):
 
         _, tmp_path = tempfile.mkstemp()
         pdf_surface = cairo.PDFSurface(tmp_path, 32, 32)  # resized later anyway
+        pdf_surface.restrict_to_version(FIXED_PDF_VERSION)
         pdf_context = cairo.Context(pdf_surface)
 
         for pagenum in range(pages_count):
