@@ -26,13 +26,19 @@ assert Union
 
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.WARNING)
 
+def __print_without_chars(s: str):
+    """ Remove control characters
+    We might use 'Cc' instead of 'C', but better safe than sorry
+    https://www.unicode.org/reports/tr44/#GC_Values_Table
+    """
+    print(''.join(ch for ch in s if not unicodedata.category(ch).startswith('C')))
 
 def __check_file(filename: str, mode: int = os.R_OK) -> bool:
     if not os.path.exists(filename):
-        print("[-] %s doesn't exist." % filename)
+        __print_without_chars("[-] %s doesn't exist." % filename)
         return False
     elif not os.path.isfile(filename):
-        print("[-] %s is not a regular file." % filename)
+        __print_without_chars("[-] %s is not a regular file." % filename)
         return False
     elif not os.access(filename, mode):
         mode_str = []  # type: List[str]
@@ -40,7 +46,7 @@ def __check_file(filename: str, mode: int = os.R_OK) -> bool:
             mode_str += 'readable'
         if mode & os.W_OK:
             mode_str += 'writeable'
-        print("[-] %s is not %s." % (filename, 'nor '.join(mode_str)))
+        __print_without_chars("[-] %s is not %s." % (filename, 'nor '.join(mode_str)))
         return False
     return True
 
@@ -88,10 +94,10 @@ def show_meta(filename: str, sandbox: bool):
     try:
         p, mtype = parser_factory.get_parser(filename)  # type: ignore
     except ValueError as e:
-        print("[-] something went wrong when processing %s: %s" % (filename, e))
+        __print_without_chars("[-] something went wrong when processing %s: %s" % (filename, e))
         return
     if p is None:
-        print("[-] %s's format (%s) is not supported" % (filename, mtype))
+        __print_without_chars("[-] %s's format (%s) is not supported" % (filename, mtype))
         return
     p.sandbox = sandbox
     __print_meta(filename, p.get_meta())
@@ -100,28 +106,22 @@ def show_meta(filename: str, sandbox: bool):
 def __print_meta(filename: str, metadata: dict, depth: int = 1):
     padding = " " * depth*2
     if not metadata:
-        print(padding + "No metadata found in %s." % filename)
+        __print_without_chars(padding + "No metadata found in %s." % filename)
         return
 
-    print("[%s] Metadata for %s:" % ('+'*depth, filename))
+    __print_without_chars("[%s] Metadata for %s:" % ('+'*depth, filename))
 
     for (k, v) in sorted(metadata.items()):
         if isinstance(v, dict):
             __print_meta(k, v, depth+1)
             continue
 
-        # Remove control characters
-        # We might use 'Cc' instead of 'C', but better safe than sorry
-        # https://www.unicode.org/reports/tr44/#GC_Values_Table
-        try:
-            v = ''.join(ch for ch in v if not unicodedata.category(ch).startswith('C'))
+        try:  # FIXME this is ugly.
+            __print_without_chars(padding + "  %s: %s" % (k, v))
+        except UnicodeEncodeError:
+            __print_without_chars(padding + "  %s: harmful content" % k)
         except TypeError:
             pass  # for things that aren't iterable
-
-        try:  # FIXME this is ugly.
-            print(padding + "  %s: %s" % (k, v))
-        except UnicodeEncodeError:
-            print(padding + "  %s: harmful content" % k)
 
 
 def clean_meta(filename: str, is_lightweight: bool, inplace: bool, sandbox: bool,
@@ -133,10 +133,10 @@ def clean_meta(filename: str, is_lightweight: bool, inplace: bool, sandbox: bool
     try:
         p, mtype = parser_factory.get_parser(filename)  # type: ignore
     except ValueError as e:
-        print("[-] something went wrong when cleaning %s: %s" % (filename, e))
+        __print_without_chars("[-] something went wrong when cleaning %s: %s" % (filename, e))
         return False
     if p is None:
-        print("[-] %s's format (%s) is not supported" % (filename, mtype))
+        __print_without_chars("[-] %s's format (%s) is not supported" % (filename, mtype))
         return False
     p.unknown_member_policy = policy
     p.lightweight_cleaning = is_lightweight
@@ -151,7 +151,7 @@ def clean_meta(filename: str, is_lightweight: bool, inplace: bool, sandbox: bool
                 os.rename(p.output_filename, filename)
         return ret
     except RuntimeError as e:
-        print("[-] %s can't be cleaned: %s" % (filename, e))
+        __print_without_chars("[-] %s can't be cleaned: %s" % (filename, e))
     return False
 
 
@@ -169,7 +169,7 @@ def show_parsers():
                 # mimetype, so there is not point in showing the mimetype at all
                 continue
             formats.add('  - %s (%s)' % (mtype, ', '.join(extensions)))
-    print('\n'.join(sorted(formats)))
+    __print_without_chars('\n'.join(sorted(formats)))
 
 
 def __get_files_recursively(files: List[str]) -> List[str]:
@@ -198,9 +198,9 @@ def main() -> int:
             show_parsers()
             return 0
         elif args.check_dependencies:
-            print("Dependencies for mat2 %s:" % __version__)
+            __print_without_chars("Dependencies for mat2 %s:" % __version__)
             for key, value in sorted(check_dependencies().items()):
-                print('- %s: %s %s' % (key, 'yes' if value['found'] else 'no',
+                __print_without_chars('- %s: %s %s' % (key, 'yes' if value['found'] else 'no',
                                        '(optional)' if not value['required'] else ''))
         else:
             arg_parser.print_help()
