@@ -221,14 +221,14 @@ def main() -> int:
         files = __get_files_recursively(args.files)
         # We have to use Processes instead of Threads, since
         # we're using tempfile.mkdtemp, which isn't thread-safe.
+        futures = list()
         with concurrent.futures.ProcessPoolExecutor() as executor:
-            futures = list()
             for f in files:
                 future = executor.submit(clean_meta, f, args.lightweight,
                                          inplace, args.sandbox, policy)
                 futures.append(future)
-            for future in concurrent.futures.as_completed(futures):
-                no_failure &= future.result()
+        for future in concurrent.futures.as_completed(futures):
+            no_failure &= future.result()
         return 0 if no_failure is True else -1
 
 
