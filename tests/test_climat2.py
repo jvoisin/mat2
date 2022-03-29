@@ -267,14 +267,7 @@ class TestCommandLineParallel(unittest.TestCase):
     def test_different(self):
         src = './tests/data/'
         dst = './tests/data/parallel'
-        if sys.version_info >= (3, 8):
-            with os.scandir(src) as itr:
-                    entries = list(itr)
-            shutil._copytree(entries=entries, src=src, dst=dst, symlinks=False,
-                    ignore=None, copy_function=shutil.copy2,
-                    ignore_dangling_symlinks=False)
-        else:
-            shutil.copytree(src, dst)
+        shutil.copytree(src, dst)
 
         proc = subprocess.Popen(mat2_binary + glob.glob('./tests/data/parallel/dirty.*'),
                 stdout=subprocess.PIPE)
@@ -286,7 +279,7 @@ class TestCommandLineParallel(unittest.TestCase):
             self.assertIsNotNone(p)
             p = parser_factory.get_parser(p.output_filename)
             self.assertEqual(p.get_meta(), {})
-        shutil.rmtree('./tests/data/parallel')
+        shutil.rmtree('./tests/data/parallel/')
 
     def test_faulty(self):
         for i in range(self.iterations):
