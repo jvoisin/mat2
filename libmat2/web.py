@@ -104,6 +104,7 @@ class _HTMLParser(parser.HTMLParser):
         self.tag_required_blocklist = required_blocklisted_tags
         self.tag_blocklist = blocklisted_tags
 
+    # pylint: disable=R0201
     def error(self, message):  # pragma: no cover
         """ Amusingly, Python's documentation doesn't mention that this
         function needs to be implemented in subclasses of the parent class
