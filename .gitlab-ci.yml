@@ -1,3 +1,6 @@
+include:
+  - template: Security/SAST.gitlab-ci.yml
+
 variables:
   CONTAINER_REGISTRY: $CI_REGISTRY/georg/mat2-ci-images
 
