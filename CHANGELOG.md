@@ -1,3 +1,12 @@
+# 0.12.4 - 2022-04-30
+
+- Fix possible errors/crashes when processing multiple files
+  via the command line interface
+- Use a fixed PDF version for the output
+- Improve compatibility with modern versions of rsvg
+- Improve the robustness of the command line interface with
+  regard to control characters
+
 # 0.12.3 - 2022-01-06
 
 - Implement code for internationalization
