@@ -179,7 +179,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                 # Some fileformats do require to have the `mimetype` file
                 # as the first file in the archive.
                 if self._get_member_name(item) == 'mimetype':
-                    items = [item] + items
+                    items.insert(0, item)
                 else:
                     items.append(item)
 
