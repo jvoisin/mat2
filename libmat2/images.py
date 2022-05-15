@@ -181,3 +181,23 @@ class PPMParser(abstract.AbstractParser):
                         line = re.sub(r"\s+", "", line, flags=re.UNICODE)
                         fout.write(line)
         return True
+
+class HEICParser(exiftool.ExiftoolParser):
+    mimetypes = {'image/heic'}
+    meta_allowlist = {'SourceFile', 'ExifToolVersion', 'FileName','Directory',
+            'FileSize', 'FileModifyDate', 'FileAccessDate',
+            'FileInodeChangeDate', 'FilePermissions', 'FileType',
+            'FileTypeExtension', 'MIMEType', 'MajorBrand', 'MinorVersion',
+            'CompatibleBrands','HandlerType', 'PrimaryItemReference',
+            'HEVCConfigurationVersion', 'GeneralProfileSpace',
+            'GeneralTierFlag', 'GeneralProfileIDC',
+            'GenProfileCompatibilityFlags', 'ConstraintIndicatorFlags',
+            'GeneralLevelIDC', 'MinSpatialSegmentationIDC',
+            'ParallelismType','ChromaFormat', 'BitDepthLuma', 'BitDepthChroma',
+            'NumTemporalLayers', 'TemporalIDNested', 'ImageWidth',
+            'ImageHeight', 'ImageSpatialExtent', 'ImagePixelDepth',
+            'AverageFrameRate', 'ConstantFrameRate', 'MediaDataSize',
+            'MediaDataOffset','ImageSize', 'Megapixels'}
+
+    def remove_all(self) -> bool:
+        return self._lightweight_cleanup()

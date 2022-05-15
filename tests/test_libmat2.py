@@ -251,6 +251,12 @@ class TestGetMeta(unittest.TestCase):
         meta = p.get_meta()
         self.assertEqual(meta['Name'], 'I am so')
 
+    def test_heic(self):
+        p = images.HEICParser('./tests/data/dirty.heic')
+        meta = p.get_meta()
+        self.assertEqual(meta['ProfileCopyright'], 'Public Domain')
+        self.assertEqual(meta['ProfileDescription'], 'GIMP built-in sRGB')
+
 
 class TestRemovingThumbnails(unittest.TestCase):
     def test_odt(self):
@@ -503,6 +509,11 @@ class TestCleaning(unittest.TestCase):
             'meta': {
                 'EncodingSettings': 'Lavf52.103.0',
             },
+            'expected_meta': {},
+        },{
+            'name': 'heic',
+            'parser': images.HEICParser,
+            'meta': {},
             'expected_meta': {},
         }
         ]

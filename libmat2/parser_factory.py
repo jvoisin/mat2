@@ -11,6 +11,10 @@ T = TypeVar('T', bound='abstract.AbstractParser')
 mimetypes.add_type('application/epub+zip', '.epub')
 mimetypes.add_type('application/x-dtbncx+xml', '.ncx')  # EPUB Navigation Control XML File
 
+# This should be removed after we move to python3.10
+# https://github.com/python/cpython/commit/20a5b7e986377bdfd929d7e8c4e3db5847dfdb2d
+mimetypes.add_type('image/heic', '.heic')
+
 
 def __load_all_parsers():
     """ Loads every parser in a dynamic way """
