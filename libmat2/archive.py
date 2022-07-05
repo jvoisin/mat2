@@ -193,14 +193,24 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                 zin.extract(member=item, path=temp_folder)
                 full_path = os.path.join(temp_folder, member_name)
 
-                original_permissions = os.stat(full_path).st_mode
+                try:
+                    original_permissions = os.stat(full_path).st_mode
+                except FileNotFoundError:
+                    logging.error("Something went wrong during processing of "
+                            "%s in %s, likely a path traversal attack.",
+                            member_name, self.filename)
+                    abort = True
+                    # we're breaking instead of continuing, because this exception
+                    # is raised in case of weird path-traversal-like atttacks.
+                    break
+
                 os.chmod(full_path, original_permissions | stat.S_IWUSR | stat.S_IRUSR)
 
                 original_compression = self._get_member_compression(item)
 
                 if self._specific_cleanup(full_path) is False:
-                    logging.warning("Something went wrong during deep cleaning of %s",
-                                    member_name)
+                    logging.warning("Something went wrong during deep cleaning of %s in %s",
+                                    member_name, self.filename)
                     abort = True
                     continue
 
