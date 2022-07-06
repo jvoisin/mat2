@@ -1,3 +1,8 @@
+# 0.13.0 - 2022-07-06
+
+- Fix an arbitrary file read
+- Add support for heic files 
+
 # 0.12.4 - 2022-04-30
 
 - Fix possible errors/crashes when processing multiple files
