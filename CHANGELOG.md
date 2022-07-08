@@ -1,6 +1,6 @@
 # 0.13.0 - 2022-07-06
 
-- Fix an arbitrary file read
+- Fix an arbitrary file read (CVE-2022-35410)
 - Add support for heic files 
 
 # 0.12.4 - 2022-04-30
