@@ -11,6 +11,7 @@ import os
 import shutil
 import subprocess
 import tempfile
+import functools
 from typing import List, Optional
 
 
@@ -21,6 +22,7 @@ CalledProcessError = subprocess.CalledProcessError
 # pylint: disable=subprocess-run-check
 
 
+@functools.lru_cache
 def _get_bwrap_path() -> str:
     which_path = shutil.which('bwrap')
     if which_path:

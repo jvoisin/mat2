@@ -70,7 +70,7 @@ class ExiftoolParser(abstract.AbstractParser):
             return False
         return True
 
-@functools.lru_cache()
+@functools.lru_cache
 def _get_exiftool_path() -> str:  # pragma: no cover
     which_path = shutil.which('exiftool')
     if which_path:
