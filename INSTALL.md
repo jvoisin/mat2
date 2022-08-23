@@ -18,12 +18,16 @@ installed, mat2 uses it to sandbox any external processes it invokes.
 
 ## Arch Linux
 
-Thanks to [Francois_B](https://www.sciunto.org/), there is an package available on
-[Arch linux's AUR](https://aur.archlinux.org/packages/mat2/).
+Thanks to [kpcyrd](https://archlinux.org/packages/?maintainer=kpcyrd), there is an package available on
+[Arch linux's AUR]([https://archlinux.org/packages/community/any/mat2/](https://archlinux.org/packages/community/any/mat2/)).
 
 ## Debian
 
-There is a package available in [Debian](https://packages.debian.org/search?keywords=mat2&searchon=names&section=all).
+There is a package available in [Debian](https://packages.debian.org/search?keywords=mat2&searchon=names&section=all) and you can install Mat2 with:
+
+```
+sudo apt install mat2
+```
 
 ## Fedora
 
@@ -37,13 +41,13 @@ through this copr).
 First you need to enable Mat2's copr:
 
 ```
-dnf -y copr enable atenart/mat2
+sudo dnf -y copr enable atenart/mat2
 ```
 
 Then you can install both the Mat2 command and Nautilus extension:
 
 ```
-dnf -y install mat2 mat2-nautilus
+sudo dnf -y install mat2 mat2-nautilus
 ```
 
 ## Gentoo
