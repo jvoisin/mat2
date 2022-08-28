@@ -7,12 +7,11 @@ import tempfile
 import os
 import logging
 import shutil
-from typing import Dict, Set, Pattern, Union, Any, List
+from typing import Pattern, Union, Any
 
 from . import abstract, UnknownMemberPolicy, parser_factory
 
 # Make pyflakes happy
-assert Set
 assert Pattern
 
 # pylint: disable=not-callable,assignment-from-no-return,too-many-branches
@@ -53,11 +52,11 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
         # Those are the files that have a format that _isn't_
         # supported by mat2, but that we want to keep anyway.
-        self.files_to_keep = set()  # type: Set[Pattern]
+        self.files_to_keep = set()  # type: set[Pattern]
 
         # Those are the files that we _do not_ want to keep,
         # no matter if they are supported or not.
-        self.files_to_omit = set()  # type: Set[Pattern]
+        self.files_to_omit = set()  # type: set[Pattern]
 
         # what should the parser do if it encounters an unknown file in
         # the archive?
@@ -76,7 +75,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
         # pylint: disable=unused-argument,no-self-use
         return True  # pragma: no cover
 
-    def _specific_get_meta(self, full_path: str, file_path: str) -> Dict[str, Any]:
+    def _specific_get_meta(self, full_path: str, file_path: str) -> dict[str, Any]:
         """ This method can be used to extract specific metadata
         from files present in the archive."""
         # pylint: disable=unused-argument,no-self-use
@@ -91,7 +90,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
     @staticmethod
     @abc.abstractmethod
-    def _get_all_members(archive: ArchiveClass) -> List[ArchiveMember]:
+    def _get_all_members(archive: ArchiveClass) -> list[ArchiveMember]:
         """Return all the members of the archive."""
 
     @staticmethod
@@ -101,7 +100,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
     @staticmethod
     @abc.abstractmethod
-    def _get_member_meta(member: ArchiveMember) -> Dict[str, str]:
+    def _get_member_meta(member: ArchiveMember) -> dict[str, str]:
         """Return all the metadata of a given member."""
 
     @staticmethod
@@ -132,8 +131,8 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
         # pylint: disable=unused-argument
         return member
 
-    def get_meta(self) -> Dict[str, Union[str, dict]]:
-        meta = dict()  # type: Dict[str, Union[str, dict]]
+    def get_meta(self) -> dict[str, Union[str, dict]]:
+        meta = dict()  # type: dict[str, Union[str, dict]]
 
         with self.archive_class(self.filename) as zin:
             temp_folder = tempfile.mkdtemp()
@@ -174,7 +173,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
             # Sort the items to process, to reduce fingerprinting,
             # and keep them in the `items` variable.
-            items = list()  # type: List[ArchiveMember]
+            items = list()  # type: list[ArchiveMember]
             for item in sorted(self._get_all_members(zin), key=self._get_member_name):
                 # Some fileformats do require to have the `mimetype` file
                 # as the first file in the archive.
@@ -340,7 +339,7 @@ class TarParser(ArchiveBasedAbstractParser):
         return member
 
     @staticmethod
-    def _get_member_meta(member: ArchiveMember) -> Dict[str, str]:
+    def _get_member_meta(member: ArchiveMember) -> dict[str, str]:
         assert isinstance(member, tarfile.TarInfo)  # please mypy
         metadata = {}
         if member.mtime != 0:
@@ -362,7 +361,7 @@ class TarParser(ArchiveBasedAbstractParser):
         archive.add(full_path, member.name, filter=TarParser._clean_member)  # type: ignore
 
     @staticmethod
-    def _get_all_members(archive: ArchiveClass) -> List[ArchiveMember]:
+    def _get_all_members(archive: ArchiveClass) -> list[ArchiveMember]:
         assert isinstance(archive, tarfile.TarFile)  # please mypy
         return archive.getmembers()  # type: ignore
 
@@ -416,7 +415,7 @@ class ZipParser(ArchiveBasedAbstractParser):
         return member
 
     @staticmethod
-    def _get_member_meta(member: ArchiveMember) -> Dict[str, str]:
+    def _get_member_meta(member: ArchiveMember) -> dict[str, str]:
         assert isinstance(member, zipfile.ZipInfo)  # please mypy
         metadata = {}
         if member.create_system == 3:  # this is Linux
@@ -443,7 +442,7 @@ class ZipParser(ArchiveBasedAbstractParser):
                              compress_type=member.compress_type)
 
     @staticmethod
-    def _get_all_members(archive: ArchiveClass) -> List[ArchiveMember]:
+    def _get_all_members(archive: ArchiveClass) -> list[ArchiveMember]:
         assert isinstance(archive, zipfile.ZipFile)  # please mypy
         return archive.infolist()  # type: ignore
 

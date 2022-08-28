@@ -1,7 +1,7 @@
 import imghdr
 import os
 import re
-from typing import Set, Dict, Union, Any
+from typing import Union, Any
 
 import cairo
 
@@ -13,7 +13,6 @@ from gi.repository import GdkPixbuf, GLib, Rsvg
 from . import exiftool, abstract
 
 # Make pyflakes happy
-assert Set
 assert Any
 
 class SVGParser(exiftool.ExiftoolParser):
@@ -50,7 +49,7 @@ class SVGParser(exiftool.ExiftoolParser):
         surface.finish()
         return True
 
-    def get_meta(self) -> Dict[str, Union[str, dict]]:
+    def get_meta(self) -> dict[str, Union[str, dict]]:
         meta = super().get_meta()
 
         # The namespace is mandatory, but only the …/2000/svg is valid.
@@ -165,8 +164,8 @@ class TiffParser(GdkPixbufAbstractParser):
 class PPMParser(abstract.AbstractParser):
     mimetypes = {'image/x-portable-pixmap'}
 
-    def get_meta(self) -> Dict[str, Union[str, dict]]:
-        meta = {}  # type: Dict[str, Union[str, Dict[Any, Any]]]
+    def get_meta(self) -> dict[str, Union[str, dict]]:
+        meta = {}  # type: dict[str, Union[str, dict[Any, Any]]]
         with open(self.filename) as f:
             for idx, line in enumerate(f):
                 if line.lstrip().startswith('#'):

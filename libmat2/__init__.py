@@ -2,12 +2,11 @@
 
 import enum
 import importlib
-from typing import Dict, Optional, Union
+from typing import Optional, Union
 
 from . import exiftool, video
 
 # make pyflakes happy
-assert Dict
 assert Optional
 assert Union
 
@@ -67,8 +66,8 @@ CMD_DEPENDENCIES = {
     },
 }
 
-def check_dependencies() -> Dict[str, Dict[str, bool]]:
-    ret = dict()  # type: Dict[str, dict]
+def check_dependencies() -> dict[str, dict[str, bool]]:
+    ret = dict()  # type: dict[str, dict]
 
     for key, value in DEPENDENCIES.items():
         ret[key] = {

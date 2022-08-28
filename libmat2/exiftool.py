@@ -4,13 +4,10 @@ import logging
 import os
 import shutil
 import subprocess
-from typing import Dict, Union, Set
+from typing import Union
 
 from . import abstract
 from . import bubblewrap
-
-# Make pyflakes happy
-assert Set
 
 
 class ExiftoolParser(abstract.AbstractParser):
@@ -18,9 +15,9 @@ class ExiftoolParser(abstract.AbstractParser):
     from a import file, hence why several parsers are re-using its `get_meta`
     method.
     """
-    meta_allowlist = set()  # type: Set[str]
+    meta_allowlist = set()  # type: set[str]
 
-    def get_meta(self) -> Dict[str, Union[str, dict]]:
+    def get_meta(self) -> dict[str, Union[str, dict]]:
         try:
             if self.sandbox:
                 out = bubblewrap.run([_get_exiftool_path(), '-json',

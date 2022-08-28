@@ -12,7 +12,7 @@ import shutil
 import subprocess
 import tempfile
 import functools
-from typing import List, Optional
+from typing import Optional
 
 
 __all__ = ['PIPE', 'run', 'CalledProcessError']
@@ -33,7 +33,7 @@ def _get_bwrap_path() -> str:
 
 def _get_bwrap_args(tempdir: str,
                     input_filename: str,
-                    output_filename: Optional[str] = None) -> List[str]:
+                    output_filename: Optional[str] = None) -> list[str]:
     ro_bind_args = []
     cwd = os.getcwd()
 
@@ -78,7 +78,7 @@ def _get_bwrap_args(tempdir: str,
     return args
 
 
-def run(args: List[str],
+def run(args: list[str],
         input_filename: str,
         output_filename: Optional[str] = None,
         **kwargs) -> subprocess.CompletedProcess:

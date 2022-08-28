@@ -2,7 +2,7 @@ import mimetypes
 import os
 import shutil
 import tempfile
-from typing import Dict, Union
+from typing import Union
 
 import mutagen
 
@@ -18,7 +18,7 @@ class MutagenParser(abstract.AbstractParser):
         except mutagen.MutagenError:
             raise ValueError
 
-    def get_meta(self) -> Dict[str, Union[str, dict]]:
+    def get_meta(self) -> dict[str, Union[str, dict]]:
         f = mutagen.File(self.filename)
         if f.tags:
             return {k:', '.join(map(str, v)) for k, v in f.tags.items()}
@@ -38,8 +38,8 @@ class MutagenParser(abstract.AbstractParser):
 class MP3Parser(MutagenParser):
     mimetypes = {'audio/mpeg', }
 
-    def get_meta(self) -> Dict[str, Union[str, dict]]:
-        metadata = {}  # type: Dict[str, Union[str, dict]]
+    def get_meta(self) -> dict[str, Union[str, dict]]:
+        metadata = {}  # type: dict[str, Union[str, dict]]
         meta = mutagen.File(self.filename).tags
         if not meta:
             return metadata
@@ -68,7 +68,7 @@ class FLACParser(MutagenParser):
         f.save(deleteid3=True)
         return True
 
-    def get_meta(self) -> Dict[str, Union[str, dict]]:
+    def get_meta(self) -> dict[str, Union[str, dict]]:
         meta = super().get_meta()
         for num, picture in enumerate(mutagen.File(self.filename).pictures):
             name = picture.desc if picture.desc else 'Cover %d' % num

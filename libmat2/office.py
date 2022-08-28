@@ -4,7 +4,7 @@ import logging
 import os
 import re
 import zipfile
-from typing import Dict, Set, Pattern, Tuple, Any
+from typing import Pattern, Any
 
 import xml.etree.ElementTree as ET  # type: ignore
 
@@ -13,10 +13,9 @@ from .archive import ZipParser
 # pylint: disable=line-too-long
 
 # Make pyflakes happy
-assert Set
 assert Pattern
 
-def _parse_xml(full_path: str) -> Tuple[ET.ElementTree, Dict[str, str]]:
+def _parse_xml(full_path: str) -> tuple[ET.ElementTree, dict[str, str]]:
     """ This function parses XML, with namespace support. """
     namespace_map = dict()
     for _, (key, value) in ET.iterparse(full_path, ("start-ns", )):
@@ -148,7 +147,7 @@ class MSOfficeParser(ZipParser):
                 return False
             xml_data = zin.read('[Content_Types].xml')
 
-        self.content_types = dict()  # type: Dict[str, str]
+        self.content_types = dict()  # type: dict[str, str]
         try:
             tree = ET.fromstring(xml_data)
         except ET.ParseError:
@@ -431,7 +430,7 @@ class MSOfficeParser(ZipParser):
 
         return True
 
-    def _specific_get_meta(self, full_path: str, file_path: str) -> Dict[str, Any]:
+    def _specific_get_meta(self, full_path: str, file_path: str) -> dict[str, Any]:
         """
         Yes, I know that parsing xml with regexp ain't pretty,
         be my guest and fix it if you want.
@@ -512,7 +511,7 @@ class LibreOfficeParser(ZipParser):
                 return False
         return True
 
-    def _specific_get_meta(self, full_path: str, file_path: str) -> Dict[str, Any]:
+    def _specific_get_meta(self, full_path: str, file_path: str) -> dict[str, Any]:
         """
         Yes, I know that parsing xml with regexp ain't pretty,
         be my guest and fix it if you want.

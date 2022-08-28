@@ -7,7 +7,7 @@ import re
 import logging
 import tempfile
 import io
-from typing import Dict, Union
+from typing import Union
 from distutils.version import LooseVersion
 
 import cairo
@@ -146,13 +146,13 @@ class PDFParser(abstract.AbstractParser):
         return True
 
     @staticmethod
-    def __parse_metadata_field(data: str) -> Dict[str, str]:
+    def __parse_metadata_field(data: str) -> dict[str, str]:
         metadata = {}
         for (_, key, value) in re.findall(r"<(xmp|pdfx|pdf|xmpMM):(.+)>(.+)</\1:\2>", data, re.I):
             metadata[key] = value
         return metadata
 
-    def get_meta(self) -> Dict[str, Union[str, dict]]:
+    def get_meta(self) -> dict[str, Union[str, dict]]:
         """ Return a dict with all the meta of the file
         """
         metadata = {}
