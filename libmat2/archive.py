@@ -72,20 +72,20 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
     def _specific_cleanup(self, full_path: str) -> bool:
         """ This method can be used to apply specific treatment
         to files present in the archive."""
-        # pylint: disable=unused-argument,no-self-use
+        # pylint: disable=unused-argument
         return True  # pragma: no cover
 
     def _specific_get_meta(self, full_path: str, file_path: str) -> dict[str, Any]:
         """ This method can be used to extract specific metadata
         from files present in the archive."""
-        # pylint: disable=unused-argument,no-self-use
+        # pylint: disable=unused-argument
         return {}  # pragma: no cover
 
     def _final_checks(self) -> bool:
         """ This method is invoked after the file has been cleaned,
         allowing to run final verifications.
         """
-        # pylint: disable=unused-argument,no-self-use
+        # pylint: disable=unused-argument
         return True
 
     @staticmethod

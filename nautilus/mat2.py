@@ -10,7 +10,7 @@ so we're not allowed to call anything Gtk-related outside of the main
 thread, so we'll have to resort to using a `queue` to pass "messages" around.
 """
 
-# pylint: disable=no-name-in-module,unused-argument,no-self-use,import-error
+# pylint: disable=no-name-in-module,unused-argument,import-error
 
 import queue
 import threading
