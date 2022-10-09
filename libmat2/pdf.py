@@ -8,7 +8,6 @@ import logging
 import tempfile
 import io
 from typing import Union
-from distutils.version import LooseVersion
 
 import cairo
 import gi
@@ -16,11 +15,6 @@ gi.require_version('Poppler', '0.18')
 from gi.repository import Poppler, GLib
 
 from . import abstract
-
-poppler_version = Poppler.get_version()
-if LooseVersion(poppler_version) < LooseVersion('0.46'):  # pragma: no cover
-    raise ValueError("mat2 needs at least Poppler version 0.46 to work. \
-The installed version is %s." % poppler_version)  # pragma: no cover
 
 FIXED_PDF_VERSION = cairo.PDFVersion.VERSION_1_5
 
