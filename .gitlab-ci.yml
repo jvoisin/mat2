@@ -38,12 +38,6 @@ linting:pylint:
     # Once nautilus-python is in Debian, decomment it form the line below
     - pylint --disable=no-else-return,no-else-raise,no-else-continue,unnecessary-comprehension,raise-missing-from,unsubscriptable-object,use-list-literal --extension-pkg-whitelist=Nautilus,GObject,Gtk,Gio,GLib,gi ./nautilus/mat2.py
 
-linting:pyflakes:
-  image: $CONTAINER_REGISTRY:linting
-  stage: linting
-  script:
-    - pyflakes3 ./libmat2 ./mat2 ./tests/ ./nautilus
-
 linting:mypy:
   image: $CONTAINER_REGISTRY:linting
   stage: linting

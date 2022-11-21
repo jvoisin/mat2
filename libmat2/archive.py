@@ -11,9 +11,6 @@ from typing import Pattern, Union, Any
 
 from . import abstract, UnknownMemberPolicy, parser_factory
 
-# Make pyflakes happy
-assert Pattern
-
 # pylint: disable=not-callable,assignment-from-no-return,too-many-branches
 
 # An ArchiveClass is a class representing an archive,

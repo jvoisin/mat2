@@ -12,9 +12,6 @@ from .archive import ZipParser
 
 # pylint: disable=line-too-long
 
-# Make pyflakes happy
-assert Pattern
-
 def _parse_xml(full_path: str) -> tuple[ET.ElementTree, dict[str, str]]:
     """ This function parses XML, with namespace support. """
     namespace_map = dict()
