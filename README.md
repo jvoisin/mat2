@@ -22,9 +22,14 @@ Maybe you don't want to disclose those information.
 This is precisely the job of mat2: getting rid, as much as possible, of
 metadata.
 
-mat2 provides a command line tool, and graphical user interfaces via a service
-menu for Dolphin, the default file manager of KDE, and an extension for
-Nautilus, the default file manager of GNOME.
+mat2 provides:
+- a library called `libmat2`;
+- a command line tool called `mat2`,
+- a service menu for Dolphin, KDE's default file manager
+
+If you prefer a regular graphical user interface, you might be interested in
+[Metadata Cleaner](https://metadatacleaner.romainvigier.fr/), which is using
+`mat2` under the hood.
 
 # Requirements
 

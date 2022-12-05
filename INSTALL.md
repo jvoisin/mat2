@@ -34,20 +34,16 @@ apt install mat2
 Thanks to [atenart](https://ack.tf/), there is a package available on
 [Fedora's copr]( https://copr.fedorainfracloud.org/coprs/atenart/mat2/ ).
 
-We use copr (cool other packages repo) as the mat2 Nautilus plugin depends on
-python3-nautilus, which isn't available yet in Fedora (but is distributed
-through this copr).
-
 First you need to enable mat2's copr:
 
 ```
 dnf -y copr enable atenart/mat2
 ```
 
-Then you can install both the mat2 command and Nautilus extension:
+Then you can install mat2:
 
 ```
-dnf -y install mat2 mat2-nautilus
+dnf -y install mat2
 ```
 
 ## Gentoo
