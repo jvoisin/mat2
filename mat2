@@ -163,7 +163,7 @@ def show_parsers():
                 # mimetype, so there is not point in showing the mimetype at all
                 continue
             formats.add('  - %s (%s)' % (mtype, ', '.join(extensions)))
-    __print_without_chars('\n'.join(sorted(formats)))
+    print('\n'.join(sorted(formats)))
 
 
 def __get_files_recursively(files: list[str]) -> list[str]:
