@@ -16,7 +16,7 @@ except ValueError as ex:
     print(ex)
     sys.exit(1)
 
-__version__ = '0.13.0'
+__version__ = '0.13.1'
 
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.WARNING)
 

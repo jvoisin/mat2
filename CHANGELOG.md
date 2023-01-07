@@ -1,3 +1,8 @@
+# 0.13.1 - 2023-01-07
+
+- Improve xlsx support
+- Remove the Nautilus extension
+
 # 0.13.0 - 2022-07-06
 
 - Fix an arbitrary file read (CVE-2022-35410)
