@@ -2,6 +2,7 @@
 
 import os
 import shutil
+from typing import List, Union, Set
 import sys
 import mimetypes
 import argparse
@@ -35,7 +36,7 @@ def __check_file(filename: str, mode: int = os.R_OK) -> bool:
         __print_without_chars("[-] %s is not a regular file." % filename)
         return False
     elif not os.access(filename, mode):
-        mode_str = []  # type: list[str]
+        mode_str = []  # type: List[str]
         if mode & os.R_OK:
             mode_str += 'readable'
         if mode & os.W_OK:
@@ -151,10 +152,10 @@ def clean_meta(filename: str, is_lightweight: bool, inplace: bool, sandbox: bool
 
 def show_parsers():
     print('[+] Supported formats:')
-    formats = set()  # set[str]
+    formats = set()  # Set[str]
     for parser in parser_factory._get_parsers():  # type: ignore
         for mtype in parser.mimetypes:
-            extensions = set()  # set[str]
+            extensions = set()  # Set[str]
             for extension in mimetypes.guess_all_extensions(mtype):
                 if extension not in UNSUPPORTED_EXTENSIONS:
                     extensions.add(extension)
@@ -166,8 +167,8 @@ def show_parsers():
     print('\n'.join(sorted(formats)))
 
 
-def __get_files_recursively(files: list[str]) -> list[str]:
-    ret = set()  # type: set[str]
+def __get_files_recursively(files: List[str]) -> List[str]:
+    ret = set()  # type: Set[str]
     for f in files:
         if os.path.isdir(f):
             for path, _, _files in os.walk(f):
