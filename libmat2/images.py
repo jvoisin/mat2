@@ -1,4 +1,3 @@
-import imghdr
 import os
 import re
 from typing import Union, Any
@@ -71,9 +70,6 @@ class PNGParser(exiftool.ExiftoolParser):
     def __init__(self, filename):
         super().__init__(filename)
 
-        if imghdr.what(filename) != 'png':
-            raise ValueError
-
         try:  # better fail here than later
             cairo.ImageSurface.create_from_png(self.filename)
         except:  # pragma: no cover
@@ -111,7 +107,6 @@ class GdkPixbufAbstractParser(exiftool.ExiftoolParser):
 
     def __init__(self, filename):
         super().__init__(filename)
-        # we can't use imghdr here because of https://bugs.python.org/issue28591
         try:
             GdkPixbuf.Pixbuf.new_from_file(self.filename)
         except GLib.GError:
