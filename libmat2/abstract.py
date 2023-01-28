@@ -1,7 +1,7 @@
 import abc
 import os
 import re
-from typing import Union
+from typing import Union, Set, Dict
 
 
 class AbstractParser(abc.ABC):
@@ -9,8 +9,8 @@ class AbstractParser(abc.ABC):
     It might yield `ValueError` on instantiation on invalid files,
     and `RuntimeError` when something went wrong in `remove_all`.
     """
-    meta_list = set()  # type: set[str]
-    mimetypes = set()  # type: set[str]
+    meta_list = set()  # type: Set[str]
+    mimetypes = set()  # type: Set[str]
 
     def __init__(self, filename: str) -> None:
         """
@@ -33,7 +33,7 @@ class AbstractParser(abc.ABC):
         self.sandbox = True
 
     @abc.abstractmethod
-    def get_meta(self) -> dict[str, Union[str, dict]]:
+    def get_meta(self) -> Dict[str, Union[str, Dict]]:
         """Return all the metadata of the current file"""
 
     @abc.abstractmethod

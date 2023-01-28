@@ -2,7 +2,7 @@ import mimetypes
 import os
 import shutil
 import tempfile
-from typing import Union
+from typing import Union, Dict
 
 import mutagen
 
@@ -18,10 +18,10 @@ class MutagenParser(abstract.AbstractParser):
         except mutagen.MutagenError:
             raise ValueError
 
-    def get_meta(self) -> dict[str, Union[str, dict]]:
+    def get_meta(self) -> Dict[str, Union[str, Dict]]:
         f = mutagen.File(self.filename)
         if f.tags:
-            return {k:', '.join(map(str, v)) for k, v in f.tags.items()}
+            return {k: ', '.join(map(str, v)) for k, v in f.tags.items()}
         return {}
 
     def remove_all(self) -> bool:
@@ -38,8 +38,8 @@ class MutagenParser(abstract.AbstractParser):
 class MP3Parser(MutagenParser):
     mimetypes = {'audio/mpeg', }
 
-    def get_meta(self) -> dict[str, Union[str, dict]]:
-        metadata = {}  # type: dict[str, Union[str, dict]]
+    def get_meta(self) -> Dict[str, Union[str, Dict]]:
+        metadata = {}  # type: Dict[str, Union[str, Dict]]
         meta = mutagen.File(self.filename).tags
         if not meta:
             return metadata
@@ -68,12 +68,12 @@ class FLACParser(MutagenParser):
         f.save(deleteid3=True)
         return True
 
-    def get_meta(self) -> dict[str, Union[str, dict]]:
+    def get_meta(self) -> Dict[str, Union[str, Dict]]:
         meta = super().get_meta()
         for num, picture in enumerate(mutagen.File(self.filename).pictures):
             name = picture.desc if picture.desc else 'Cover %d' % num
             extension = mimetypes.guess_extension(picture.mime)
-            if extension is None:  #  pragma: no cover
+            if extension is None: #  pragma: no cover
                 meta[name] = 'harmful data'
                 continue
 
@@ -97,6 +97,7 @@ class WAVParser(video.AbstractFFmpegParser):
                       'FileSize', 'FileType', 'FileTypeExtension',
                       'MIMEType', 'NumChannels', 'SampleRate', 'SourceFile',
                      }
+
 
 class AIFFParser(video.AbstractFFmpegParser):
     mimetypes = {'audio/aiff', 'audio/x-aiff'}

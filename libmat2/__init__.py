@@ -2,7 +2,7 @@
 
 import enum
 import importlib
-from typing import Optional, Union
+from typing import Optional, Union, Dict
 
 from . import exiftool, video
 
@@ -66,8 +66,9 @@ CMD_DEPENDENCIES = {
     },
 }
 
-def check_dependencies() -> dict[str, dict[str, bool]]:
-    ret = dict()  # type: dict[str, dict]
+
+def check_dependencies() -> Dict[str, Dict[str, bool]]:
+    ret = dict()  # type: Dict[str, Dict]
 
     for key, value in DEPENDENCIES.items():
         ret[key] = {

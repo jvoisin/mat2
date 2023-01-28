@@ -7,7 +7,7 @@ import re
 import logging
 import tempfile
 import io
-from typing import Union
+from typing import Union, Dict
 
 import cairo
 import gi
@@ -17,6 +17,7 @@ from gi.repository import Poppler, GLib
 from . import abstract
 
 FIXED_PDF_VERSION = cairo.PDFVersion.VERSION_1_5
+
 
 class PDFParser(abstract.AbstractParser):
     mimetypes = {'application/pdf', }
@@ -140,13 +141,13 @@ class PDFParser(abstract.AbstractParser):
         return True
 
     @staticmethod
-    def __parse_metadata_field(data: str) -> dict[str, str]:
+    def __parse_metadata_field(data: str) -> Dict[str, str]:
         metadata = {}
         for (_, key, value) in re.findall(r"<(xmp|pdfx|pdf|xmpMM):(.+)>(.+)</\1:\2>", data, re.I):
             metadata[key] = value
         return metadata
 
-    def get_meta(self) -> dict[str, Union[str, dict]]:
+    def get_meta(self) -> Dict[str, Union[str, Dict]]:
         """ Return a dict with all the meta of the file
         """
         metadata = {}

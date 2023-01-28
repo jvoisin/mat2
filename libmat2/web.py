@@ -1,5 +1,5 @@
 from html import parser, escape
-from typing import  Any, Optional
+from typing import Any, Optional, Dict, List, Tuple, Set
 import re
 import string
 
@@ -25,7 +25,7 @@ class CSSParser(abstract.AbstractParser):
             f.write(cleaned)
         return True
 
-    def get_meta(self) -> dict[str, Any]:
+    def get_meta(self) -> Dict[str, Any]:
         metadata = {}
         with open(self.filename, encoding='utf-8') as f:
             try:
@@ -44,10 +44,10 @@ class CSSParser(abstract.AbstractParser):
 
 
 class AbstractHTMLParser(abstract.AbstractParser):
-    tags_blocklist = set()  # type: set[str]
+    tags_blocklist = set()  # type: Set[str]
     # In some html/xml-based formats some tags are mandatory,
     # so we're keeping them, but are discarding their content
-    tags_required_blocklist = set()  # type: set[str]
+    tags_required_blocklist = set()  # type: Set[str]
 
     def __init__(self, filename):
         super().__init__(filename)
@@ -57,7 +57,7 @@ class AbstractHTMLParser(abstract.AbstractParser):
             self.__parser.feed(f.read())
         self.__parser.close()
 
-    def get_meta(self) -> dict[str, Any]:
+    def get_meta(self) -> Dict[str, Any]:
         return self.__parser.get_meta()
 
     def remove_all(self) -> bool:
@@ -112,7 +112,7 @@ class _HTMLParser(parser.HTMLParser):
         """
         raise ValueError(message)
 
-    def handle_starttag(self, tag: str, attrs: list[tuple[str, Optional[str]]]):
+    def handle_starttag(self, tag: str, attrs: List[Tuple[str, Optional[str]]]):
         # Ignore the type, because mypy is too stupid to infer
         # that get_starttag_text() can't return None.
         original_tag = self.get_starttag_text()  # type: ignore
@@ -159,7 +159,7 @@ class _HTMLParser(parser.HTMLParser):
                     self.__textrepr += escape(data)
 
     def handle_startendtag(self, tag: str,
-                           attrs: list[tuple[str, Optional[str]]]):
+                           attrs: List[Tuple[str, Optional[str]]]):
         if tag in self.tag_required_blocklist | self.tag_blocklist:
             meta = {k:v for k, v in attrs}
             name = meta.get('name', 'harmful metadata')
@@ -184,7 +184,7 @@ class _HTMLParser(parser.HTMLParser):
             f.write(self.__textrepr)
         return True
 
-    def get_meta(self) -> dict[str, Any]:
+    def get_meta(self) -> Dict[str, Any]:
         if self.__validation_queue:
             raise ValueError("Some tags (%s) were left unclosed in %s" % (
                 ', '.join(self.__validation_queue),

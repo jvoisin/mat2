@@ -1,6 +1,6 @@
 import os
 import re
-from typing import Union, Any
+from typing import Union, Any, Dict
 
 import cairo
 
@@ -48,7 +48,7 @@ class SVGParser(exiftool.ExiftoolParser):
         surface.finish()
         return True
 
-    def get_meta(self) -> dict[str, Union[str, dict]]:
+    def get_meta(self) -> Dict[str, Union[str, Dict]]:
         meta = super().get_meta()
 
         # The namespace is mandatory, but only the …/2000/svg is valid.
@@ -56,6 +56,7 @@ class SVGParser(exiftool.ExiftoolParser):
         if meta.get('Xmlns') == ns:
             meta.pop('Xmlns')
         return meta
+
 
 class PNGParser(exiftool.ExiftoolParser):
     mimetypes = {'image/png', }
@@ -156,11 +157,12 @@ class TiffParser(GdkPixbufAbstractParser):
                       'FileTypeExtension', 'ImageHeight', 'ImageSize',
                       'ImageWidth', 'MIMEType', 'Megapixels', 'SourceFile'}
 
+
 class PPMParser(abstract.AbstractParser):
     mimetypes = {'image/x-portable-pixmap'}
 
-    def get_meta(self) -> dict[str, Union[str, dict]]:
-        meta = {}  # type: dict[str, Union[str, dict[Any, Any]]]
+    def get_meta(self) -> Dict[str, Union[str, Dict]]:
+        meta = {}  # type: Dict[str, Union[str, Dict[Any, Any]]]
         with open(self.filename) as f:
             for idx, line in enumerate(f):
                 if line.lstrip().startswith('#'):
@@ -176,9 +178,10 @@ class PPMParser(abstract.AbstractParser):
                         fout.write(line)
         return True
 
+
 class HEICParser(exiftool.ExiftoolParser):
     mimetypes = {'image/heic'}
-    meta_allowlist = {'SourceFile', 'ExifToolVersion', 'FileName','Directory',
+    meta_allowlist = {'SourceFile', 'ExifToolVersion', 'FileName', 'Directory',
             'FileSize', 'FileModifyDate', 'FileAccessDate',
             'FileInodeChangeDate', 'FilePermissions', 'FileType',
             'FileTypeExtension', 'MIMEType', 'MajorBrand', 'MinorVersion',

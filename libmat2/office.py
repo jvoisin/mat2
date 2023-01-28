@@ -4,7 +4,7 @@ import logging
 import os
 import re
 import zipfile
-from typing import Pattern, Any
+from typing import Pattern, Any, Tuple, Dict
 
 import xml.etree.ElementTree as ET  # type: ignore
 
@@ -12,7 +12,8 @@ from .archive import ZipParser
 
 # pylint: disable=line-too-long
 
-def _parse_xml(full_path: str) -> tuple[ET.ElementTree, dict[str, str]]:
+
+def _parse_xml(full_path: str) -> Tuple[ET.ElementTree, Dict[str, str]]:
     """ This function parses XML, with namespace support. """
     namespace_map = dict()
     for _, (key, value) in ET.iterparse(full_path, ("start-ns", )):
@@ -67,7 +68,6 @@ class MSOfficeParser(ZipParser):
         # Do we want to keep the following ones?
         'application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml',
     }
-
 
     def __init__(self, filename):
         super().__init__(filename)
@@ -218,7 +218,7 @@ class MSOfficeParser(ZipParser):
         if 'w' not in namespace:
             return True
 
-        parent_map = {c:p for p in tree.iter() for c in p}
+        parent_map = {c: p for p in tree.iter() for c in p}
 
         elements_to_remove = list()
         for element in tree.iterfind('.//w:nsid', namespace):
@@ -228,7 +228,6 @@ class MSOfficeParser(ZipParser):
 
         tree.write(full_path, xml_declaration=True)
         return True
-
 
     @staticmethod
     def __remove_revisions(full_path: str) -> bool:
@@ -318,7 +317,6 @@ class MSOfficeParser(ZipParser):
             # "connector for Non-visual property"
             for i in re.findall(r'<p:cNvPr id="([0-9]+)"', content):
                 self.__counters['cNvPr'].add(int(i))
-
 
     @staticmethod
     def __randomize_creationId(full_path: str) -> bool:
@@ -441,8 +439,8 @@ class MSOfficeParser(ZipParser):
 
         with open(full_path, encoding='utf-8') as f:
             try:
-                results = re.findall(r"<(.+)>(.+)</\1>", f.read(), re.I|re.M)
-                return {k:v for (k, v) in results}
+                results = re.findall(r"<(.+)>(.+)</\1>", f.read(), re.I | re.M)
+                return {k: v for (k, v) in results}
             except (TypeError, UnicodeDecodeError):
                 # We didn't manage to parse the xml file
                 return {file_path: 'harmful content', }
@@ -458,7 +456,6 @@ class LibreOfficeParser(ZipParser):
         'application/vnd.oasis.opendocument.formula',
         'application/vnd.oasis.opendocument.image',
     }
-
 
     def __init__(self, filename):
         super().__init__(filename)

@@ -3,7 +3,7 @@ import functools
 import shutil
 import logging
 
-from typing import Union
+from typing import Union, Dict
 
 from . import exiftool
 from . import bubblewrap
@@ -12,7 +12,7 @@ from . import bubblewrap
 class AbstractFFmpegParser(exiftool.ExiftoolParser):
     """ Abstract parser for all FFmpeg-based ones, mainly for video. """
     # Some fileformats have mandatory metadata fields
-    meta_key_value_allowlist = {}  # type: dict[str, Union[str, int]]
+    meta_key_value_allowlist = {}  # type: Dict[str, Union[str, int]]
 
     def remove_all(self) -> bool:
         if self.meta_key_value_allowlist:
@@ -45,10 +45,10 @@ class AbstractFFmpegParser(exiftool.ExiftoolParser):
             return False
         return True
 
-    def get_meta(self) -> dict[str, Union[str, dict]]:
+    def get_meta(self) -> Dict[str, Union[str, Dict]]:
         meta = super().get_meta()
 
-        ret = dict()  # type: dict[str, Union[str, dict]]
+        ret = dict()  # type: Dict[str, Union[str, Dict]]
         for key, value in meta.items():
             if key in self.meta_key_value_allowlist:
                 if value == self.meta_key_value_allowlist[key]:

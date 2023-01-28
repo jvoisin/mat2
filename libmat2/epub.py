@@ -3,9 +3,10 @@ import re
 import uuid
 import zipfile
 import xml.etree.ElementTree as ET  # type: ignore
-from typing import Any
+from typing import Any, Dict
 
 from . import archive, office
+
 
 class EPUBParser(archive.ZipParser):
     mimetypes = {'application/epub+zip', }
@@ -28,7 +29,6 @@ class EPUBParser(archive.ZipParser):
              }))
         self.uniqid = uuid.uuid4()
 
-
     def is_archive_valid(self):
         super().is_archive_valid()
         with zipfile.ZipFile(self.filename) as zin:
@@ -37,7 +37,7 @@ class EPUBParser(archive.ZipParser):
                 if member_name.endswith('META-INF/encryption.xml'):
                     raise ValueError('the file contains encrypted fonts')
 
-    def _specific_get_meta(self, full_path, file_path) -> dict[str, Any]:
+    def _specific_get_meta(self, full_path, file_path) -> Dict[str, Any]:
         if not file_path.endswith('.opf'):
             return {}
 
@@ -72,7 +72,6 @@ class EPUBParser(archive.ZipParser):
         tree.write(full_path, xml_declaration=True, encoding='utf-8',
                    short_empty_elements=False)
         return True
-
 
     def __handle_tocncx(self, full_path: str) -> bool:
         try:
