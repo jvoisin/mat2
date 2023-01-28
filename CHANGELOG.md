@@ -1,3 +1,7 @@
+# 0.13.2 - 2023-01-28
+
+- Fix a crash on some python versions
+
 # 0.13.1 - 2023-01-07
 
 - Improve xlsx support
