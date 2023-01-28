@@ -78,7 +78,7 @@ def _get_bwrap_args(tempdir: str,
     return args
 
 
-def run(args: list[str],
+def run(args: List[str],
         input_filename: str,
         output_filename: Optional[str] = None,
         **kwargs) -> subprocess.CompletedProcess:

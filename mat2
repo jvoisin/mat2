@@ -2,7 +2,7 @@
 
 import os
 import shutil
-from typing import List, Union, Set
+from typing import List, Set, Dict
 import sys
 import mimetypes
 import argparse
@@ -98,7 +98,7 @@ def show_meta(filename: str, sandbox: bool):
     __print_meta(filename, p.get_meta())
 
 
-def __print_meta(filename: str, metadata: dict, depth: int = 1):
+def __print_meta(filename: str, metadata: Dict, depth: int = 1):
     padding = " " * depth*2
     if not metadata:
         __print_without_chars(padding + "No metadata found in %s." % filename)

@@ -148,7 +148,7 @@ class MSOfficeParser(ZipParser):
                 return False
             xml_data = zin.read('[Content_Types].xml')
 
-        self.content_types = dict()  # type: dict[str, str]
+        self.content_types = dict()  # type: Dict[str, str]
         try:
             tree = ET.fromstring(xml_data)
         except ET.ParseError:
@@ -429,7 +429,7 @@ class MSOfficeParser(ZipParser):
 
         return True
 
-    def _specific_get_meta(self, full_path: str, file_path: str) -> dict[str, Any]:
+    def _specific_get_meta(self, full_path: str, file_path: str) -> Dict[str, Any]:
         """
         Yes, I know that parsing xml with regexp ain't pretty,
         be my guest and fix it if you want.
@@ -509,7 +509,7 @@ class LibreOfficeParser(ZipParser):
                 return False
         return True
 
-    def _specific_get_meta(self, full_path: str, file_path: str) -> dict[str, Any]:
+    def _specific_get_meta(self, full_path: str, file_path: str) -> Dict[str, Any]:
         """
         Yes, I know that parsing xml with regexp ain't pretty,
         be my guest and fix it if you want.

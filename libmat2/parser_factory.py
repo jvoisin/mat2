@@ -2,7 +2,7 @@ import glob
 import os
 import mimetypes
 import importlib
-from typing import TypeVar, Optional
+from typing import TypeVar, Optional, List
 
 from . import abstract, UNSUPPORTED_EXTENSIONS
 
@@ -34,7 +34,7 @@ def __load_all_parsers():
 __load_all_parsers()
 
 
-def _get_parsers() -> list[T]:
+def _get_parsers() -> List[T]:
     """ Get all our parsers!"""
     def __get_parsers(cls):
         return cls.__subclasses__() + \

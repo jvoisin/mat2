@@ -128,7 +128,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
         # pylint: disable=unused-argument
         return member
 
-    def get_meta(self) -> dict[str, Union[str, Dict]]:
+    def get_meta(self) -> Dict[str, Union[str, Dict]]:
         meta = dict()  # type: Dict[str, Union[str, Dict]]
 
         with self.archive_class(self.filename) as zin:
@@ -170,7 +170,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
             # Sort the items to process, to reduce fingerprinting,
             # and keep them in the `items` variable.
-            items = list()  # type: list[ArchiveMember]
+            items = list()  # type: List[ArchiveMember]
             for item in sorted(self._get_all_members(zin), key=self._get_member_name):
                 # Some fileformats do require to have the `mimetype` file
                 # as the first file in the archive.
