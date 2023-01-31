@@ -22,7 +22,7 @@ CalledProcessError = subprocess.CalledProcessError
 # pylint: disable=subprocess-run-check
 
 
-@functools.lru_cache
+@functools.lru_cache(maxsize=None)
 def _get_bwrap_path() -> str:
     which_path = shutil.which('bwrap')
     if which_path:

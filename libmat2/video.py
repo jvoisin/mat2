@@ -135,7 +135,7 @@ class MP4Parser(AbstractFFmpegParser):
     }
 
 
-@functools.lru_cache()
+@functools.lru_cache(maxsize=None)
 def _get_ffmpeg_path() -> str:  # pragma: no cover
     which_path = shutil.which('ffmpeg')
     if which_path:
