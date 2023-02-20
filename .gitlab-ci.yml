@@ -1,6 +1,3 @@
-include:
-  - template: Security/SAST.gitlab-ci.yml
-
 variables:
   CONTAINER_REGISTRY: $CI_REGISTRY/georg/mat2-ci-images
 
@@ -12,28 +9,16 @@ stages:
   before_script:  # This is needed to not run the testsuite as root
     - useradd --home-dir ${CI_PROJECT_DIR} mat2
     - chown -R mat2 .
-
-linting:bandit:
-  image: $CONTAINER_REGISTRY:linting 
-  stage: linting
-  script:  # TODO: remove B405 and B314
-    - bandit ./mat2 --format txt --skip B101
-    - bandit -r ./libmat2 --format txt --skip B101,B404,B603,B405,B314,B108,B311
-
-linting:codespell:
-  image: $CONTAINER_REGISTRY:linting
-  stage: linting
-  script:
-    # Run codespell to check for spelling errors; ignore errors about binary
-    # files, use a config with ignored words and exclude the git directory,
-    # which might contain false positives
-    - codespell -q 2 -I utils/ci/codespell/ignored_words.txt -S .git
   
-linting:pylint:
-  image: $CONTAINER_REGISTRY:linting
+linting:ruff:
   stage: linting
   script:
-    - pylint --disable=no-else-return,no-else-raise,no-else-continue,unnecessary-comprehension,raise-missing-from,unsubscriptable-object,use-dict-literal,unspecified-encoding,consider-using-f-string,use-list-literal,too-many-statements --extension-pkg-whitelist=cairo,gi ./libmat2 ./mat2
+    - apt update
+    - apt install -qqy --no-install-recommends python3-venv
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - pip3 install ruff
+    - ruff check .
 
 linting:mypy:
   image: $CONTAINER_REGISTRY:linting
