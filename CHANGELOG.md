@@ -1,3 +1,7 @@
+# 0.13.3 - 2023-02-23
+
+- Fix a decorator argument
+
 # 0.13.2 - 2023-01-28
 
 - Fix a crash on some python versions
