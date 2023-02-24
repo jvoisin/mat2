@@ -1,5 +1,6 @@
 [project]
 name = "mat"
+version = "0.13.3"
 readme = "README.md"
 requires-python = ">=3.9"
 
