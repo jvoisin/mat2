@@ -11,6 +11,7 @@ stages:
     - chown -R mat2 .
   
 linting:ruff:
+  image: $CONTAINER_REGISTRY:linting
   stage: linting
   script:
     - apt update
