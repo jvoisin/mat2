@@ -2,7 +2,7 @@ import glob
 import os
 import mimetypes
 import importlib
-from typing import TypeVar, Optional, List
+from typing import TypeVar, Optional, List, Tuple
 
 from . import abstract, UNSUPPORTED_EXTENSIONS
 
@@ -42,7 +42,7 @@ def _get_parsers() -> List[T]:
     return __get_parsers(abstract.AbstractParser)
 
 
-def get_parser(filename: str) -> tuple[Optional[T], Optional[str]]:
+def get_parser(filename: str) -> Tuple[Optional[T], Optional[str]]:
     """ Return the appropriate parser for a given filename.
 
         :raises ValueError: Raised if the instantiation of the parser went wrong.
