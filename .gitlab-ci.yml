@@ -63,3 +63,33 @@ tests:gentoo:
   <<: *prepare_env
   script:
     - su - mat2 -c "python3 -m unittest discover -v"
+
+tests:python3.7:
+  image: $CONTAINER_REGISTRY:python3.7
+  stage: test
+  script:
+    - python3 -m unittest discover -v
+
+tests:python3.8:
+  image: $CONTAINER_REGISTRY:python3.8
+  stage: test
+  script:
+    - python3 -m unittest discover -v
+
+tests:python3.9:
+  image: $CONTAINER_REGISTRY:python3.9
+  stage: test
+  script:
+    - python3 -m unittest discover -v
+
+tests:python3.10:
+  image: $CONTAINER_REGISTRY:python3.10
+  stage: test
+  script:
+    - python3 -m unittest discover -v
+
+tests:python3.11:
+  image: $CONTAINER_REGISTRY:python3.11
+  stage: test
+  script:
+    - python3 -m unittest discover -v
