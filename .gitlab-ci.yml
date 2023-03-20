@@ -1,5 +1,6 @@
 variables:
   CONTAINER_REGISTRY: $CI_REGISTRY/georg/mat2-ci-images
+  GIT_STRATEGY: clone
 
 stages:
   - linting
