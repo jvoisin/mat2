@@ -49,3 +49,22 @@ dnf -y install mat2
 ## Gentoo
 
 mat2 is available in the [torbrowser overlay](https://github.com/MeisterP/torbrowser-overlay).
+
+
+# OSX
+
+## Homebrew
+
+mat2 is [available on homebrew](https://formulae.brew.sh/formula/mat2):
+
+```
+brew install mat2
+```
+
+## MacPorts
+
+mat2 is [available on MacPorts](https://ports.macports.org/port/mat2/):
+
+```
+port install mat2
+```
