@@ -105,6 +105,11 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
     def _get_member_name(member: ArchiveMember) -> str:
         """Return the name of the given member."""
 
+    @staticmethod
+    @abc.abstractmethod
+    def _is_dir(member: ArchiveMember) -> bool:
+        """Return true is the given member is a directory."""
+
     @abc.abstractmethod
     def _add_file_to_archive(self, archive: ArchiveClass, member: ArchiveMember,
                              full_path: str):
@@ -138,8 +143,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                 local_meta = self._get_member_meta(item)
                 member_name = self._get_member_name(item)
 
-                if member_name[-1] == '/':  # pragma: no cover
-                    # `is_dir` is added in Python3.6
+                if self._is_dir(item):  # pragma: no cover
                     continue  # don't keep empty folders
 
                 zin.extract(member=item, path=temp_folder)
@@ -183,7 +187,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
             # we're iterating (and thus inserting) them in lexicographic order.
             for item in items:
                 member_name = self._get_member_name(item)
-                if member_name[-1] == '/':  # `is_dir` is added in Python3.6
+                if self._is_dir(item):
                     continue  # don't keep empty folders
 
                 full_path = os.path.join(temp_folder, member_name)
@@ -374,6 +378,11 @@ class TarParser(ArchiveBasedAbstractParser):
         member.mode = permissions
         return member
 
+    @staticmethod
+    def _is_dir(member: ArchiveMember) -> bool:
+        assert isinstance(member, tarfile.TarInfo)  # please mypy
+        return member.isdir()
+
 
 class TarGzParser(TarParser):
     compression = ':gz'
@@ -460,3 +469,8 @@ class ZipParser(ArchiveBasedAbstractParser):
         assert isinstance(member, zipfile.ZipInfo)  # please mypy
         member.compress_type = compression
         return member
+
+    @staticmethod
+    def _is_dir(member: ArchiveMember) -> bool:
+        assert isinstance(member, zipfile.ZipInfo)  # please mypy
+        return member.is_dir()
