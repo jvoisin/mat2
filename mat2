@@ -36,7 +36,7 @@ def __check_file(filename: str, mode: int = os.R_OK) -> bool:
         __print_without_chars("[-] %s is not a regular file." % filename)
         return False
     elif not os.access(filename, mode):
-        mode_str = []  # type: List[str]
+        mode_str: List[str] = list()
         if mode & os.R_OK:
             mode_str += 'readable'
         if mode & os.W_OK:
@@ -168,7 +168,7 @@ def show_parsers():
 
 
 def __get_files_recursively(files: List[str]) -> List[str]:
-    ret = set()  # type: Set[str]
+    ret: Set[str] = set()
     for f in files:
         if os.path.isdir(f):
             for path, _, _files in os.walk(f):

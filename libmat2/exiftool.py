@@ -15,7 +15,7 @@ class ExiftoolParser(abstract.AbstractParser):
     from a import file, hence why several parsers are re-using its `get_meta`
     method.
     """
-    meta_allowlist = set()  # type: Set[str]
+    meta_allowlist: Set[str] = set()
 
     def get_meta(self) -> Dict[str, Union[str, Dict]]:
         try:

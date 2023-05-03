@@ -148,7 +148,7 @@ class MSOfficeParser(ZipParser):
                 return False
             xml_data = zin.read('[Content_Types].xml')
 
-        self.content_types = dict()  # type: Dict[str, str]
+        self.content_types: Dict[str, str] = dict()
         try:
             tree = ET.fromstring(xml_data)
         except ET.ParseError:

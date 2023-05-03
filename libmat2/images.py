@@ -11,9 +11,6 @@ from gi.repository import GdkPixbuf, GLib, Rsvg
 
 from . import exiftool, abstract
 
-# Make pyflakes happy
-assert Any
-
 class SVGParser(exiftool.ExiftoolParser):
     mimetypes = {'image/svg+xml', }
     meta_allowlist = {'Directory', 'ExifToolVersion', 'FileAccessDate',
@@ -162,7 +159,7 @@ class PPMParser(abstract.AbstractParser):
     mimetypes = {'image/x-portable-pixmap'}
 
     def get_meta(self) -> Dict[str, Union[str, Dict]]:
-        meta = {}  # type: Dict[str, Union[str, Dict[Any, Any]]]
+        meta: Dict[str, Union[str, Dict[Any, Any]]] = dict()
         with open(self.filename) as f:
             for idx, line in enumerate(f):
                 if line.lstrip().startswith('#'):

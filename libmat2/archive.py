@@ -49,15 +49,15 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
         # Those are the files that have a format that _isn't_
         # supported by mat2, but that we want to keep anyway.
-        self.files_to_keep = set()  # type: Set[Pattern]
+        self.files_to_keep: Set[Pattern] = set()
 
         # Those are the files that we _do not_ want to keep,
         # no matter if they are supported or not.
-        self.files_to_omit = set()  # type: Set[Pattern]
+        self.files_to_omit: Set[Pattern] = set()
 
         # what should the parser do if it encounters an unknown file in
         # the archive?
-        self.unknown_member_policy = UnknownMemberPolicy.ABORT  # type: UnknownMemberPolicy
+        self.unknown_member_policy: UnknownMemberPolicy = UnknownMemberPolicy.ABORT
 
         # The LGTM comment is to mask a false-positive,
         # see https://lgtm.com/projects/g/jvoisin/mat2/
@@ -134,7 +134,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
         return member
 
     def get_meta(self) -> Dict[str, Union[str, Dict]]:
-        meta = dict()  # type: Dict[str, Union[str, Dict]]
+        meta: Dict[str, Union[str, Dict]] = dict()
 
         with self.archive_class(self.filename) as zin:
             temp_folder = tempfile.mkdtemp()
@@ -174,7 +174,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
             # Sort the items to process, to reduce fingerprinting,
             # and keep them in the `items` variable.
-            items = list()  # type: List[ArchiveMember]
+            items: List[ArchiveMember] = list()
             for item in sorted(self._get_all_members(zin), key=self._get_member_name):
                 # Some fileformats do require to have the `mimetype` file
                 # as the first file in the archive.

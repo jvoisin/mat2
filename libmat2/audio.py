@@ -39,7 +39,7 @@ class MP3Parser(MutagenParser):
     mimetypes = {'audio/mpeg', }
 
     def get_meta(self) -> Dict[str, Union[str, Dict]]:
-        metadata = {}  # type: Dict[str, Union[str, Dict]]
+        metadata: Dict[str, Union[str, Dict]] = dict()
         meta = mutagen.File(self.filename).tags
         if not meta:
             return metadata

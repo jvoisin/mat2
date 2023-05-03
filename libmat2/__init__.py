@@ -2,13 +2,9 @@
 
 import enum
 import importlib
-from typing import Optional, Union, Dict
+from typing import Dict
 
 from . import exiftool, video
-
-# make pyflakes happy
-assert Optional
-assert Union
 
 # A set of extension that aren't supported, despite matching a supported mimetype
 UNSUPPORTED_EXTENSIONS = {
@@ -68,7 +64,7 @@ CMD_DEPENDENCIES = {
 
 
 def check_dependencies() -> Dict[str, Dict[str, bool]]:
-    ret = dict()  # type: Dict[str, Dict]
+    ret: Dict[str, Dict] = dict()
 
     for key, value in DEPENDENCIES.items():
         ret[key] = {
