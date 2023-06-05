@@ -100,6 +100,9 @@ example, with a file named "myfile.png" a cleaned version named
 It's possible to run mat2 as a web service, via
 [mat2-web](https://0xacab.org/jvoisin/mat2-web).
 
+If you're using WordPress, you might be interested in [wp-mat](https://git.autistici.org/noblogs/wp-mat)
+and [wp-mat-server](https://git.autistici.org/noblogs/wp-mat-server).
+
 ## Desktop GUI
 
 For GNU/Linux desktops, it's possible to use the
