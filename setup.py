@@ -20,6 +20,7 @@ setuptools.setup(
         'pycairo',
     ],
     packages=setuptools.find_packages(exclude=('tests', )),
+    data_files = [('man/man1', ['doc/mat2.1'])],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
