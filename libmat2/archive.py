@@ -146,8 +146,14 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                 if self._is_dir(item):  # pragma: no cover
                     continue  # don't keep empty folders
 
-                zin.extract(member=item, path=temp_folder)
                 full_path = os.path.join(temp_folder, member_name)
+                if not os.path.abspath(full_path).startswith(temp_folder):
+                    logging.error("%s contains a file (%s) pointing outside (%s) of its root.",
+                        self.filename, member_name, full_path)
+                    break
+
+                zin.extract(member=item, path=temp_folder)
+
                 os.chmod(full_path, stat.S_IRUSR)
 
                 specific_meta = self._specific_get_meta(full_path, member_name)
