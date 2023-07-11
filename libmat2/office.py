@@ -63,7 +63,19 @@ class MSOfficeParser(ZipParser):
         'application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml',  # /word/footer.xml
         'application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml',  # /word/header.xml
         'application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml',  # /word/styles.xml
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml',  # /word/numbering.xml (used for bullet point formatting)
+        'application/vnd.openxmlformats-officedocument.theme+xml',  # /word/theme/theme[0-9].xml (used for font and background coloring, etc.)
         'application/vnd.openxmlformats-package.core-properties+xml',  # /docProps/core.xml
+
+        # for more complicated powerpoints
+        'application/vnd.openxmlformats-officedocument.presentationml.notesSlide+xml',
+        'application/vnd.openxmlformats-officedocument.presentationml.notesMaster+xml',
+        'application/vnd.openxmlformats-officedocument.presentationml.handoutMaster+xml',
+        'application/vnd.openxmlformats-officedocument.drawingml.diagramData+xml',
+        'application/vnd.openxmlformats-officedocument.drawingml.diagramLayout+xml',
+        'application/vnd.openxmlformats-officedocument.drawingml.diagramStyle+xml',
+        'application/vnd.openxmlformats-officedocument.drawingml.diagramColors+xml',
+        'application/vnd.ms-office.drawingml.diagramDrawing+xml',
 
         # Do we want to keep the following ones?
         'application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml',
@@ -85,7 +97,7 @@ class MSOfficeParser(ZipParser):
             r'^_rels/\.rels$',
             r'^xl/sharedStrings\.xml$',  # https://docs.microsoft.com/en-us/office/open-xml/working-with-the-shared-string-table
             r'^xl/calcChain\.xml$',
-            r'^(?:word|ppt|xl)/_rels/document\.xml\.rels$',
+            r'^(?:word|ppt|xl)/_rels/(document|workbook|presentation)\.xml\.rels$',
             r'^(?:word|ppt|xl)/_rels/footer[0-9]*\.xml\.rels$',
             r'^(?:word|ppt|xl)/_rels/header[0-9]*\.xml\.rels$',
             r'^(?:word|ppt|xl)/charts/_rels/chart[0-9]+\.xml\.rels$',
@@ -100,6 +112,7 @@ class MSOfficeParser(ZipParser):
             r'^ppt/slideLayouts/_rels/slideLayout[0-9]+\.xml\.rels$',
             r'^ppt/slideLayouts/slideLayout[0-9]+\.xml$',
             r'^(?:word|ppt|xl)/tableStyles\.xml$',
+            r'^(?:word|ppt|xl)/tables/table[0-9]+\.xml$',
             r'^ppt/slides/_rels/slide[0-9]*\.xml\.rels$',
             r'^ppt/slides/slide[0-9]*\.xml$',
             # https://msdn.microsoft.com/en-us/library/dd908153(v=office.12).aspx
@@ -109,8 +122,13 @@ class MSOfficeParser(ZipParser):
             r'^ppt/slideMasters/slideMaster[0-9]+\.xml',
             r'^ppt/slideMasters/_rels/slideMaster[0-9]+\.xml\.rels',
             r'^xl/worksheets/_rels/sheet[0-9]+\.xml\.rels',
-            r'^xl/drawings/vmlDrawing[0-9]+\.vml',
-            r'^xl/drawings/drawing[0-9]+\.xml',
+            r'^(?:word|ppt|xl)/drawings/vmlDrawing[0-9]+\.vml',
+            r'^(?:word|ppt|xl)/drawings/drawing[0-9]+\.xml',
+            r'^(?:word|ppt|xl)/embeddings/Microsoft_Excel_Worksheet[0-9]+\.xlsx',
+            # rels for complicated powerpoints
+            r'^ppt/notesSlides/_rels/notesSlide[0-9]+\.xml\.rels',
+            r'^ppt/notesMasters/_rels/notesMaster[0-9]+\.xml\.rels',
+            r'^ppt/handoutMasters/_rels/handoutMaster[0-9]+\.xml\.rels',
         }))
         self.files_to_omit = set(map(re.compile, {  # type: ignore
             r'^\[trash\]/',
@@ -120,18 +138,24 @@ class MSOfficeParser(ZipParser):
             r'^(?:word|ppt|xl)/printerSettings/',
             r'^(?:word|ppt|xl)/theme',
             r'^(?:word|ppt|xl)/people\.xml$',
+            r'^(?:word|ppt|xl)/persons/person\.xml$',
             r'^(?:word|ppt|xl)/numbering\.xml$',
             r'^(?:word|ppt|xl)/tags/',
+            r'^(?:word|ppt|xl)/glossary/',
             # View properties like view mode, last viewed slide etc
             r'^(?:word|ppt|xl)/viewProps\.xml$',
             # Additional presentation-wide properties like printing properties,
             # presentation show properties etc.
             r'^(?:word|ppt|xl)/presProps\.xml$',
             r'^(?:word|ppt|xl)/comments[0-9]+\.xml$',
-
+            r'^(?:word|ppt|xl)/threadedComments/threadedComment[0-9]*\.xml$',
+            r'^(?:word|ppt|xl)/commentsExtended\.xml$',
+            r'^(?:word|ppt|xl)/commentsExtensible\.xml$',
+            r'^(?:word|ppt|xl)/commentsIds\.xml$',
             # we have an allowlist in self.files_to_keep,
             # so we can trash everything else
             r'^(?:word|ppt|xl)/_rels/',
+            r'docMetadata/LabelInfo\.xml$'
         }))
 
         if self.__fill_files_to_keep_via_content_types() is False:
