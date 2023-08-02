@@ -1,3 +1,12 @@
+# 0.13.4 - 2023-08-02
+
+- Add documentation about mat2 on OSX
+- Make use of python3.7 constructs to simplify code
+- Use moderner type annotations
+- Harden get_meta in archive.py against variants of CVE-2022-35410 
+- Improve MSOffice document support
+- Package the manpage on pypi 
+
 # 0.13.3 - 2023-02-23
 
 - Fix a decorator argument
