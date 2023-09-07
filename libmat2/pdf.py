@@ -36,7 +36,10 @@ class PDFParser(abstract.AbstractParser):
 
     def remove_all(self) -> bool:
         if self.lightweight_cleaning is True:
-            return self.__remove_all_lightweight()
+            try:
+                return self.__remove_all_lightweight()
+            except cairo.Error as e:
+                raise RuntimeError(e)
         return self.__remove_all_thorough()
 
     def __remove_all_lightweight(self) -> bool:
