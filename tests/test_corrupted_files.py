@@ -14,7 +14,7 @@ from libmat2 import harmless, video, web, archive
 
 # No need to logging messages, should something go wrong,
 # the testsuite _will_ fail.
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.FATAL)
 
 

@@ -186,7 +186,7 @@ def main() -> int:
     args = arg_parser.parse_args()
 
     if args.verbose:
-        logging.getLogger().setLevel(logging.DEBUG)
+        logging.getLogger(__name__).setLevel(logging.DEBUG)
 
     if not args.files:
         if args.list:
