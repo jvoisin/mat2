@@ -508,6 +508,7 @@ class TestCleaning(unittest.TestCase):
                 'TrackID': 1,
                 'TrackLayer': 0,
                 'TransferCharacteristics': 'BT.709',
+                'VideoFullRangeFlag': 0,
             },
         },{
             'name': 'wmv',
