@@ -95,3 +95,9 @@ tests:python3.11:
   stage: test
   script:
     - python3 -m unittest discover -v
+
+tests:python3.12:
+  image: $CONTAINER_REGISTRY:python3.12
+  stage: test
+  script:
+    - python3 -m unittest discover -v
