@@ -82,6 +82,8 @@ class FLACParser(MutagenParser):
             with open(fname, 'wb') as f:
                 f.write(picture.data)
             p, _ = parser_factory.get_parser(fname)  # type: ignore
+            if p is None:
+                raise ValueError
             p.sandbox = self.sandbox
             # Mypy chokes on ternaries :/
             meta[name] = p.get_meta() if p else 'harmful data'  # type: ignore
