@@ -19,7 +19,7 @@ installed, mat2 uses it to sandbox any external processes it invokes.
 ## Arch Linux
 
 Thanks to [kpcyrd](https://archlinux.org/packages/?maintainer=kpcyrd), there is an package available on
-[Arch linux's AUR](https://archlinux.org/packages/community/any/mat2/).
+[Arch Linux's repository](https://archlinux.org/packages/extra/any/mat2/).
 
 ## Debian
 
