@@ -860,7 +860,8 @@ class TestComplexOfficeFiles(unittest.TestCase):
         os.remove(p.output_filename)
 
 class TextDocxWithComment(unittest.TestCase):
-    # MS Word opens with errors when comments.xml is removed but references remain in document.xml
+    # MS Word opens with errors when comments.xml is removed but comment reference
+    # tags remain in document.xml
     def test_docx_with_comment(self):
         with zipfile.ZipFile('./tests/data/comment.docx') as zipin:
             c = zipin.open('word/document.xml')
