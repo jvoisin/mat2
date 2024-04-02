@@ -858,3 +858,12 @@ class TestComplexOfficeFiles(unittest.TestCase):
 
         os.remove(target)
         os.remove(p.output_filename)
+
+class TextDocxWithComment(unittest.TestCase):
+    def test_docx_with_comment(self):
+        target = './tests/data/comment.docx'
+        p = office.MSOfficeParser(target)
+        self.assertTrue(p.remove_all())
+
+        os.remove(target)
+        os.remove(p.output_filename)
