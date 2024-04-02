@@ -862,9 +862,14 @@ class TestComplexOfficeFiles(unittest.TestCase):
 class TextDocxWithComment(unittest.TestCase):
     def test_docx_with_comment(self):
         with zipfile.ZipFile('./tests/data/comment.docx') as zipin:
-            # Strip comment meta
             c = zipin.open('word/document.xml')
             content = c.read()
+
+            # ensure saved as utf-8
+            r = b'encoding="UTF-8"'
+            self.assertIn(r.lower(), content.lower())
+
+            # Strip comment meta
             r = b'w:commentRangeStart'
             self.assertIn(r, content)
             r = b'w:commentRangeEnd'
@@ -886,9 +891,14 @@ class TextDocxWithComment(unittest.TestCase):
         self.assertTrue(p.remove_all())
 
         with zipfile.ZipFile('./tests/data/comment_clean.cleaned.docx') as zipin:
-            # Strip comment meta
             c = zipin.open('word/document.xml')
             content = c.read()
+
+            # ensure saved as utf-8
+            r = b'encoding="UTF-8"'
+            self.assertIn(r.lower(), content.lower())
+
+            # Strip comment meta
             r = b'w:commentRangeStart'
             self.assertNotIn(r, content)
             r = b'w:commentRangeEnd'
