@@ -147,7 +147,7 @@ class MSOfficeParser(ZipParser):
             # Additional presentation-wide properties like printing properties,
             # presentation show properties etc.
             r'^(?:word|ppt|xl)/presProps\.xml$',
-            r'^(?:word|ppt|xl)/comments[0-9]+\.xml$',
+            r'^(?:word|ppt|xl)/comments[0-9]*\.xml$',
             r'^(?:word|ppt|xl)/threadedComments/threadedComment[0-9]*\.xml$',
             r'^(?:word|ppt|xl)/commentsExtended\.xml$',
             r'^(?:word|ppt|xl)/commentsExtensible\.xml$',
