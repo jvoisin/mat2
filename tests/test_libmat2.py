@@ -874,6 +874,9 @@ class TextDocxWithComment(unittest.TestCase):
             r = b'w:commentReference'
             self.assertIn(r, content)
 
+            # Check if 'word/comments.xml' exists in the zip
+            self.assertIn('word/comments.xml', zipin.namelist())
+
             # Remove dead targets from in document.xml.rels
             c = zipin.open('word/_rels/document.xml.rels')
             content = c.read()
@@ -894,6 +897,9 @@ class TextDocxWithComment(unittest.TestCase):
             self.assertNotIn(r, content)
             r = b'w:commentReference'
             self.assertNotIn(r, content)
+
+            # Check if 'word/comments.xml' exists in the zip
+            self.assertNotIn('word/comments.xml', zipin.namelist())
 
             # Remove dead targets from document.xml.rels
             c = zipin.open('word/_rels/document.xml.rels')
