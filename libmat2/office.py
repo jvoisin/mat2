@@ -38,7 +38,7 @@ def _sort_xml_attributes(full_path: str) -> bool:
     for c in tree.getroot():
         c[:] = sorted(c, key=lambda child: (child.tag, child.get('desc')))
 
-    tree.write(full_path, xml_declaration=True, encoding='utf-8')
+    tree.write(full_path, xml_declaration=True)
     return True
 
 
@@ -220,7 +220,7 @@ class MSOfficeParser(ZipParser):
         for element in elements_to_remove:
             parent_map[element].remove(element)
 
-        tree.write(full_path, xml_declaration=True, encoding='utf-8')
+        tree.write(full_path, xml_declaration=True)
         return True
 
     @staticmethod
@@ -250,7 +250,7 @@ class MSOfficeParser(ZipParser):
         for element in elements_to_remove:
             parent_map[element].remove(element)
 
-        tree.write(full_path, xml_declaration=True, encoding='utf-8')
+        tree.write(full_path, xml_declaration=True)
         return True
 
     @staticmethod
@@ -287,7 +287,7 @@ class MSOfficeParser(ZipParser):
             parent_map[element].insert(position, children)
             parent_map[element].remove(element)
 
-        tree.write(full_path, xml_declaration=True, encoding='utf-8')
+        tree.write(full_path, xml_declaration=True)
         return True
     
     @staticmethod
@@ -353,7 +353,7 @@ class MSOfficeParser(ZipParser):
             if name in removed_fnames:
                 root.remove(item)
 
-        tree.write(full_path, xml_declaration=True, encoding='utf-8')
+        tree.write(full_path, xml_declaration=True)
         return True
 
     def __remove_document_xml_rels_members(self, full_path: str) -> bool:
@@ -421,7 +421,7 @@ class MSOfficeParser(ZipParser):
 
         for item in tree.iterfind('.//p14:creationId', namespace):
             item.set('val', '%s' % random.randint(0, 2**32))
-        tree.write(full_path, xml_declaration=True, encoding='utf-8')
+        tree.write(full_path, xml_declaration=True)
         return True
 
     @staticmethod
@@ -437,7 +437,7 @@ class MSOfficeParser(ZipParser):
 
         for item in tree.iterfind('.//p:sldMasterId', namespace):
             item.set('id', '%s' % random.randint(0, 2**32))
-        tree.write(full_path, xml_declaration=True, encoding='utf-8')
+        tree.write(full_path, xml_declaration=True)
         return True
 
     def _specific_cleanup(self, full_path: str) -> bool:
@@ -587,7 +587,7 @@ class LibreOfficeParser(ZipParser):
             for changes in text.iterfind('.//text:tracked-changes', namespace):
                 text.remove(changes)
 
-        tree.write(full_path, xml_declaration=True, encoding='utf-8')
+        tree.write(full_path, xml_declaration=True)
         return True
 
     def _specific_cleanup(self, full_path: str) -> bool:
