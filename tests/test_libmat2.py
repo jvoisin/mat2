@@ -865,9 +865,10 @@ class TextDocxWithComment(unittest.TestCase):
             c = zipin.open('word/document.xml')
             content = c.read()
 
-            # ensure saved as utf-8
-            r = b'encoding="UTF-8"'
-            self.assertIn(r.lower(), content.lower())
+            # ensure encoding is utf-8
+            r = b'encoding=(\'|\")UTF-8(\'|\")'
+            match = re.search(r, content, re.IGNORECASE)
+            self.assertIsNotNone(match)
 
             # Strip comment meta
             r = b'w:commentRangeStart'
@@ -894,9 +895,10 @@ class TextDocxWithComment(unittest.TestCase):
             c = zipin.open('word/document.xml')
             content = c.read()
 
-            # ensure saved as utf-8
-            r = b'encoding="UTF-8"'
-            self.assertIn(r.lower(), content.lower())
+            # ensure encoding is utf-8
+            r = b'encoding=(\'|\")UTF-8(\'|\")'
+            match = re.search(r, content, re.IGNORECASE)
+            self.assertIsNotNone(match)
 
             # Strip comment meta
             r = b'w:commentRangeStart'
