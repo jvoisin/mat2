@@ -864,6 +864,7 @@ class TextDocxWithComment(unittest.TestCase):
     # tags remain in document.xml
     def test_docx_with_comment(self):
         with zipfile.ZipFile('./tests/data/comment.docx') as zipin:
+            # Strip comment meta
             c = zipin.open('word/document.xml')
             content = c.read()
             r = b'w:commentRangeStart'
@@ -871,6 +872,12 @@ class TextDocxWithComment(unittest.TestCase):
             r = b'w:commentRangeEnd'
             self.assertIn(r, content)
             r = b'w:commentReference'
+            self.assertIn(r, content)
+
+            # Remove dead targets from in document.xml.rels
+            c = zipin.open('word/_rels/document.xml.rels')
+            content = c.read()
+            r = b'Target="comments.xml"'
             self.assertIn(r, content)
 
         shutil.copy('./tests/data/comment.docx', './tests/data/comment_clean.docx')
@@ -878,6 +885,7 @@ class TextDocxWithComment(unittest.TestCase):
         self.assertTrue(p.remove_all())
 
         with zipfile.ZipFile('./tests/data/comment_clean.cleaned.docx') as zipin:
+            # Strip comment meta
             c = zipin.open('word/document.xml')
             content = c.read()
             r = b'w:commentRangeStart'
@@ -885,6 +893,12 @@ class TextDocxWithComment(unittest.TestCase):
             r = b'w:commentRangeEnd'
             self.assertNotIn(r, content)
             r = b'w:commentReference'
+            self.assertNotIn(r, content)
+
+            # Remove dead targets from document.xml.rels
+            c = zipin.open('word/_rels/document.xml.rels')
+            content = c.read()
+            r = b'Target="comments.xml"'
             self.assertNotIn(r, content)
 
         os.remove('./tests/data/comment_clean.docx')
