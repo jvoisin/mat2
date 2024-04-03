@@ -858,3 +858,20 @@ class TestComplexOfficeFiles(unittest.TestCase):
 
         os.remove(target)
         os.remove(p.output_filename)
+
+class TextDocx(unittest.TestCase):
+    def test_comment_xml_is_removed(self):
+        with zipfile.ZipFile('./tests/data/comment.docx') as zipin:
+            # Check if 'word/comments.xml' exists in the zip
+            self.assertIn('word/comments.xml', zipin.namelist())
+
+        shutil.copy('./tests/data/comment.docx', './tests/data/comment_clean.docx')
+        p = office.MSOfficeParser('./tests/data/comment_clean.docx')
+        self.assertTrue(p.remove_all())
+
+        with zipfile.ZipFile('./tests/data/comment_clean.cleaned.docx') as zipin:
+            # Check if 'word/comments.xml' exists in the zip
+            self.assertNotIn('word/comments.xml', zipin.namelist())
+
+        os.remove('./tests/data/comment_clean.docx')
+        os.remove('./tests/data/comment_clean.cleaned.docx')
