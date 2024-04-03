@@ -599,11 +599,11 @@ class LibreOfficeParser(ZipParser):
                 if self.__remove_revisions(full_path) is False:
                     return False
 
-            try:
-                _sort_xml_attributes(full_path)
-            except ET.ParseError as e:
-                logging.error("Unable to parse %s: %s", full_path, e)
-                return False
+            # try:
+            #     _sort_xml_attributes(full_path)
+            # except ET.ParseError as e:
+            #     logging.error("Unable to parse %s: %s", full_path, e)
+            #     return False
         return True
 
     def _specific_get_meta(self, full_path: str, file_path: str) -> Dict[str, Any]:
