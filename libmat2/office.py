@@ -290,6 +290,39 @@ class MSOfficeParser(ZipParser):
         tree.write(full_path, xml_declaration=True, encoding='utf-8')
         return True
 
+    @staticmethod
+    def __remove_document_comment_meta(full_path: str) -> bool:
+        try:
+            tree, namespace = _parse_xml(full_path)
+        except ET.ParseError as e:  # pragma: no cover
+            logging.error("Unable to parse %s: %s", full_path, e)
+            return False
+
+        # search the docs to see if we can bail early
+        range_start = tree.find('.//w:commentRangeStart', namespace)
+        range_end = tree.find('.//w:commentRangeEnd', namespace)
+        references = tree.find('.//w:commentReference', namespace)
+        if range_start is None and range_end is None and references is None:
+            return True  # No comment meta tags are present
+
+        parent_map = {c:p for p in tree.iter() for c in p}
+
+        # iterate over the elements and add them to list
+        elements_del = list()
+        for element in tree.iterfind('.//w:commentRangeStart', namespace):
+            elements_del.append(element)
+        for element in tree.iterfind('.//w:commentRangeEnd', namespace):
+            elements_del.append(element)
+        for element in tree.iterfind('.//w:commentReference', namespace):
+            elements_del.append(element)
+
+        # remove the elements
+        for element in elements_del:
+            parent_map[element].remove(element)
+
+        tree.write(full_path, xml_declaration=True, encoding='utf-8')
+        return True
+
     def __remove_content_type_members(self, full_path: str) -> bool:
         """ The method will remove the dangling references
         form the [Content_Types].xml file, since MS office doesn't like them
@@ -395,6 +428,9 @@ class MSOfficeParser(ZipParser):
         elif full_path.endswith('/word/document.xml'):
             # this file contains the revisions
             if self.__remove_revisions(full_path) is False:
+                return False  # pragma: no cover
+            # remove comment references and ranges
+            if self.__remove_document_comment_meta(full_path) is False:
                 return False  # pragma: no cover
         elif full_path.endswith('/docProps/app.xml'):
             # This file must be present and valid,
