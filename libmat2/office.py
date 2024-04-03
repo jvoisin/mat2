@@ -28,18 +28,18 @@ def _parse_xml(full_path: str) -> Tuple[ET.ElementTree, Dict[str, str]]:
     return ET.parse(full_path), namespace_map
 
 
-def _sort_xml_attributes(full_path: str) -> bool:
-    """ Sort xml attributes lexicographically,
-    because it's possible to fingerprint producers (MS Office, Libreoffice, …)
-    since they are all using different orders.
-    """
-    tree = ET.parse(full_path)
+# def _sort_xml_attributes(full_path: str) -> bool:
+#     """ Sort xml attributes lexicographically,
+#     because it's possible to fingerprint producers (MS Office, Libreoffice, …)
+#     since they are all using different orders.
+#     """
+#     tree = ET.parse(full_path)
 
-    for c in tree.getroot():
-        c[:] = sorted(c, key=lambda child: (child.tag, child.get('desc')))
+#     for c in tree.getroot():
+#         c[:] = sorted(c, key=lambda child: (child.tag, child.get('desc')))
 
-    tree.write(full_path, xml_declaration=True, encoding='utf-8')
-    return True
+#     tree.write(full_path, xml_declaration=True, encoding='utf-8')
+#     return True
 
 
 class MSOfficeParser(ZipParser):
@@ -500,11 +500,11 @@ class MSOfficeParser(ZipParser):
         if self.__remove_nsid(full_path) is False:
             return False  # pragma: no cover
 
-        try:
-            _sort_xml_attributes(full_path)
-        except ET.ParseError as e:  # pragma: no cover
-            logging.error("Unable to parse %s: %s", full_path, e)
-            return False
+        # try:
+        #     _sort_xml_attributes(full_path)
+        # except ET.ParseError as e:  # pragma: no cover
+        #     logging.error("Unable to parse %s: %s", full_path, e)
+        #     return False
 
         # This is awful, I'm sorry.
         #
