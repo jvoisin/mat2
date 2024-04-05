@@ -323,6 +323,38 @@ class MSOfficeParser(ZipParser):
         tree.write(full_path, xml_declaration=True, encoding='utf-8')
         return True
 
+    def __remove_document_xml_rels_members(self, full_path: str) -> bool:
+        """ Remove the dangling references from the word/_rels/document.xml.rels file, since MS office doesn't like them.
+        """
+        try:
+            tree, namespace = _parse_xml(full_path)
+        except ET.ParseError as e:  # pragma: no cover
+            logging.error("Unable to parse %s: %s", full_path, e)
+            return False
+
+        if len(namespace.items()) != 1:  # pragma: no cover
+            logging.debug("Got several namespaces for Types: %s", namespace.items())
+
+        removed_fnames = set()
+        with zipfile.ZipFile(self.filename) as zin:
+            for fname in [item.filename for item in zin.infolist()]:
+                for file_to_omit in self.files_to_omit:
+                    if file_to_omit.search(fname):
+                        matches = map(lambda r: r.search(fname), self.files_to_keep)
+                        if any(matches):  # the file is in the allowlist
+                            continue
+                        removed_fnames.add(fname)
+                        break
+
+        root = tree.getroot()
+        for item in root.findall('{%s}Relationship' % namespace['']):
+            name = 'word/' + item.attrib['Target'] # add the word/ prefix to the path, since all document rels are in the word/ directory
+            if name in removed_fnames:
+                root.remove(item)
+
+        tree.write(full_path, xml_declaration=True, encoding='utf-8')
+        return True
+
     @staticmethod
     def __remove_document_comment_meta(full_path: str) -> bool:
         try:
@@ -445,7 +477,7 @@ class MSOfficeParser(ZipParser):
         if os.stat(full_path).st_size == 0:  # Don't process empty files
             return True
 
-        if not full_path.endswith('.xml'):
+        if not full_path.endswith(('.xml', '.xml.rels')):
             return True
 
         if self.__randomize_creationId(full_path) is False:
@@ -465,6 +497,10 @@ class MSOfficeParser(ZipParser):
             # remove comment references and ranges
             if self.__remove_document_comment_meta(full_path) is False:
                 return False  # pragma: no cover
+        elif full_path.endswith('/word/_rels/document.xml.rels'):
+            # similar to the above, but for the document.xml.rels file
+            if self.__remove_document_xml_rels_members(full_path) is False:  # pragma: no cover
+                return False
         elif full_path.endswith('/docProps/app.xml'):
             # This file must be present and valid,
             # so we're removing as much as we can.
