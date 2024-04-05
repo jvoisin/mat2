@@ -38,7 +38,7 @@ def _sort_xml_attributes(full_path: str) -> bool:
     for c in tree.getroot():
         c[:] = sorted(c, key=lambda child: (child.tag, child.get('desc')))
 
-    tree.write(full_path, xml_declaration=True)
+    tree.write(full_path, xml_declaration=True, encoding='utf-8')
     return True
 
 
@@ -220,7 +220,7 @@ class MSOfficeParser(ZipParser):
         for element in elements_to_remove:
             parent_map[element].remove(element)
 
-        tree.write(full_path, xml_declaration=True)
+        tree.write(full_path, xml_declaration=True, encoding='utf-8')
         return True
 
     @staticmethod
@@ -250,7 +250,7 @@ class MSOfficeParser(ZipParser):
         for element in elements_to_remove:
             parent_map[element].remove(element)
 
-        tree.write(full_path, xml_declaration=True)
+        tree.write(full_path, xml_declaration=True, encoding='utf-8')
         return True
 
     @staticmethod
@@ -287,7 +287,40 @@ class MSOfficeParser(ZipParser):
             parent_map[element].insert(position, children)
             parent_map[element].remove(element)
 
-        tree.write(full_path, xml_declaration=True)
+        tree.write(full_path, xml_declaration=True, encoding='utf-8')
+        return True
+
+    @staticmethod
+    def __remove_document_comment_meta(full_path: str) -> bool:
+        try:
+            tree, namespace = _parse_xml(full_path)
+        except ET.ParseError as e:  # pragma: no cover
+            logging.error("Unable to parse %s: %s", full_path, e)
+            return False
+
+        # search the docs to see if we can bail early
+        range_start = tree.find('.//w:commentRangeStart', namespace)
+        range_end = tree.find('.//w:commentRangeEnd', namespace)
+        references = tree.find('.//w:commentReference', namespace)
+        if range_start is None and range_end is None and references is None:
+            return True  # No comment meta tags are present
+
+        parent_map = {c:p for p in tree.iter() for c in p}
+
+        # iterate over the elements and add them to list
+        elements_del = list()
+        for element in tree.iterfind('.//w:commentRangeStart', namespace):
+            elements_del.append(element)
+        for element in tree.iterfind('.//w:commentRangeEnd', namespace):
+            elements_del.append(element)
+        for element in tree.iterfind('.//w:commentReference', namespace):
+            elements_del.append(element)
+
+        # remove the elements
+        for element in elements_del:
+            parent_map[element].remove(element)
+
+        tree.write(full_path, xml_declaration=True, encoding='utf-8')
         return True
 
     @staticmethod
@@ -353,7 +386,7 @@ class MSOfficeParser(ZipParser):
             if name in removed_fnames:
                 root.remove(item)
 
-        tree.write(full_path, xml_declaration=True)
+        tree.write(full_path, xml_declaration=True, encoding='utf-8')
         return True
 
     def _final_checks(self) -> bool:
@@ -388,7 +421,7 @@ class MSOfficeParser(ZipParser):
 
         for item in tree.iterfind('.//p14:creationId', namespace):
             item.set('val', '%s' % random.randint(0, 2**32))
-        tree.write(full_path, xml_declaration=True)
+        tree.write(full_path, xml_declaration=True, encoding='utf-8')
         return True
 
     @staticmethod
@@ -404,7 +437,7 @@ class MSOfficeParser(ZipParser):
 
         for item in tree.iterfind('.//p:sldMasterId', namespace):
             item.set('id', '%s' % random.randint(0, 2**32))
-        tree.write(full_path, xml_declaration=True)
+        tree.write(full_path, xml_declaration=True, encoding='utf-8')
         return True
 
     def _specific_cleanup(self, full_path: str) -> bool:
@@ -550,7 +583,7 @@ class LibreOfficeParser(ZipParser):
             for changes in text.iterfind('.//text:tracked-changes', namespace):
                 text.remove(changes)
 
-        tree.write(full_path, xml_declaration=True)
+        tree.write(full_path, xml_declaration=True, encoding='utf-8')
         return True
 
     def _specific_cleanup(self, full_path: str) -> bool:

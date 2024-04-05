@@ -876,6 +876,32 @@ class TextDocx(unittest.TestCase):
         os.remove('./tests/data/comment_clean.docx')
         os.remove('./tests/data/comment_clean.cleaned.docx')
 
+    def test_xml_is_utf8(self):
+        with zipfile.ZipFile('./tests/data/comment.docx') as zipin:
+            c = zipin.open('word/document.xml')
+            content = c.read()
+
+            # ensure encoding is utf-8
+            r = b'encoding=(\'|\")UTF-8(\'|\")'
+            match = re.search(r, content, re.IGNORECASE)
+            self.assertIsNotNone(match)
+
+        shutil.copy('./tests/data/comment.docx', './tests/data/comment_clean.docx')
+        p = office.MSOfficeParser('./tests/data/comment_clean.docx')
+        self.assertTrue(p.remove_all())
+
+        with zipfile.ZipFile('./tests/data/comment_clean.cleaned.docx') as zipin:
+            c = zipin.open('word/document.xml')
+            content = c.read()
+
+            # ensure encoding is still utf-8
+            r = b'encoding=(\'|\")UTF-8(\'|\")'
+            match = re.search(r, content, re.IGNORECASE)
+            self.assertIsNotNone(match)
+
+        os.remove('./tests/data/comment_clean.docx')
+        os.remove('./tests/data/comment_clean.cleaned.docx')
+
     def test_comment_references_are_removed(self):
         with zipfile.ZipFile('./tests/data/comment.docx') as zipin:
             c = zipin.open('word/document.xml')
