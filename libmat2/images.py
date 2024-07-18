@@ -116,6 +116,7 @@ class GdkPixbufAbstractParser(exiftool.ExiftoolParser):
 
         _, extension = os.path.splitext(self.filename)
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.filename)
+        pixbuf = GdkPixbuf.Pixbuf.apply_embedded_orientation(pixbuf)
         if extension.lower() == '.jpg':
             extension = '.jpeg'  # gdk is picky
         elif extension.lower() == '.tif':
@@ -138,7 +139,7 @@ class JPGParser(GdkPixbufAbstractParser):
                       'MIMEType', 'ImageWidth', 'ImageSize', 'BitsPerSample',
                       'ColorComponents', 'EncodingProcess', 'JFIFVersion',
                       'ResolutionUnit', 'XResolution', 'YCbCrSubSampling',
-                      'YResolution', 'Megapixels', 'ImageHeight'}
+                      'YResolution', 'Megapixels', 'ImageHeight', 'Orientation'}
 
 
 class TiffParser(GdkPixbufAbstractParser):
@@ -152,7 +153,7 @@ class TiffParser(GdkPixbufAbstractParser):
                       'FileInodeChangeDate', 'FileModifyDate', 'FileName',
                       'FilePermissions', 'FileSize', 'FileType',
                       'FileTypeExtension', 'ImageHeight', 'ImageSize',
-                      'ImageWidth', 'MIMEType', 'Megapixels', 'SourceFile'}
+                      'ImageWidth', 'MIMEType', 'Megapixels', 'SourceFile', 'Orientation'}
 
 
 class PPMParser(abstract.AbstractParser):

@@ -33,7 +33,6 @@ class TestLightWeightCleaning(unittest.TestCase):
                 'parser': images.TiffParser,
                 'meta': {'ImageDescription': 'OLYMPUS DIGITAL CAMERA         '},
                 'expected_meta': {
-                    'Orientation': 'Horizontal (normal)',
                     'ResolutionUnit': 'inches',
                     'XResolution': 72,
                     'YResolution': 72

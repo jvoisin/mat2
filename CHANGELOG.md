@@ -1,3 +1,6 @@
+# 0.13.5 - 2023-08-02
+- Keep orientation metadata on jpeg and tiff files
+
 # 0.13.4 - 2023-08-02
 
 - Add documentation about mat2 on OSX
