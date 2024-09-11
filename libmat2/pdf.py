@@ -38,7 +38,7 @@ class PDFParser(abstract.AbstractParser):
         if self.lightweight_cleaning is True:
             try:
                 return self.__remove_all_lightweight()
-            except cairo.Error as e:
+            except (cairo.Error, MemoryError) as e:
                 raise RuntimeError(e)
         return self.__remove_all_thorough()
 
