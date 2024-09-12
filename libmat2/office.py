@@ -283,9 +283,15 @@ class MSOfficeParser(ZipParser):
                     for children in element.iterfind('./*'):
                         elements_ins.append((element, position, children))
                     break
+
         for (element, position, children) in elements_ins:
             parent_map[element].insert(position, children)
-            parent_map[element].remove(element)
+            
+        # the list can sometimes contain duplicate elements, so don't remove
+        # until all children have been processed
+        for (element, position, children) in elements_ins:
+            if element in parent_map[element]:
+                parent_map[element].remove(element)
 
         tree.write(full_path, xml_declaration=True, encoding='utf-8')
         return True
