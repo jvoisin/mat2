@@ -1,5 +1,10 @@
-# 0.13.5 - 2023-08-02
+# 0.13.5 - 2025-01-09
 - Keep orientation metadata on jpeg and tiff files
+- Improve cairo-related error/exceptions handling
+- Improve the logging
+- Improve the sandboxing
+- Improve Python3.12 support
+- Improve MSOffice documents handling
 
 # 0.13.4 - 2023-08-02
 
