@@ -101,3 +101,15 @@ tests:python3.12:
   stage: test
   script:
     - python3 -m unittest discover -v
+
+tests:python3.13:
+  image: $CONTAINER_REGISTRY:python3.13
+  stage: test
+  script:
+    - python3 -m unittest discover -v
+
+tests:python3.14:
+  image: $CONTAINER_REGISTRY:python3.14
+  stage: test
+  script:
+    - python3 -m unittest discover -v
