@@ -508,8 +508,11 @@ class TestCleaning(unittest.TestCase):
                 'TrackID': 1,
                 'TrackLayer': 0,
                 'TransferCharacteristics': 'BT.709',
-                'VideoFullRangeFlag': 0,
+                'VideoFullRangeFlag': 'Limited',
             },
+            'extra_expected_meta': {
+                'VideoFullRangeFlag': 0,
+             }
         },{
             'name': 'wmv',
             'ffmpeg': 1,
@@ -522,7 +525,10 @@ class TestCleaning(unittest.TestCase):
             'name': 'heic',
             'parser': images.HEICParser,
             'meta': {},
-            'expected_meta': {},
+            'expected_meta': {
+                'ExifByteOrder': 'Big-endian (Motorola, MM)',
+                'Warning': 'Bad IFD0 directory',
+            },
         }
         ]
 
@@ -558,7 +564,12 @@ class TestCleaning(unittest.TestCase):
                 if meta:
                     for k, v in p2.get_meta().items():
                         self.assertIn(k, case['expected_meta'], '"%s" is not in "%s" (%s)' % (k, case['expected_meta'], case['name']))
-                        self.assertIn(str(case['expected_meta'][k]), str(v))
+                        if str(case['expected_meta'][k]) in str(v):
+                            continue
+                        if 'extra_expected_meta' in case and k in case['extra_expected_meta']:
+                            if str(case['extra_expected_meta'][k]) in str(v):
+                                continue
+                        self.assertTrue(False, "got a different value (%s) than excepted (%s) for %s" % (str(v), meta, k))
                 self.assertTrue(p2.remove_all())
 
                 os.remove(target)

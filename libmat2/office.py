@@ -525,7 +525,7 @@ class MSOfficeParser(ZipParser):
         # see: https://docs.microsoft.com/en-us/dotnet/framework/wpf/advanced/mc-ignorable-attribute
         with open(full_path, 'rb') as f:
             text = f.read()
-            out = re.sub(b'mc:Ignorable="[^"]*"', b'', text, 1)
+            out = re.sub(b'mc:Ignorable="[^"]*"', b'', text, count=1)
         with open(full_path, 'wb') as f:
             f.write(out)
 

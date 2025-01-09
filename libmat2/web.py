@@ -20,7 +20,7 @@ class CSSParser(abstract.AbstractParser):
                 content = f.read()
             except UnicodeDecodeError:  # pragma: no cover
                 raise ValueError
-            cleaned = re.sub(r'/\*.*?\*/', '', content, 0, self.flags)
+            cleaned = re.sub(r'/\*.*?\*/', '', content, count=0, flags=self.flags)
         with open(self.output_filename, 'w', encoding='utf-8') as f:
             f.write(cleaned)
         return True

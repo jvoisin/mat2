@@ -136,8 +136,8 @@ class PDFParser(abstract.AbstractParser):
         # It should(tm) be alright though, because cairo's output format
         # for metadata is fixed.
         with open(out_file, 'rb') as f:
-            out = re.sub(rb'<<[\s\n]*/Producer.*?>>', b' << >>', f.read(), 0,
-                         re.DOTALL | re.IGNORECASE)
+            out = re.sub(rb'<<[\s\n]*/Producer.*?>>', b' << >>', f.read(),
+                         count=0, flags=re.DOTALL | re.IGNORECASE)
         with open(out_file, 'wb') as f:
             f.write(out)
 
