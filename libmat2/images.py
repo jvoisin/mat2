@@ -196,3 +196,15 @@ class HEICParser(exiftool.ExiftoolParser):
 
     def remove_all(self) -> bool:
         return self._lightweight_cleanup()
+
+class WEBPParser(GdkPixbufAbstractParser):
+    mimetypes = {'image/webp'}
+    meta_allowlist = {'SourceFile', 'ExifToolVersion', 'FileName',
+                      'Directory', 'FileSize', 'FileModifyDate',
+                      'FileAccessDate', "FileInodeChangeDate",
+                      'FilePermissions', 'FileType', 'FileTypeExtension',
+                      'MIMEType', 'ImageWidth', 'ImageSize', 'BitsPerSample',
+                      'ColorComponents', 'EncodingProcess', 'JFIFVersion',
+                      'ResolutionUnit', 'XResolution', 'YCbCrSubSampling',
+                      'YResolution', 'Megapixels', 'ImageHeight', 'Orientation',
+                      'HorizontalScale', 'VerticalScale', 'VP8Version'}

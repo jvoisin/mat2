@@ -113,6 +113,11 @@ class TestGetMeta(unittest.TestCase):
         meta = p.get_meta()
         self.assertEqual(meta['Comment'], 'Created with GIMP')
 
+    def test_webp(self):
+        p = images.WEBPParser('./tests/data/dirty.webp')
+        meta = p.get_meta()
+        self.assertEqual(meta['Warning'], '[minor] Improper EXIF header')
+
     def test_ppm(self):
         p = images.PPMParser('./tests/data/dirty.ppm')
         meta = p.get_meta()
@@ -332,6 +337,11 @@ class TestCleaning(unittest.TestCase):
             'name': 'jpg',
             'parser': images.JPGParser,
             'meta': {'Comment': 'Created with GIMP'},
+            'expected_meta': {},
+        }, {
+            'name': 'webp',
+            'parser': images.WEBPParser,
+            'meta': {'Warning': '[minor] Improper EXIF header'},
             'expected_meta': {},
         }, {
             'name': 'wav',
