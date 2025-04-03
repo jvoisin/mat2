@@ -152,7 +152,10 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                         self.filename, member_name, full_path)
                     break
 
-                zin.extract(member=item, path=temp_folder)
+                try:
+                    zin.extract(member=item, path=temp_folder)
+                except OSError as e:
+                    logging.error("Unable to extraxt %s from %s: %s", item, self.filename, e)
 
                 os.chmod(full_path, stat.S_IRUSR)
 
