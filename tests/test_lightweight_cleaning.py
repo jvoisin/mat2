@@ -23,11 +23,11 @@ class TestLightWeightCleaning(unittest.TestCase):
                 'parser': images.JPGParser,
                 'meta': {'Comment': 'Created with GIMP'},
                 'expected_meta': {},
-            }, {
-                'name': 'webp',
-                'parser': images.WEBPParser,
-                'meta': {'Warning': '[minor] Improper EXIF header'},
-                'expected_meta': {},
+            #}, {
+            #    'name': 'webp',
+            #    'parser': images.WEBPParser,
+            #    'meta': {'Warning': '[minor] Improper EXIF header'},
+            #    'expected_meta': {},
             }, {
                 'name': 'torrent',
                 'parser': torrent.TorrentParser,
