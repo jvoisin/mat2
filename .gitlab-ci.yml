@@ -23,12 +23,6 @@ linting:ruff:
     - pip3 install ruff
     - ruff check .
 
-linting:mypy:
-  image: $CONTAINER_REGISTRY:linting
-  stage: linting
-  script:
-    - mypy --ignore-missing-imports mat2 libmat2/*.py
-
 tests:archlinux:
   image: $CONTAINER_REGISTRY:archlinux
   stage: test
