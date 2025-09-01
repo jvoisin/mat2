@@ -4,6 +4,7 @@ import unittest
 import shutil
 import os
 import re
+import sys
 import tarfile
 import tempfile
 import zipfile
@@ -638,10 +639,20 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/clean.cleaned.html')
         os.remove('./tests/data/clean.cleaned.cleaned.html')
 
-        with open('./tests/data/clean.html', 'w') as f:
-            f.write('<title><title><pouet/><meta/></title></title><test/>')
-        with self.assertRaises(ValueError):
+        if sys.version_info >= (3, 13):
+            with open('./tests/data/clean.html', 'w') as f:
+                f.write('<title><title><pouet/><meta/></title></title><test/>')
+            with self.assertRaises(ValueError):
+                p = web.HTMLParser('./tests/data/clean.html')
+        else:
+            with open('./tests/data/clean.html', 'w') as f:
+                f.write('<title><title><pouet/><meta/></title></title><test/>')
             p = web.HTMLParser('./tests/data/clean.html')
+            self.assertTrue(p.remove_all())
+            with open('./tests/data/clean.cleaned.html', 'r') as f:
+                self.assertEqual(f.read(), '<title></title><test/>')
+            os.remove('./tests/data/clean.cleaned.html')
+        os.remove('./tests/data/clean.html')
 
         with open('./tests/data/clean.html', 'w') as f:
             f.write('<test><title>Some<b>metadata</b><br/></title></test>')
