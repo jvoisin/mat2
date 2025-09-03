@@ -11,7 +11,7 @@ setuptools.setup(
     description="A handy tool to trash your metadata",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://0xacab.org/jvoisin/mat2",
+    url="https://github.com/jvoisin/mat2",
     python_requires = '>=3.5.0',
     scripts=['mat2'],
     install_requires=[
@@ -31,6 +31,6 @@ setuptools.setup(
         "Intended Audience :: End Users/Desktop",
     ],
     project_urls={
-        'bugtacker': 'https://0xacab.org/jvoisin/mat2/issues',
+        'bugtacker': 'https://github.com/jvoisin/mat2/issues',
     },
 )

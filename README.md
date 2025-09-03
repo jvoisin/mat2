@@ -149,7 +149,7 @@ of the guarantee that mat2 won't modify the data of their files, there is the
 
 # Contact
 
-If possible, use the [issues system](https://0xacab.org/jvoisin/mat2/issues)
+If possible, use the [issues system](https://github.com/jvoisin/mat2/issues)
 or the [mailing list](https://www.autistici.org/mailman/listinfo/mat-dev)
 Should a more private contact be needed (eg. for reporting security issues),
 you can email Julien (jvoisin) Voisin at `julien.voisin+mat2@dustri.org`,

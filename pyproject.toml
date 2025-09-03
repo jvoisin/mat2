@@ -11,9 +11,9 @@ dependencies = [
         'pycairo',
 ]
 [project.urls]
-Repository = "https://0xacab.org/jvoisin/mat2"
-Issues = "https://0xacab.org/jvoisin/mat2/-/issues"
-Changelog = "https://0xacab.org/jvoisin/mat2/-/blob/master/CHANGELOG.md"
+Repository = "https://github.com/jvoisin/mat2"
+Issues = "https://github.com/jvoisin/mat2/issues"
+Changelog = "https://github.com/jvoisin/mat2/blob/master/CHANGELOG.md"
 
 [tool.ruff]
 target-version = "py39"

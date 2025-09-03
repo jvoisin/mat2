@@ -19,14 +19,14 @@ details.
 # jpegoptim, optipng, …
 
 While designed to reduce as much as possible the size of pictures,
-those software can be used to remove metadata. They usually have very good
+those software can be used to remove metadata. They usually have excellent
 support for a single picture format, and can be used in place of mat2 for them.
 
 
 # PDF Redact Tools
 
 [PDF Redact Tools](https://github.com/firstlookmedia/pdf-redact-tools) is
-a software developed by the people from [First Look
+software developed by the people from [First Look
 Media](https://firstlook.media/), the entity behind, amongst other things, 
 [The Intercept](https://theintercept.com/).
 
@@ -34,13 +34,13 @@ The tool uses roughly the same approach than mat2 to deal with PDF,
 which is unfortunately the only fileformat that it does support.
 It's interesting to note that it has counter-measures against
 [yellow dots](https://en.wikipedia.org/wiki/Machine_Identification_Code),
-a capacity that mat2 [doesn't possess yet](https://0xacab.org/jvoisin/mat2/issues/43).
+a capacity that mat2 doesn't have.
 
 
 # Exiv2
 
 [Exiv2](https://www.exiv2.org/) was considered for mat2,
-but it currently [misses a lot of metadata](https://0xacab.org/jvoisin/mat2/issues/85)
+but it currently misses a lot of metadata.
 
 
 # Others non open source software/online service
