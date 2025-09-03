@@ -1,0 +1,45 @@
+name: CI for Python versions
+on:
+  pull_request:
+  push:
+  schedule:
+    - cron: '0 16 * * 5'
+
+jobs:
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+      - run: pip install ruff
+      - run: | 
+          ruff check .
+  build:
+    needs: linting
+    runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14.0-rc.2"]
+    steps:
+      - uses: actions/checkout@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          sudo apt-get install --no-install-recommends --no-install-suggests --yes \
+            ffmpeg \
+            gir1.2-gdkpixbuf-2.0 \
+            gir1.2-poppler-0.18 \
+            gir1.2-rsvg-2.0 \
+            libimage-exiftool-perl \
+            python3-gi-cairo \
+            libcairo2-dev \
+            libgirepository-2.0-dev \
+            libgirepository1.0-dev \
+            gobject-introspection \
+            python3-mutagen
+          pip install .
+      - name: Build and run the testsuite
+        run:  python3 -m unittest discover -v
