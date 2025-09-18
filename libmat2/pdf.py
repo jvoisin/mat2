@@ -27,7 +27,7 @@ class PDFParser(abstract.AbstractParser):
 
     def __init__(self, filename):
         super().__init__(filename)
-        self.uri = 'file://' + os.path.abspath(self.filename)
+        self.uri = 'file://' + GLib.Uri.escape_string(os.path.abspath(self.filename), '/', True)
         self.__scale = 200 / 72.0  # how much precision do we want for the render
         try:  # Check now that the file is valid, to avoid surprises later
             Poppler.Document.new_from_file(self.uri, None)
@@ -125,11 +125,11 @@ class PDFParser(abstract.AbstractParser):
 
     @staticmethod
     def __remove_superficial_meta(in_file: str, out_file: str) -> bool:
-        document = Poppler.Document.new_from_file('file://' + in_file)
+        document = Poppler.Document.new_from_file('file://' + GLib.Uri.escape_string(in_file, '/', True))
         document.set_producer('')
         document.set_creator('')
         document.set_creation_date(-1)
-        document.save('file://' + os.path.abspath(out_file))
+        document.save('file://' + GLib.Uri.escape_string(os.path.abspath(out_file), '/', True))
 
         # Cairo adds "/Producer" and "/CreationDate", and Poppler sometimes
         # fails to remove them, we have to use this terrible regex.
