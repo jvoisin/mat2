@@ -41,7 +41,7 @@ class AbstractFFmpegParser(exiftool.ExiftoolParser):
             else:
                 subprocess.run(cmd, check=True)
         except subprocess.CalledProcessError as e:
-            logging.error("Something went wrong during the processing of %s: %s", self.filename, e)
+            logging.error("Something went wrong during the processing of %s: return code %d", self.filename, e.returncode)
             return False
         return True
 
