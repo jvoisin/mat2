@@ -16,6 +16,7 @@ class EPUBParser(archive.ZipParser):
         super().__init__(filename)
         self.files_to_keep = set(map(re.compile, {  # type: ignore
             'META-INF/container.xml',
+            'META-INF/com.apple.ibooks.display-options.xml',  # specify is "specified fonts" should be used
             'mimetype',
             'OEBPS/content.opf',
             'content.opf',
