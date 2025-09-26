@@ -57,8 +57,6 @@ def create_arg_parser() -> argparse.ArgumentParser:
                         ', '.join(p.value for p in UnknownMemberPolicy))
     parser.add_argument('--inplace', action='store_true',
                         help='clean in place, without backup')
-    parser.add_argument('--no-sandbox', dest='sandbox', action='store_false',
-                        default=True, help='Disable bubblewrap\'s sandboxing')
 
     excl_group = parser.add_mutually_exclusive_group()
     excl_group.add_argument('files', nargs='*', help='the files to process',
@@ -82,7 +80,7 @@ def create_arg_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def show_meta(filename: str, sandbox: bool):
+def show_meta(filename: str):
     if not __check_file(filename):
         return
 
@@ -94,7 +92,6 @@ def show_meta(filename: str, sandbox: bool):
     if p is None:
         __print_without_chars("[-] %s's format (%s) is not supported" % (filename, mtype))
         return
-    p.sandbox = sandbox
     __print_meta(filename, p.get_meta())
 
 
@@ -119,7 +116,7 @@ def __print_meta(filename: str, metadata: Dict, depth: int = 1):
             pass  # for things that aren't iterable
 
 
-def clean_meta(filename: str, is_lightweight: bool, inplace: bool, sandbox: bool,
+def clean_meta(filename: str, is_lightweight: bool, inplace: bool,
                policy: UnknownMemberPolicy) -> bool:
     mode = (os.R_OK | os.W_OK) if inplace else os.R_OK
     if not __check_file(filename, mode):
@@ -135,7 +132,6 @@ def clean_meta(filename: str, is_lightweight: bool, inplace: bool, sandbox: bool
         return False
     p.unknown_member_policy = policy
     p.lightweight_cleaning = is_lightweight
-    p.sandbox = sandbox
 
     try:
         logging.debug('Cleaning %s…', filename)
@@ -203,7 +199,7 @@ def main() -> int:
 
     elif args.show:
         for f in __get_files_recursively(args.files):
-            show_meta(f, args.sandbox)
+            show_meta(f)
         return 0
 
     else:
@@ -220,7 +216,7 @@ def main() -> int:
         with concurrent.futures.ProcessPoolExecutor() as executor:
             for f in files:
                 future = executor.submit(clean_meta, f, args.lightweight,
-                                         inplace, args.sandbox, policy)
+                                         inplace, policy)
                 futures.append(future)
         for future in concurrent.futures.as_completed(futures):
             no_failure &= future.result()

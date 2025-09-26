@@ -6,8 +6,6 @@ import logging
 from typing import Union, Dict
 
 from . import exiftool
-from . import bubblewrap
-
 
 class AbstractFFmpegParser(exiftool.ExiftoolParser):
     """ Abstract parser for all FFmpeg-based ones, mainly for video. """
@@ -34,12 +32,7 @@ class AbstractFFmpegParser(exiftool.ExiftoolParser):
                '-flags:a', '+bitexact',  # don't add any metadata
                self.output_filename]
         try:
-            if self.sandbox:
-                bubblewrap.run(cmd, check=True,
-                               input_filename=self.filename,
-                               output_filename=self.output_filename)
-            else:
-                subprocess.run(cmd, check=True)
+            subprocess.run(cmd, check=True)
         except subprocess.CalledProcessError as e:
             logging.error("Something went wrong during the processing of %s: return code %d", self.filename, e.returncode)
             return False

@@ -164,7 +164,6 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
                 member_parser, _ = parser_factory.get_parser(full_path)  # type: ignore
                 if member_parser:
-                    member_parser.sandbox = self.sandbox
                     local_meta = {**local_meta, **member_parser.get_meta()}
 
                 if local_meta:
@@ -252,7 +251,6 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                             abort = True
                             continue
                     else:
-                        member_parser.sandbox = self.sandbox
                         if member_parser.remove_all() is False:
                             logging.warning("In file %s, something went wrong \
                                              with the cleaning of %s \

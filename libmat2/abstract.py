@@ -30,7 +30,6 @@ class AbstractParser(abc.ABC):
 
         self.output_filename = fname + '.cleaned' + extension
         self.lightweight_cleaning = False
-        self.sandbox = True
 
     @abc.abstractmethod
     def get_meta(self) -> Dict[str, Union[str, Dict]]:

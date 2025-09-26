@@ -7,7 +7,6 @@ import subprocess
 from typing import Union, Set, Dict
 
 from . import abstract
-from . import bubblewrap
 
 
 class ExiftoolParser(abstract.AbstractParser):
@@ -19,15 +18,9 @@ class ExiftoolParser(abstract.AbstractParser):
 
     def get_meta(self) -> Dict[str, Union[str, Dict]]:
         try:
-            if self.sandbox:
-                out = bubblewrap.run([_get_exiftool_path(), '-json',
-                                      self.filename],
-                                     input_filename=self.filename,
-                                     check=True, stdout=subprocess.PIPE).stdout
-            else:
-                out = subprocess.run([_get_exiftool_path(), '-json',
-                                      self.filename],
-                                     check=True, stdout=subprocess.PIPE).stdout
+            out = subprocess.run([_get_exiftool_path(), '-json',
+                                  self.filename],
+                                 check=True, stdout=subprocess.PIPE).stdout
         except subprocess.CalledProcessError:  # pragma: no cover
             raise ValueError
         meta = json.loads(out.decode('utf-8'))[0]
@@ -56,12 +49,7 @@ class ExiftoolParser(abstract.AbstractParser):
                '-o', self.output_filename,
                self.filename]
         try:
-            if self.sandbox:
-                bubblewrap.run(cmd, check=True,
-                               input_filename=self.filename,
-                               output_filename=self.output_filename)
-            else:
-                subprocess.run(cmd, check=True)
+            subprocess.run(cmd, check=True)
         except subprocess.CalledProcessError as e:  # pragma: no cover
             logging.error("Something went wrong during the processing of %s: %s", self.filename, e)
             return False

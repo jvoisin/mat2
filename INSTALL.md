@@ -11,11 +11,6 @@ pip3 install mat2
 
 # GNU/Linux
 
-## Optional dependencies
-
-When [bubblewrap](https://github.com/projectatomic/bubblewrap) is
-installed, mat2 uses it to sandbox any external processes it invokes.
-
 ## Arch Linux
 
 Thanks to [kpcyrd](https://archlinux.org/packages/?maintainer=kpcyrd), there is an package available on

@@ -24,7 +24,6 @@ class TestHelp(unittest.TestCase):
         self.assertIn(b'mat2 [-h] [-V]', stdout)
         self.assertIn(b'[--unknown-members policy]', stdout)
         self.assertIn(b'[--inplace]', stdout)
-        self.assertIn(b'[--no-sandbox]', stdout)
         self.assertIn(b' [-v] [-l]', stdout)
         self.assertIn(b'[--check-dependencies]', stdout)
         self.assertIn(b'[-L | -s]', stdout)
@@ -36,8 +35,10 @@ class TestHelp(unittest.TestCase):
         self.assertIn(b'mat2 [-h] [-V]', stdout)
         self.assertIn(b'[--unknown-members policy]', stdout)
         self.assertIn(b'[--inplace]', stdout)
-        self.assertIn(b'[--no-sandbox]', stdout)
-        self.assertIn(b' [-v] [-l] [--check-dependencies] [-L | -s]', stdout)
+        self.assertIn(b' [-v]', stdout)
+        self.assertIn(b'[-l]', stdout)
+        self.assertIn(b'[--check-dependencies]', stdout)
+        self.assertIn(b'[-L | -s]', stdout)
         self.assertIn(b'[files ...]', stdout)
 
 
@@ -120,26 +121,6 @@ class TestCleanMeta(unittest.TestCase):
         self.assertNotIn(b'Comment: Created with GIMP', stdout)
 
         os.remove('./tests/data/clean.jpg')
-
-    def test_jpg_nosandbox(self):
-        shutil.copy('./tests/data/dirty.jpg', './tests/data/clean.jpg')
-
-        proc = subprocess.Popen(mat2_binary + ['--show', '--no-sandbox', './tests/data/clean.jpg'],
-                stdout=subprocess.PIPE)
-        stdout, _ = proc.communicate()
-        self.assertIn(b'Comment: Created with GIMP', stdout)
-
-        proc = subprocess.Popen(mat2_binary + ['./tests/data/clean.jpg'],
-                stdout=subprocess.PIPE)
-        stdout, _ = proc.communicate()
-
-        proc = subprocess.Popen(mat2_binary + ['--show', './tests/data/clean.cleaned.jpg'],
-                stdout=subprocess.PIPE)
-        stdout, _ = proc.communicate()
-        self.assertNotIn(b'Comment: Created with GIMP', stdout)
-
-        os.remove('./tests/data/clean.jpg')
-        os.remove('./tests/data/clean.cleaned.jpg')
 
 
 class TestCopyPermissions(unittest.TestCase):

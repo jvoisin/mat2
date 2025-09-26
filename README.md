@@ -39,7 +39,6 @@ If you prefer a regular graphical user interface, you might be interested in
 - `gir1.2-rsvg-2.0` for svg support
 - `FFmpeg`, optionally, for video support
 - `libimage-exiftool-perl` for everything else
-- `bubblewrap`, optionally, for sandboxing
 
 Please note that mat2 requires at least Python3.5.
 
@@ -65,7 +64,7 @@ $ python3-coverage report --include -m --include /libmat2/*'
 # How to use mat2
 
 ```
-usage: mat2 [-h] [-V] [--unknown-members policy] [--inplace] [--no-sandbox]
+usage: mat2 [-h] [-V] [--unknown-members policy] [--inplace]
             [-v] [-l] [--check-dependencies] [-L | -s]
             [files [files ...]]
 
@@ -82,7 +81,6 @@ optional arguments:
                         (policy should be one of: abort, omit, keep) [Default:
                         abort]
   --inplace             clean in place, without backup
-  --no-sandbox          Disable bubblewrap's sandboxing
   -v, --version         show program's version number and exit
   -l, --list            list all supported fileformats
   --check-dependencies  check if mat2 has all the dependencies it needs

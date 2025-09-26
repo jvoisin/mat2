@@ -41,7 +41,6 @@ def TestOneInput(data):
     try:
         p, _ = parser_factory.get_parser(fname)
         if p:
-            p.sandbox = False
             p.get_meta()
             p.remove_all()
             p, _ = parser_factory.get_parser(fname)
