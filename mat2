@@ -9,6 +9,7 @@ import argparse
 import logging
 import unicodedata
 import concurrent.futures
+import warnings
 
 try:
     from libmat2 import parser_factory, UNSUPPORTED_EXTENSIONS
@@ -57,6 +58,9 @@ def create_arg_parser() -> argparse.ArgumentParser:
                         ', '.join(p.value for p in UnknownMemberPolicy))
     parser.add_argument('--inplace', action='store_true',
                         help='clean in place, without backup')
+    parser.add_argument('--no-sandbox', dest='sandbox', action='store_true',
+                        default=False, help='Disable bubblewrap\'s sandboxing')
+
 
     excl_group = parser.add_mutually_exclusive_group()
     excl_group.add_argument('files', nargs='*', help='the files to process',
@@ -180,6 +184,9 @@ def __get_files_recursively(files: List[str]) -> List[str]:
 def main() -> int:
     arg_parser = create_arg_parser()
     args = arg_parser.parse_args()
+
+    if args.sandbox:
+        warnings.warn("sandboxing support has been removed", DeprecationWarning)
 
     if args.verbose:
         logging.getLogger(__name__).setLevel(logging.DEBUG)
