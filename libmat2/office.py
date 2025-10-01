@@ -135,6 +135,7 @@ class MSOfficeParser(ZipParser):
             r'^customXml/',
             r'webSettings\.xml$',
             r'^docProps/custom\.xml$',
+            r'^docProps/thumbnail.wmf$',
             r'^(?:word|ppt|xl)/printerSettings/',
             r'^(?:word|ppt|xl)/theme',
             r'^(?:word|ppt|xl)/people\.xml$',
