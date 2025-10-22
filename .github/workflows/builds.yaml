@@ -28,6 +28,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
+          sudo apt update && \
           sudo apt-get install --no-install-recommends --no-install-suggests --yes \
             ffmpeg \
             gir1.2-gdkpixbuf-2.0 \
