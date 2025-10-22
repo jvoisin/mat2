@@ -39,7 +39,8 @@ jobs:
             libgirepository-2.0-dev \
             libimage-exiftool-perl \
             python3-gi-cairo \
-            python3-mutagen
+            python3-mutagen \
+            webp-pixbuf-loader
           pip install .
       - name: Build and run the testsuite
         run:  python3 -m unittest discover -v
