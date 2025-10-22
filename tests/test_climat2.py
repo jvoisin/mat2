@@ -217,11 +217,11 @@ class TestGetMeta(unittest.TestCase):
         self.assertIn(b'i am a : various comment', stdout)
         self.assertIn(b'artist: jvoisin', stdout)
 
-    #def test_webp(self):
-    #    proc = subprocess.Popen(mat2_binary + ['--show', './tests/data/dirty.webp'],
-    #            stdout=subprocess.PIPE)
-    #    stdout, _ = proc.communicate()
-    #    self.assertIn(b'Warning: [minor] Improper EXIF header', stdout)
+    def test_webp(self):
+        proc = subprocess.Popen(mat2_binary + ['--show', './tests/data/dirty.webp'],
+                stdout=subprocess.PIPE)
+        stdout, _ = proc.communicate()
+        self.assertIn(b'Warning: [minor] Improper EXIF header', stdout)
 
 class TestControlCharInjection(unittest.TestCase):
     def test_jpg(self):
