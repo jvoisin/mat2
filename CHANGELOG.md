@@ -1,15 +1,24 @@
+# 0.14.0 - 2025-10-23
+- Add webp support
+- Improve reliability
+- Correctly handle PDF with weird filenames
+- Improve epub support
+- Improve MSOffice documents support
+- Add Python 3.13 and 3.14 support
+- Remove bubblewrap sandboxing
+
 # 0.13.5 - 2025-01-09
 - Keep orientation metadata on jpeg and tiff files
 - Improve cairo-related error/exceptions handling
 - Improve the logging
 - Improve the sandboxing
-- Improve Python3.12 support
+- Improve Python 3.12 support
 - Improve MSOffice documents handling
 
 # 0.13.4 - 2023-08-02
 
 - Add documentation about mat2 on OSX
-- Make use of python3.7 constructs to simplify code
+- Make use of python 3.7 constructs to simplify code
 - Use moderner type annotations
 - Harden get_meta in archive.py against variants of CVE-2022-35410 
 - Improve MSOffice document support
@@ -88,7 +97,7 @@
 
 # 0.10.0 - 2019-11-30
 
-- Make mat2 work on Python3.8
+- Make mat2 work on Python 3.8
 - Minor improvement of ppt handling
 - Minor improvement of odt handling
 - Add an integration KDE's file manager: Dolphin
