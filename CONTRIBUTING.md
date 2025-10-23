@@ -6,10 +6,6 @@ but you can send patches to jvoisin by [email](https://dustri.org/) if you prefe
 Do feel free to pick up [an issue]( https://github.com/jvoisin/mat2/issues )
 and to send a pull-request.
 
-Before sending the pull-request, please do check that everything is fine by
-running the full test suite in GitLab. To do that, after forking mat2 in GitLab,
-you need to go in Settings -> CI/CD -> Runner and there enable shared runners.
-
 Mat2 also has unit tests (that are also run in the full test suite). You can run
 them with `python3 -m unittest discover -v`.
 
@@ -36,10 +32,10 @@ Since mat2 is written in Python3, please conform as much as possible to the
 7. Create a tag with `git tag -s $VERSION`
 8. Push the commit with `git push origin master`
 9. Push the tag with `git push --tags`
-10. Download the gitlab archive of the release
+10. Download the github archive of the release
 11. Diff it against the local copy
 12. If there is no difference, sign the archive with `gpg --armor --detach-sign mat2-$VERSION.tar.xz`
-13. Upload the signature on Gitlab's [tag page](https://github.com/jvoisin/mat2/tags) and add the changelog there
+13. Upload the signature on github [tag page](https://github.com/jvoisin/mat2/tags) and add the changelog there
 14. Announce the release on the [mailing list](https://mailman.boum.org/listinfo/mat-dev)
 15. Sign'n'upload the new version on pypi with `python3 setup.py sdist bdist_wheel` then `twine upload -s dist/*`
 16. Do the secret release dance
