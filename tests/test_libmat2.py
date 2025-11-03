@@ -639,7 +639,7 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/clean.cleaned.html')
         os.remove('./tests/data/clean.cleaned.cleaned.html')
 
-        if sys.version_info >= (3, 13):
+        if sys.version_info >= (3, 9):
             with open('./tests/data/clean.html', 'w') as f:
                 f.write('<title><title><pouet/><meta/></title></title><test/>')
             with self.assertRaises(ValueError):
