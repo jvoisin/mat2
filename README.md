@@ -97,11 +97,6 @@ It's possible to run mat2 as a web service, via
 If you're using WordPress, you might be interested in [wp-mat](https://git.autistici.org/noblogs/wp-mat)
 and [wp-mat-server](https://git.autistici.org/noblogs/wp-mat-server).
 
-## Desktop GUI
-
-For GNU/Linux desktops, it's possible to use the
-[Metadata Cleaner](https://gitlab.com/rmnvgr/metadata-cleaner) GTK application.
-
 # Supported formats
 
 The following formats are supported: avi, bmp, css, epub/ncx, flac, gif, jpeg,
