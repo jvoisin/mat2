@@ -328,7 +328,7 @@ class TestCleaning(unittest.TestCase):
         'name': 'pdf',
         'parser': pdf.PDFParser,
         'meta': {'producer': 'pdfTeX-1.40.14'},
-        'expected_meta': {'creation-date': -1, 'format': 'PDF-1.5', 'mod-date': -1},
+        'expected_meta': {'creation-date': -1, 'format': 'PDF-1.4', 'mod-date': -1},
         }, {
             'name': 'png',
             'parser': images.PNGParser,

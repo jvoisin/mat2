@@ -16,8 +16,6 @@ from gi.repository import Poppler, GLib
 
 from . import abstract
 
-FIXED_PDF_VERSION = cairo.PDFVersion.VERSION_1_5
-
 
 class PDFParser(abstract.AbstractParser):
     mimetypes = {'application/pdf', }
@@ -30,9 +28,25 @@ class PDFParser(abstract.AbstractParser):
         self.uri = 'file://' + GLib.Uri.escape_string(os.path.abspath(self.filename), '/', True)
         self.__scale = 200 / 72.0  # how much precision do we want for the render
         try:  # Check now that the file is valid, to avoid surprises later
-            Poppler.Document.new_from_file(self.uri, None)
+            document = Poppler.Document.new_from_file(self.uri, None)
+            self.pdf_version = self.__pdf_version_to_cairo(document.get_pdf_version())
         except GLib.GError:  # Invalid PDF
             raise ValueError
+
+    def __pdf_version_to_cairo(major: int, minor: int) -> cairo.PDFVersion:
+        """
+            Convert a PDF version to the cairo.PDFVersion enum.
+        """
+        if major == 1:
+            if minor == 4:
+                return cairo.PDFVersion(0)
+            elif minor == 5:
+                return cairo.PDFVersion(1)
+            elif minor == 6:
+                return cairo.PDFVersion(2)
+            elif minor == 7:
+                return cairo.PDFVersion(3)
+        return cairo.PDFVersion(0)
 
     def remove_all(self) -> bool:
         if self.lightweight_cleaning is True:
@@ -51,7 +65,7 @@ class PDFParser(abstract.AbstractParser):
 
         tmp_path = tempfile.mkstemp()[1]
         pdf_surface = cairo.PDFSurface(tmp_path, 10, 10)  # resized later anyway
-        pdf_surface.restrict_to_version(FIXED_PDF_VERSION)
+        pdf_surface.restrict_to_version(self.pdf_version)
         pdf_context = cairo.Context(pdf_surface)  # context draws on the surface
 
         for pagenum in range(pages_count):
@@ -80,7 +94,7 @@ class PDFParser(abstract.AbstractParser):
 
         _, tmp_path = tempfile.mkstemp()
         pdf_surface = cairo.PDFSurface(tmp_path, 32, 32)  # resized later anyway
-        pdf_surface.restrict_to_version(FIXED_PDF_VERSION)
+        pdf_surface.restrict_to_version(self.pdf_version)
         pdf_context = cairo.Context(pdf_surface)
 
         for pagenum in range(pages_count):
