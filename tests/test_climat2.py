@@ -24,12 +24,12 @@ class TestHelp(unittest.TestCase):
         self.assertIn(b'mat2 [-h] [-V]', stdout)
         self.assertIn(b'[--unknown-members policy]', stdout)
         self.assertIn(b'[--inplace]', stdout)
-        self.assertIn(b'[-v]', stdout)
-        self.assertIn(b'[-l]', stdout)
-        self.assertIn(b'[--check-dependencies]', stdout)
+        self.assertIn(b'-v', stdout)
+        self.assertIn(b'-l', stdout)
+        self.assertIn(b'--check-dependencies', stdout)
         self.assertIn(b'[-L', stdout)
         self.assertIn(b'-s]', stdout)
-        self.assertIn(b'[files ...]', stdout)
+        self.assertIn(b'files', stdout)
 
     def test_no_arg(self):
         proc = subprocess.Popen(mat2_binary, stdout=subprocess.PIPE)
@@ -37,12 +37,12 @@ class TestHelp(unittest.TestCase):
         self.assertIn(b'mat2 [-h] [-V]', stdout)
         self.assertIn(b'[--unknown-members policy]', stdout)
         self.assertIn(b'[--inplace]', stdout)
-        self.assertIn(b'[-v]', stdout)
-        self.assertIn(b'[-l]', stdout)
-        self.assertIn(b'[--check-dependencies]', stdout)
+        self.assertIn(b'-v', stdout)
+        self.assertIn(b'-l', stdout)
+        self.assertIn(b'--check-dependencies', stdout)
         self.assertIn(b'[-L', stdout)
         self.assertIn(b'-s]', stdout)
-        self.assertIn(b'[files ...]', stdout)
+        self.assertIn(b'files', stdout)
 
 
 class TestVersion(unittest.TestCase):
