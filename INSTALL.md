@@ -26,19 +26,12 @@ apt install mat2
 
 ## Fedora
 
-Thanks to [atenart](https://ack.tf/), there is a package available on
-[Fedora's copr]( https://copr.fedorainfracloud.org/coprs/atenart/mat2/ ).
+mat2 is available in the [official Fedora repositories](https://packages.fedoraproject.org/pkgs/mat2/mat2/).
 
-First you need to enable mat2's copr:
-
-```
-dnf -y copr enable atenart/mat2
-```
-
-Then you can install mat2:
+You can install mat2 with:
 
 ```
-dnf -y install mat2
+dnf install mat2
 ```
 
 ## Gentoo
