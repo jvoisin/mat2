@@ -1,0 +1,16 @@
+[Nemo Action]
+Active=true
+Name=Clean Metadata
+Comment=Remove metadata from selected files
+Icon-Name=edit-clear
+
+# LOGIC:
+# 1. Run mat2
+# 2. Success (&&): Show "Metadata successfully cleaned."
+# 3. Failure (||): Show "An error occurred during cleaning."
+Exec=sh -c 'mat2 %F && zenity --info --text="Metadata successfully cleaned." --title="Cleaning Complete" || zenity --error --text="An error occurred during cleaning." --title="Cleaning Failed"'
+
+Selection=NotNone
+Extensions=any;
+Quote=double
+Terminal=false
