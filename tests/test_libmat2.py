@@ -748,7 +748,10 @@ class TestCleaningArchives(unittest.TestCase):
 
         tmp_dir = tempfile.mkdtemp()
         with tarfile.open('./tests/data/dirty.cleaned.tar') as zout:
-            zout.extractall(path=tmp_dir)
+            if sys.version_info < (3, 12):
+                zout.extractall(path=tmp_dir)
+            else:
+                zout.extractall(path=tmp_dir, filter=None)
             zout.close()
 
         number_of_files = 0
@@ -783,7 +786,10 @@ class TestCleaningArchives(unittest.TestCase):
 
         tmp_dir = tempfile.mkdtemp()
         with tarfile.open('./tests/data/dirty.cleaned.tar.gz') as zout:
-            zout.extractall(path=tmp_dir)
+            if sys.version_info < (3, 12):
+                zout.extractall(path=tmp_dir)
+            else:
+                zout.extractall(path=tmp_dir, filter=None)
             zout.close()
 
         number_of_files = 0
@@ -818,7 +824,10 @@ class TestCleaningArchives(unittest.TestCase):
 
         tmp_dir = tempfile.mkdtemp()
         with tarfile.open('./tests/data/dirty.cleaned.tar.bz2') as zout:
-            zout.extractall(path=tmp_dir)
+            if sys.version_info < (3, 12):
+                zout.extractall(path=tmp_dir)
+            else:
+                zout.extractall(path=tmp_dir, filter=None)
             zout.close()
 
         number_of_files = 0
@@ -853,7 +862,10 @@ class TestCleaningArchives(unittest.TestCase):
 
         tmp_dir = tempfile.mkdtemp()
         with tarfile.open('./tests/data/dirty.cleaned.tar.xz') as zout:
-            zout.extractall(path=tmp_dir)
+            if sys.version_info < (3, 12):
+                zout.extractall(path=tmp_dir)
+            else:
+                zout.extractall(path=tmp_dir, filter=None)
             zout.close()
 
         number_of_files = 0
