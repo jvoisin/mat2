@@ -7,6 +7,7 @@ import tempfile
 import os
 import logging
 import shutil
+import sys
 from typing import Pattern, Union, Any, Set, Dict, List
 
 from . import abstract, UnknownMemberPolicy, parser_factory
@@ -206,7 +207,11 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
                     abort = True
                     break
 
-                zin.extract(member=item, path=temp_folder)
+
+                if (zin is tarfile.TarFile) and sys.version_info < (3, 12):
+                    zin.extract(member=item, path=temp_folder, filter='data')
+                else:
+                    zin.extract(member=item, path=temp_folder)
 
                 try:
                     original_permissions = os.stat(full_path).st_mode
