@@ -340,7 +340,7 @@ class MSOfficeParser(ZipParser):
             return False
 
         if len(namespace.items()) != 1:  # pragma: no cover
-            logging.debug("Got several namespaces for Types: %s", namespace.items())
+            logging.getLogger(__name__).debug("Got several namespaces for Types: %s", namespace.items())
 
         removed_fnames = set()
         with zipfile.ZipFile(self.filename) as zin:
@@ -373,7 +373,7 @@ class MSOfficeParser(ZipParser):
             return False
 
         if len(namespace.items()) != 1:  # pragma: no cover
-            logging.debug("Got several namespaces for Types: %s", namespace.items())
+            logging.getLogger(__name__).debug("Got several namespaces for Types: %s", namespace.items())
 
         removed_fnames = set()
         with zipfile.ZipFile(self.filename) as zin:
