@@ -8,7 +8,7 @@ Icon-Name=edit-clear
 # 1. Run mat2
 # 2. Success (&&): Show "Metadata successfully cleaned."
 # 3. Failure (||): Show "An error occurred during cleaning."
-Exec=sh -c 'mat2 %F && zenity --info --text="Metadata successfully cleaned." --title="Cleaning Complete" || zenity --error --text="An error occurred during cleaning." --title="Cleaning Failed"'
+Exec=sh -c 'mat2 %F && notify-send "MAT2" "Metadata successfully cleaned." || notify-send "MAT2" "An error occurred during cleaning."'
 
 Selection=NotNone
 Extensions=any;
