@@ -103,8 +103,8 @@ and [wp-mat-server](https://git.autistici.org/noblogs/wp-mat-server).
 
 ## Desktop GUI
 
-For GNU/Linux desktops, it's possible to use the
-[Metadata Cleaner](https://gitlab.com/rmnvgr/metadata-cleaner) GTK application.
+For GNU/Linux desktops, it's possible to use the [Metadata
+Cleaner](https://gitlab.com/metadatacleaner/metadatacleaner) GTK application.
 
 # Supported formats
 
