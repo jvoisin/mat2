@@ -551,13 +551,13 @@ class MSOfficeParser(ZipParser):
 
 class LibreOfficeParser(ZipParser):
     mimetypes = {
-        'application/vnd.oasis.opendocument.text',
-        'application/vnd.oasis.opendocument.spreadsheet',
-        'application/vnd.oasis.opendocument.presentation',
-        'application/vnd.oasis.opendocument.graphics',
         'application/vnd.oasis.opendocument.chart',
         'application/vnd.oasis.opendocument.formula',
+        'application/vnd.oasis.opendocument.graphics',
         'application/vnd.oasis.opendocument.image',
+        'application/vnd.oasis.opendocument.presentation',
+        'application/vnd.oasis.opendocument.spreadsheet',
+        'application/vnd.oasis.opendocument.text',
     }
 
     def __init__(self, filename):
@@ -565,14 +565,15 @@ class LibreOfficeParser(ZipParser):
 
         self.files_to_keep = set(map(re.compile, {  # type: ignore
             r'^META-INF/manifest\.xml$',
-            r'^content\.xml$',
+            r'^(?:Object\s\d+/)?content\.xml$',
             r'^manifest\.rdf$',
             r'^mimetype$',
             r'^settings\.xml$',
-            r'^styles\.xml$',
+            r'^(?:Object\s\d+/)?styles\.xml$',
         }))
         self.files_to_omit = set(map(re.compile, {  # type: ignore
-            r'^meta\.xml$',
+            r'^ObjectReplacements/',
+            r'meta\.xml$',
             r'^layout-cache$',
             r'^Configurations2/',
             r'^Thumbnails/',
