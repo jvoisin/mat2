@@ -28,7 +28,7 @@ mat2 provides:
 - a service menu for Dolphin, KDE's default file manager
 
 If you prefer a regular graphical user interface, you might be interested in
-[Metadata Cleaner]( https://gitlab.com/metadatacleaner/metadatacleaner), which
+[Metadata Cleaner](https://gitlab.com/metadatacleaner/metadatacleaner), which
 is using `mat2` under the hood.
 
 # Requirements
