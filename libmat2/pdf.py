@@ -1,6 +1,7 @@
 """ Handle PDF
 
 """
+__lazy_modules__ = ['cairo', 'gi']
 
 import os
 import re

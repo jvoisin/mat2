@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+__lazy_modules__ = ["libmat2"]
+
 import os
 import shutil
 from typing import List, Set, Dict

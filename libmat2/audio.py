@@ -1,3 +1,5 @@
+__lazy_modules__ = ['mutagen']
+
 import mimetypes
 import os
 import shutil
