@@ -21,8 +21,8 @@ class ExiftoolParser(abstract.AbstractParser):
             out = subprocess.run([_get_exiftool_path(), '-json',
                                   self.filename],
                                  check=True, stdout=subprocess.PIPE).stdout
-        except subprocess.CalledProcessError:  # pragma: no cover
-            raise ValueError
+        except subprocess.CalledProcessError as e:  # pragma: no cover
+            raise ValueError(e)
         meta = json.loads(out.decode('utf-8'))[0]
         for key in self.meta_allowlist:
             meta.pop(key, None)

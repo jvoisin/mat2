@@ -31,8 +31,8 @@ class PDFParser(abstract.AbstractParser):
         try:  # Check now that the file is valid, to avoid surprises later
             document = Poppler.Document.new_from_file(self.uri, None)
             self.pdf_version = self.__pdf_version_to_cairo(document.get_pdf_version())
-        except GLib.GError:  # Invalid PDF
-            raise ValueError
+        except GLib.GError as e:  # Invalid PDF
+            raise ValueError(e)
 
     def __pdf_version_to_cairo(major: int, minor: int) -> cairo.PDFVersion:
         """

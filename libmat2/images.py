@@ -23,8 +23,8 @@ class SVGParser(exiftool.ExiftoolParser):
     def remove_all(self) -> bool:
         try:
             svg = Rsvg.Handle.new_from_file(self.filename)
-        except GLib.GError:
-            raise ValueError
+        except GLib.GError as e:
+            raise ValueError(e)
 
         try:
             _, _, _, _, has_viewbox, viewbox = svg.get_intrinsic_dimensions()
@@ -70,9 +70,9 @@ class PNGParser(exiftool.ExiftoolParser):
 
         try:  # better fail here than later
             cairo.ImageSurface.create_from_png(self.filename)
-        except:  # pragma: no cover
+        except Exception as e:  # pragma: no cover
             # Cairo is returning some weird exceptions :/
-            raise ValueError
+            raise ValueError(e)
 
     def remove_all(self) -> bool:
         if self.lightweight_cleaning:
@@ -107,8 +107,8 @@ class GdkPixbufAbstractParser(exiftool.ExiftoolParser):
         super().__init__(filename)
         try:
             GdkPixbuf.Pixbuf.new_from_file(self.filename)
-        except GLib.GError:
-            raise ValueError
+        except GLib.GError as e:
+            raise ValueError(e)
 
     def remove_all(self) -> bool:
         if self.lightweight_cleaning:

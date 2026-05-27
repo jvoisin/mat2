@@ -425,8 +425,8 @@ class ZipParser(ArchiveBasedAbstractParser):
         try:
             with zipfile.ZipFile(self.filename):
                 pass
-        except (zipfile.BadZipFile, OSError):
-            raise ValueError
+        except (zipfile.BadZipFile, OSError) as e:
+            raise ValueError(e)
 
     @staticmethod
     def _clean_member(member: ArchiveMember) -> ArchiveMember:

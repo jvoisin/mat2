@@ -17,8 +17,8 @@ class MutagenParser(abstract.AbstractParser):
         try:
             if mutagen.File(self.filename) is None:
                 raise ValueError
-        except mutagen.MutagenError:
-            raise ValueError
+        except mutagen.MutagenError as e:
+            raise ValueError(e)
 
     def get_meta(self) -> Dict[str, Union[str, Dict]]:
         f = mutagen.File(self.filename)
@@ -32,8 +32,8 @@ class MutagenParser(abstract.AbstractParser):
         try:
             f.delete()
             f.save()
-        except mutagen.MutagenError:
-            raise ValueError
+        except mutagen.MutagenError as e:
+            raise ValueError(e)
         return True
 
 
