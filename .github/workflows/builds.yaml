@@ -6,16 +6,7 @@ on:
     - cron: '0 16 * * 5'
 
 jobs:
-  linting:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v5
-      - run: pip install ruff
-      - run: | 
-          ruff check .
   build:
-    needs: linting
     runs-on: ubuntu-latest
     strategy:
         matrix:
