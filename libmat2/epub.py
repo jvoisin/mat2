@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import logging
 import re
 import uuid
 import zipfile
 import xml.etree.ElementTree as ET  # type: ignore
-from typing import Any, Dict
+from typing import Any
 
 from . import archive, office
 
@@ -38,7 +40,7 @@ class EPUBParser(archive.ZipParser):
                 if member_name.endswith('META-INF/encryption.xml'):
                     raise ValueError('the file contains encrypted fonts')
 
-    def _specific_get_meta(self, full_path, file_path) -> Dict[str, Any]:
+    def _specific_get_meta(self, full_path, file_path) -> dict[str, Any]:
         if not file_path.endswith('.opf'):
             return {}
 

@@ -1,6 +1,8 @@
 """ Handle PDF
 
 """
+from __future__ import annotations
+
 __lazy_modules__ = ['cairo', 'gi']
 
 import os
@@ -8,7 +10,6 @@ import re
 import logging
 import tempfile
 import io
-from typing import Union, Dict
 
 import cairo
 import gi
@@ -159,13 +160,13 @@ class PDFParser(abstract.AbstractParser):
         return True
 
     @staticmethod
-    def __parse_metadata_field(data: str) -> Dict[str, str]:
+    def __parse_metadata_field(data: str) -> dict[str, str]:
         metadata = {}
         for (_, key, value) in re.findall(r"<(xmp|pdfx|pdf|xmpMM):(.+)>(.+)</\1:\2>", data, re.I):
             metadata[key] = value
         return metadata
 
-    def get_meta(self) -> Dict[str, Union[str, Dict]]:
+    def get_meta(self) -> dict[str, str | dict]:
         """ Return a dict with all the meta of the file
         """
         metadata = {}

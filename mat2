@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 __lazy_modules__ = ["libmat2"]
 
 import os
 import shutil
-from typing import List, Set, Dict
 import sys
 import mimetypes
 import argparse
@@ -39,7 +40,7 @@ def __check_file(filename: str, mode: int = os.R_OK) -> bool:
         __print_without_chars("[-] %s is not a regular file." % filename)
         return False
     elif not os.access(filename, mode):
-        mode_str: List[str] = list()
+        mode_str: list[str] = list()
         if mode & os.R_OK:
             mode_str += 'readable'
         if mode & os.W_OK:
@@ -101,7 +102,7 @@ def show_meta(filename: str):
     __print_meta(filename, p.get_meta())
 
 
-def __print_meta(filename: str, metadata: Dict, depth: int = 1):
+def __print_meta(filename: str, metadata: dict, depth: int = 1):
     padding = " " * depth*2
     if not metadata:
         __print_without_chars(padding + "No metadata found in %s." % filename)
@@ -169,8 +170,8 @@ def show_parsers():
     print('\n'.join(sorted(formats)))
 
 
-def __get_files_recursively(files: List[str]) -> List[str]:
-    ret: Set[str] = set()
+def __get_files_recursively(files: list[str]) -> list[str]:
+    ret: set[str] = set()
     for f in files:
         if os.path.isdir(f):
             for path, _, _files in os.walk(f):

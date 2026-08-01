@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 __lazy_modules__ = ['mutagen']
 
 import mimetypes
 import os
 import shutil
 import tempfile
-from typing import Union, Dict
 
 import mutagen
 import mutagen.apev2
@@ -22,7 +23,7 @@ class MutagenParser(abstract.AbstractParser):
         except mutagen.MutagenError as e:
             raise ValueError(e)
 
-    def get_meta(self) -> Dict[str, Union[str, Dict]]:
+    def get_meta(self) -> dict[str, str | dict]:
         f = mutagen.File(self.filename)
         if f.tags:
             return {k: ', '.join(map(str, v)) for k, v in f.tags.items()}
@@ -52,8 +53,8 @@ class MutagenParser(abstract.AbstractParser):
 class MP3Parser(MutagenParser):
     mimetypes = {'audio/mpeg', }
 
-    def get_meta(self) -> Dict[str, Union[str, Dict]]:
-        metadata: Dict[str, Union[str, Dict]] = dict()
+    def get_meta(self) -> dict[str, str | dict]:
+        metadata: dict[str, str | dict] = dict()
         meta = mutagen.File(self.filename).tags
         if not meta:
             return metadata
@@ -83,7 +84,7 @@ class FLACParser(MutagenParser):
         self._remove_appended_tags()
         return True
 
-    def get_meta(self) -> Dict[str, Union[str, Dict]]:
+    def get_meta(self) -> dict[str, str | dict]:
         meta = super().get_meta()
         for num, picture in enumerate(mutagen.File(self.filename).pictures):
             name = picture.desc if picture.desc else 'Cover %d' % num

@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 import functools
 import json
 import logging
 import os
 import shutil
 import subprocess
-from typing import Union, Set, Dict
 
 from . import abstract
 
@@ -14,9 +15,9 @@ class ExiftoolParser(abstract.AbstractParser):
     from a import file, hence why several parsers are re-using its `get_meta`
     method.
     """
-    meta_allowlist: Set[str] = set()
+    meta_allowlist: set[str] = set()
 
-    def get_meta(self) -> Dict[str, Union[str, Dict]]:
+    def get_meta(self) -> dict[str, str | dict]:
         try:
             out = subprocess.run([_get_exiftool_path(), '-json',
                                   self.filename],
