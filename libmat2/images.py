@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import os
 import re
-from typing import Union, Any, Dict
+from typing import Any
 
 import cairo
 
@@ -45,7 +47,7 @@ class SVGParser(exiftool.ExiftoolParser):
         surface.finish()
         return True
 
-    def get_meta(self) -> Dict[str, Union[str, Dict]]:
+    def get_meta(self) -> dict[str, str | dict]:
         meta = super().get_meta()
 
         # The namespace is mandatory, but only the …/2000/svg is valid.
@@ -159,8 +161,8 @@ class TiffParser(GdkPixbufAbstractParser):
 class PPMParser(abstract.AbstractParser):
     mimetypes = {'image/x-portable-pixmap'}
 
-    def get_meta(self) -> Dict[str, Union[str, Dict]]:
-        meta: Dict[str, Union[str, Dict[Any, Any]]] = dict()
+    def get_meta(self) -> dict[str, str | dict]:
+        meta: dict[str, str | dict[Any, Any]] = dict()
         with open(self.filename) as f:
             for idx, line in enumerate(f):
                 if line.lstrip().startswith('#'):

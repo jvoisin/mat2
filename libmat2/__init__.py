@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import enum
 import importlib
-from typing import Dict
 
 from . import exiftool, video
 
@@ -63,8 +64,8 @@ CMD_DEPENDENCIES = {
 }
 
 
-def check_dependencies() -> Dict[str, Dict[str, bool]]:
-    ret: Dict[str, Dict] = dict()
+def check_dependencies() -> dict[str, dict[str, bool]]:
+    ret: dict[str, dict] = dict()
 
     for key, value in DEPENDENCIES.items():
         ret[key] = {
