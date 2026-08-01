@@ -970,6 +970,44 @@ class TestCleaningArchives(unittest.TestCase):
         os.remove('./tests/data/dirty.cleaned.cleaned.tar.xz')
 
 
+class TestXmlAttributeSorting(unittest.TestCase):
+    """ OOXML schemas are sequences: the order of the elements carries meaning,
+    only the order of the attributes doesn't. """
+
+    def test_attributes_are_sorted(self):
+        with tempfile.NamedTemporaryFile(suffix='.xml') as f:
+            f.write(b'<r><e z="1" a="2" m="3"/></r>')
+            f.flush()
+            self.assertTrue(office._sort_xml_attributes(f.name))
+            with open(f.name, 'rb') as g:
+                self.assertIn(b'<e a="2" m="3" z="1"', g.read())
+
+    def test_element_order_is_kept(self):
+        with tempfile.NamedTemporaryFile(suffix='.xml') as f:
+            f.write(b'<document><body><p/><tbl/><p/><sectPr/></body></document>')
+            f.flush()
+            self.assertTrue(office._sort_xml_attributes(f.name))
+            with open(f.name, 'rb') as g:
+                content = g.read()
+            self.assertEqual(re.findall(rb'<(\w+)\s*/>', content),
+                             [b'p', b'tbl', b'p', b'sectPr'])
+
+    def test_pptx_slide_layout_is_preserved(self):
+        # <p:cSld> is a sequence, <p:spTree> comes before <p:extLst>
+        target = './tests/data/ordering.pptx'
+        shutil.copy('./tests/data/narrated_powerpoint_presentation.pptx', target)
+        p = office.MSOfficeParser(target)
+        self.assertTrue(p.remove_all())
+
+        with zipfile.ZipFile(p.output_filename) as zipin:
+            slide = zipin.read('ppt/slides/slide1.xml')
+        self.assertEqual(re.findall(rb'<p:(spTree|extLst)[ />]', slide)[:2],
+                         [b'spTree', b'extLst'])
+
+        os.remove(target)
+        os.remove(p.output_filename)
+
+
 class TestComplexOfficeFiles(unittest.TestCase):
     def test_complex_pptx(self):
         target = './tests/data/clean.pptx'
