@@ -208,3 +208,33 @@ class WEBPParser(GdkPixbufAbstractParser):
                       'ResolutionUnit', 'XResolution', 'YCbCrSubSampling',
                       'YResolution', 'Megapixels', 'ImageHeight', 'Orientation',
                       'HorizontalScale', 'VerticalScale', 'VP8Version'}
+
+
+class AVIFParser(exiftool.ExiftoolParser):
+    mimetypes = {'image/avif'}
+    meta_allowlist = {'SourceFile', 'ExifToolVersion', 'FileName', 'Directory',
+                      'FileSize', 'FileModifyDate', 'FileAccessDate',
+                      'FileInodeChangeDate', 'FilePermissions', 'FileType',
+                      'FileTypeExtension', 'MIMEType', 'MajorBrand',
+                      'MinorVersion', 'CompatibleBrands', 'HandlerType',
+                      'PrimaryItemReference', 'AV1ConfigurationVersion',
+                      'ChromaFormat', 'ChromaSamplePosition', 'ImageWidth',
+                      'ImageHeight', 'ImageSpatialExtent', 'ImagePixelDepth',
+                      'MediaDataSize', 'MediaDataOffset', 'ImageSize',
+                      'Megapixels'}
+
+    def remove_all(self) -> bool:
+        return self._lightweight_cleanup()
+
+
+class JXLParser(exiftool.ExiftoolParser):
+    mimetypes = {'image/jxl'}
+    meta_allowlist = {'SourceFile', 'ExifToolVersion', 'FileName', 'Directory',
+                      'FileSize', 'FileModifyDate', 'FileAccessDate',
+                      'FileInodeChangeDate', 'FilePermissions', 'FileType',
+                      'FileTypeExtension', 'MIMEType', 'MajorBrand',
+                      'MinorVersion', 'CompatibleBrands', 'ImageWidth',
+                      'ImageHeight', 'ImageSize', 'Megapixels'}
+
+    def remove_all(self) -> bool:
+        return self._lightweight_cleanup()

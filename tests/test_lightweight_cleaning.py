@@ -29,6 +29,16 @@ class TestLightWeightCleaning(unittest.TestCase):
                 'meta': {'Warning': '[minor] Improper EXIF header'},
                 'expected_meta': {},
             }, {
+                'name': 'avif',
+                'parser': images.AVIFParser,
+                'meta': {'Description': 'This is a comment, be careful!'},
+                'expected_meta': {},
+            }, {
+                'name': 'jxl',
+                'parser': images.JXLParser,
+                'meta': {'Description': 'This is a comment, be careful!'},
+                'expected_meta': {},
+            }, {
                 'name': 'torrent',
                 'parser': torrent.TorrentParser,
                 'meta': {'created by': b'mktorrent 1.0'},

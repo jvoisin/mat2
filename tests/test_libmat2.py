@@ -122,6 +122,18 @@ class TestGetMeta(unittest.TestCase):
         meta = p.get_meta()
         self.assertEqual(meta['Warning'], '[minor] Improper EXIF header')
 
+    def test_avif(self):
+        p = images.AVIFParser('./tests/data/dirty.avif')
+        meta = p.get_meta()
+        self.assertEqual(meta['Artist'], 'jvoisin')
+        self.assertEqual(meta['Description'], 'This is a comment, be careful!')
+
+    def test_jxl(self):
+        p = images.JXLParser('./tests/data/dirty.jxl')
+        meta = p.get_meta()
+        self.assertEqual(meta['Artist'], 'jvoisin')
+        self.assertEqual(meta['Description'], 'This is a comment, be careful!')
+
     def test_ppm(self):
         p = images.PPMParser('./tests/data/dirty.ppm')
         meta = p.get_meta()
@@ -470,6 +482,16 @@ class TestCleaning(unittest.TestCase):
                   'ResolutionUnit': 'inches',
                   'XResolution': 72,
                   'YResolution': 72}
+        },{
+            'name': 'avif',
+            'parser': images.AVIFParser,
+            'meta': {'Description': 'This is a comment, be careful!'},
+            'expected_meta': {},
+        },{
+            'name': 'jxl',
+            'parser': images.JXLParser,
+            'meta': {'Description': 'This is a comment, be careful!'},
+            'expected_meta': {},
         },{
             'name': 'bmp',
             'parser': harmless.HarmlessParser,

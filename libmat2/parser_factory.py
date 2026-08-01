@@ -14,6 +14,8 @@ mimetypes.add_type('application/x-dtbncx+xml', '.ncx')  # EPUB Navigation Contro
 # This should be removed after we move to python3.10
 # https://github.com/python/cpython/commit/20a5b7e986377bdfd929d7e8c4e3db5847dfdb2d
 mimetypes.add_type('image/heic', '.heic')
+mimetypes.add_type('image/avif', '.avif')
+mimetypes.add_type('image/jxl', '.jxl')
 
 
 def __load_all_parsers():

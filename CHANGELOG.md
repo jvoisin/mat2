@@ -1,5 +1,7 @@
 # Unreleased
 - Remove APEv2 and ID3v1 tags appended to mp3, ogg and flac files
+- Add avif support
+- Add jpeg xl (jxl) support
 
 # 0.14.0 - 2025-10-23
 - Add webp support
