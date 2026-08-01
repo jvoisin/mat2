@@ -37,8 +37,12 @@ def _sort_xml_attributes(full_path: str) -> bool:
     """
     tree = ET.parse(full_path)
 
-    for c in tree.getroot():
-        c[:] = sorted(c, key=lambda child: (child.tag, child.get('desc')))
+    for element in tree.iter():
+        if len(element.attrib) < 2:
+            continue
+        attributes = sorted(element.attrib.items())
+        element.attrib.clear()
+        element.attrib.update(attributes)
 
     tree.write(full_path, xml_declaration=True, encoding='utf-8')
     return True
