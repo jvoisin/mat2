@@ -9,6 +9,9 @@ import tarfile
 import tempfile
 import zipfile
 
+import mutagen
+import mutagen.apev2
+
 from libmat2 import pdf, images, audio, office, parser_factory, torrent, harmless
 from libmat2 import check_dependencies, video, archive, web, epub
 
@@ -321,6 +324,68 @@ class TestRevisionsCleaning(unittest.TestCase):
 
         os.remove('./tests/data/revision_clean.docx')
         os.remove('./tests/data/revision_clean.cleaned.docx')
+
+
+class TestAppendedTagsCleaning(unittest.TestCase):
+    """ APEv2 and ID3v1 blocks are appended after the audio data, and aren't
+    the primary tag of any of those containers. """
+
+    @staticmethod
+    def __append_apev2(filename: str) -> None:
+        tag = mutagen.apev2.APEv2()
+        tag['Artist'] = 'jvoisin'
+        tag['Comment'] = 'I am an appended tag'
+        tag.save(filename)
+
+    @staticmethod
+    def __append_id3v1(filename: str) -> None:
+        # mutagen refuses to write ID3 on non-ID3 containers, hence the
+        # handrolled 128 bytes: TAG, title, artist, album, year, comment, genre
+        tag = b'TAG'
+        for value, size in (('I am so', 30), ('jvoisin', 30), ('harmfull', 30),
+                            ('1337', 4), ('I am an appended tag', 30)):
+            tag += value.encode('utf-8').ljust(size, b'\x00')
+        with open(filename, 'ab') as f:
+            f.write(tag + b'\xff')
+
+    def __leftovers(self, extension: str, parser, append, needles) -> list:
+        """ Clean a file carrying an appended tag, and return the needles that
+        are still in it. Printing the whole file on failure isn't helpful. """
+        target = './tests/data/appended.' + extension
+        shutil.copy('./tests/data/dirty.' + extension, target)
+        append(target)
+
+        p = parser(target)
+        self.assertTrue(p.remove_all())
+
+        with open(p.output_filename, 'rb') as f:
+            content = f.read()
+
+        # the cleaned file must still be a readable audio file
+        self.assertIsNotNone(mutagen.File(p.output_filename))
+
+        os.remove(target)
+        os.remove(p.output_filename)
+        return [n.decode('utf-8') for n in needles if n in content]
+
+    def test_apev2(self):
+        needles = (b'APETAGEX', b'I am an appended tag')
+        for extension, parser in (('mp3', audio.MP3Parser),
+                                  ('ogg', audio.OGGParser),
+                                  ('flac', audio.FLACParser)):
+            with self.subTest(extension=extension):
+                left = self.__leftovers(extension, parser,
+                                        self.__append_apev2, needles)
+                self.assertEqual(left, [])
+
+    def test_id3v1(self):
+        needles = (b'I am an appended tag', )
+        for extension, parser in (('ogg', audio.OGGParser),
+                                  ('flac', audio.FLACParser)):
+            with self.subTest(extension=extension):
+                left = self.__leftovers(extension, parser,
+                                        self.__append_id3v1, needles)
+                self.assertEqual(left, [])
 
 
 class TestCleaning(unittest.TestCase):

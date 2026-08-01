@@ -7,6 +7,8 @@ import tempfile
 from typing import Union, Dict
 
 import mutagen
+import mutagen.apev2
+import mutagen.id3
 
 from . import abstract, parser_factory, video
 
@@ -26,6 +28,15 @@ class MutagenParser(abstract.AbstractParser):
             return {k: ', '.join(map(str, v)) for k, v in f.tags.items()}
         return {}
 
+    def _remove_appended_tags(self) -> None:
+        """ mutagen.File() only binds the container's primary tag, so an APEv2
+        or ID3 block glued to the file is left untouched by delete(). """
+        for module in (mutagen.apev2, mutagen.id3):
+            try:
+                module.delete(self.output_filename)
+            except mutagen.MutagenError as e:
+                raise ValueError(e)
+
     def remove_all(self) -> bool:
         shutil.copy(self.filename, self.output_filename)
         f = mutagen.File(self.output_filename)
@@ -34,6 +45,7 @@ class MutagenParser(abstract.AbstractParser):
             f.save()
         except mutagen.MutagenError as e:
             raise ValueError(e)
+        self._remove_appended_tags()
         return True
 
 
@@ -68,6 +80,7 @@ class FLACParser(MutagenParser):
         f.clear_pictures()
         f.delete()
         f.save(deleteid3=True)
+        self._remove_appended_tags()
         return True
 
     def get_meta(self) -> Dict[str, Union[str, Dict]]:
