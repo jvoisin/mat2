@@ -111,7 +111,7 @@ Cleaner](https://gitlab.com/metadatacleaner/metadatacleaner) GTK application.
 The following formats are supported: avi, bmp, css, epub/ncx, flac, gif, jpeg,
 m4a/mp2/mp3/…, mp4, odc/odf/odg/odi/odp/ods/odt/…, off/opus/oga/spx/…, pdf,
 png, ppm, pptx/xlsx/docx/…, svg/svgz/…, tar/tar.gz/tar.bz2/tar.xz/…, tiff,
-torrent, wav, wmv, zip, webp, …
+torrent, wav, wmv, zip, webp, avif, jxl, …
   
 # Notes about detecting metadata
 
