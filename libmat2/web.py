@@ -13,7 +13,7 @@ from . import abstract
 class CSSParser(abstract.AbstractParser):
     """There is no such things as metadata in CSS files,
     only comments of the form `/* … */`, so we're removing the laters."""
-    mimetypes = {'text/css', }
+    mimetypes = frozenset({'text/css', })
     flags = re.MULTILINE | re.DOTALL
 
     def remove_all(self) -> bool:
@@ -46,10 +46,10 @@ class CSSParser(abstract.AbstractParser):
 
 
 class AbstractHTMLParser(abstract.AbstractParser):
-    tags_blocklist: set[str] = set()
+    tags_blocklist: frozenset[str] = frozenset()
     # In some html/xml-based formats some tags are mandatory,
     # so we're keeping them, but are discarding their content
-    tags_required_blocklist: set[str] = set()
+    tags_required_blocklist: frozenset[str] = frozenset()
 
     def __init__(self, filename):
         super().__init__(filename)
@@ -67,14 +67,14 @@ class AbstractHTMLParser(abstract.AbstractParser):
 
 
 class HTMLParser(AbstractHTMLParser):
-    mimetypes = {'text/html', 'application/xhtml+xml'}
-    tags_blocklist = {'meta', }
-    tags_required_blocklist = {'title', }
+    mimetypes = frozenset({'text/html', 'application/xhtml+xml'})
+    tags_blocklist = frozenset({'meta', })
+    tags_required_blocklist = frozenset({'title', })
 
 
 class DTBNCXParser(AbstractHTMLParser):
-    mimetypes = {'application/x-dtbncx+xml', }
-    tags_required_blocklist = {'title', 'doctitle', 'meta'}
+    mimetypes = frozenset({'application/x-dtbncx+xml', })
+    tags_required_blocklist = frozenset({'title', 'doctitle', 'meta'})
 
 
 class _HTMLParser(parser.HTMLParser):

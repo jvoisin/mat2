@@ -21,7 +21,7 @@ def _parse_xml(full_path: str) -> tuple[ET.ElementTree, dict[str, str]]:
     for _, (key, value) in ET.iterparse(full_path, ("start-ns", )):
         # The ns[0-9]+ namespaces are reserved for internal usage, so
         # we have to use an other nomenclature.
-        if re.match('^ns[0-9]+$', key, re.I):  # pragma: no cover
+        if re.match('^ns[0-9]+$', key, re.IGNORECASE):  # pragma: no cover
             key = 'mat' + key[2:]
 
         namespace_map[key] = value
@@ -548,7 +548,7 @@ class MSOfficeParser(ZipParser):
 
         with open(full_path, encoding='utf-8') as f:
             try:
-                results = re.findall(r"<(.+)>(.+)</\1>", f.read(), re.I | re.M)
+                results = re.findall(r"<(.+)>(.+)</\1>", f.read(), re.IGNORECASE | re.MULTILINE)
                 return {k: v for (k, v) in results}
             except (TypeError, UnicodeDecodeError):
                 # We didn't manage to parse the xml file
@@ -628,7 +628,7 @@ class LibreOfficeParser(ZipParser):
             return {}
         with open(full_path, encoding='utf-8') as f:
             try:
-                results = re.findall(r"<((?:meta|dc|cp).+?)[^>]*>(.+)</\1>", f.read(), re.I|re.M)
+                results = re.findall(r"<((?:meta|dc|cp).+?)[^>]*>(.+)</\1>", f.read(), re.IGNORECASE|re.MULTILINE)
                 return {k:v for (k, v) in results}
             except (TypeError, UnicodeDecodeError):  # We didn't manage to parse the xml file
                 # We didn't manage to parse the xml file

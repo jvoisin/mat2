@@ -47,13 +47,13 @@ class EPUBParser(archive.ZipParser):
         with open(full_path, encoding='utf-8') as f:
             try:
                 results = re.findall(r"<((?:meta|dc|cp).+?)[^>]*>(.+)</\1>",
-                                     f.read(), re.I|re.M)
+                                     f.read(), re.IGNORECASE|re.MULTILINE)
                 return {k:v for (k, v) in results}
             except (TypeError, UnicodeDecodeError):
                 return {file_path: 'harmful content', }
 
     def _specific_cleanup(self, full_path: str) -> bool:
-        if full_path.endswith('hmh.opf') or full_path.endswith('content.opf'):
+        if full_path.endswith(('hmh.opf', 'content.opf')):
             return self.__handle_contentopf(full_path)
         elif full_path.endswith('OEBPS/toc.ncx'):
             return self.__handle_tocncx(full_path)

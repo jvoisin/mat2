@@ -162,7 +162,7 @@ class PDFParser(abstract.AbstractParser):
     @staticmethod
     def __parse_metadata_field(data: str) -> dict[str, str]:
         metadata = {}
-        for (_, key, value) in re.findall(r"<(xmp|pdfx|pdf|xmpMM):(.+)>(.+)</\1:\2>", data, re.I):
+        for (_, key, value) in re.findall(r"<(xmp|pdfx|pdf|xmpMM):(.+)>(.+)</\1:\2>", data, re.IGNORECASE):
             metadata[key] = value
         return metadata
 

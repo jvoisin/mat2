@@ -43,6 +43,29 @@ exclude = ["tests*"]
 "share/man/man1" = ["doc/mat2.1"]
 
 [tool.ruff]
-target-version = "py39"
-# E501 Line too long
-ignore = ["E501", "F401", "E402", "E722"]
+target-version = "py38"
+exclude = ["./tests/"]
+
+[tool.ruff.lint]
+ignore = [
+	# Poor taste/so what/no ones.
+	"I001",    # Import block is un-sorted or un-formatted
+	"SIM102",  # Use a single `if` statement instead of nested `if` statements
+	"C408",    # Unnecessary `list()` call (rewrite as a literal)
+	"UP031",   # Use format specifiers instead of percent format
+	"LOG015",  # `error()` call on root logger
+	"C417",    # Unnecessary `map()` usage (rewrite using a generator expression)
+	"SIM117",  # Use a single `with` statement with multiple contexts instead of nested `with` statements
+	"BLE001",  # Do not catch blind exception: `Exception`
+	"SIM103",  # Return the negated condition directly
+
+	# Plain wrong. 
+	"EXE001",  # Shebang is present but file is not executable
+	"PERF402", # Use `list` or `list.copy` to create a copy of a list
+	"DTZ006",  # `datetime.datetime.fromtimestamp()` called without a `tz` argument
+	"DTZ001",  # `datetime.datetime()` called without a `tzinfo` argument
+
+
+	# Move to frozendict once we're at Python 3.15
+	"RUF012",  # Mutable default value for class attribute
+]

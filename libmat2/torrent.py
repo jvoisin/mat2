@@ -46,7 +46,7 @@ class _BencodeHandler:
             ord('i'): self.__decode_int,
             ord('l'): self.__decode_list,
         }
-        for i in range(0, 10):
+        for i in range(10):
             self.__decode_func[ord(str(i))] = self.__decode_string
 
         self.__encode_func = {

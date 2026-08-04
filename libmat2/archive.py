@@ -128,7 +128,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
     def _get_member_compression(member: ArchiveMember):
         """Get the compression of the archive member."""
         # pylint: disable=unused-argument
-        return None
+        return
 
     @staticmethod
     def _set_member_compression(member: ArchiveMember, compression) -> ArchiveMember:
