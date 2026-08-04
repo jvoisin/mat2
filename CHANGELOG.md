@@ -1,8 +1,16 @@
-# Unreleased
+# 0.15.0 - 2026-08-04
+- Be more upfront about the limited HEIC support
+- Remove setup.py and fully embrace pyproject.toml
+- Add integration with Cinammon's file manager Nemo
+- Improve compatibility with modern Python
+- Don't change the PDF version of cleaned files
 - Remove APEv2 and ID3v1 tags appended to mp3, ogg and flac files
 - Add avif support
 - Add jpeg xl (jxl) support
-- Stop reordering elements in office files, only sort their attributes
+- Improve odt support
+- Improve startup performances on modern python thanks to PEP0810
+- Stop reordering elements in office files, only sort their attributes. This
+  improves compatibility with MS Office.
 
 # 0.14.0 - 2025-10-23
 - Add webp support
