@@ -197,6 +197,10 @@ class HEICParser(exiftool.ExiftoolParser):
             'MediaDataOffset','ImageSize', 'Megapixels'}
 
     def remove_all(self) -> bool:
+        # exiftool can't rewrite HEIF item properties (the `colr` box), so an
+        # embedded ICC profile would survive a thorough cleaning.
+        if not self.lightweight_cleaning:
+            raise RuntimeError("HEIC files can't be thoroughly cleaned. Use lightweight mode instead.")
         return self._lightweight_cleanup()
 
 class WEBPParser(GdkPixbufAbstractParser):

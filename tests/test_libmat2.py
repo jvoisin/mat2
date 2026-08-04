@@ -619,47 +619,6 @@ class TestCleaning(unittest.TestCase):
                 'EncodingSettings': 'Lavf52.103.0',
             },
             'expected_meta': {},
-        },{
-            'name': 'heic',
-            'parser': images.HEICParser,
-            'meta': {},
-            'expected_meta': {
-                'BlueMatrixColumn': '0.14305 0.06061 0.71393',
-                'BlueTRC': '(Binary data 32 bytes, use -b option to extract)',
-                'CMMFlags': 'Not Embedded, Independent',
-                'ChromaticAdaptation': '1.04788 0.02292 -0.05022 0.02959 0.99048 -0.01707 -0.00925 0.01508 0.75168',
-                'ChromaticityChannel1': '0.64 0.33002',
-                'ChromaticityChannel2': '0.3 0.60001',
-                'ChromaticityChannel3': '0.15001 0.06',
-                'ChromaticityChannels': 3,
-                'ChromaticityColorant': 'Unknown',
-                'ColorSpaceData': 'RGB ',
-                'ConnectionSpaceIlluminant': '0.9642 1 0.82491',
-                'DeviceAttributes': 'Reflective, Glossy, Positive, Color',
-                'DeviceManufacturer': '',
-                'DeviceMfgDesc': 'GIMP',
-                'DeviceModel': '',
-                'DeviceModelDesc': 'sRGB',
-                'ExifByteOrder': 'Big-endian (Motorola, MM)',
-                'GreenMatrixColumn': '0.38512 0.7169 0.09706',
-                'GreenTRC': '(Binary data 32 bytes, use -b option to extract)',
-                'MediaWhitePoint': '0.9642 1 0.82491',
-                'PrimaryPlatform': 'Apple Computer Inc.',
-                'ProfileCMMType': 'Little CMS',
-                'ProfileClass': 'Display Device Profile',
-                'ProfileConnectionSpace': 'XYZ ',
-                'ProfileCopyright': 'Public Domain',
-                'ProfileCreator': 'Little CMS',
-                'ProfileDateTime': '2022:05:15 16:29:22',
-                'ProfileDescription': 'GIMP built-in sRGB',
-                'ProfileFileSignature': 'acsp',
-                'ProfileID': 0,
-                'ProfileVersion': '4.3.0',
-                'RedMatrixColumn': '0.43604 0.22249 0.01392',
-                'RedTRC': '(Binary data 32 bytes, use -b option to extract)',
-                'RenderingIntent': 'Perceptual',
-                'Warning': 'Bad IFD0 directory',
-            },
         }
         ]
 
@@ -706,6 +665,22 @@ class TestCleaning(unittest.TestCase):
                 os.remove(target)
                 os.remove(p1.output_filename)
                 os.remove(p2.output_filename)
+
+
+    def test_heic(self):
+        shutil.copy('./tests/data/dirty.heic', './tests/data/clean.heic')
+
+        # HEIC can't be thoroughly cleaned, so it must refuse in normal mode.
+        p = images.HEICParser('./tests/data/clean.heic')
+        with self.assertRaises(RuntimeError):
+            p.remove_all()
+
+        # but lightweight cleaning is still supported.
+        p.lightweight_cleaning = True
+        self.assertTrue(p.remove_all())
+
+        os.remove('./tests/data/clean.heic')
+        os.remove('./tests/data/clean.cleaned.heic')
 
 
     def test_html(self):
