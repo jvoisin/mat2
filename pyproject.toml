@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "mat2"
 version = "0.14.0"
@@ -5,15 +9,38 @@ description = "mat2 is a metadata removal tool, supporting a wide range of commo
 readme = "README.md"
 license = {file = "LICENSE"}
 requires-python = ">=3.8"
+authors = [
+        {name = "Julien (jvoisin) Voisin", email = "julien.voisin+mat2@dustri.org"},
+]
 dependencies = [
         'mutagen',
         'PyGObject',
         'pycairo',
 ]
+classifiers = [
+        "Development Status :: 5 - Production/Stable",
+        "Environment :: Console",
+        "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3 :: Only",
+        "Topic :: Security",
+        "Topic :: File Formats",
+        "Intended Audience :: End Users/Desktop",
+]
+
 [project.urls]
 Repository = "https://github.com/jvoisin/mat2"
 Issues = "https://github.com/jvoisin/mat2/issues"
 Changelog = "https://github.com/jvoisin/mat2/blob/master/CHANGELOG.md"
+
+[tool.setuptools]
+script-files = ["mat2"]
+
+[tool.setuptools.packages.find]
+exclude = ["tests*"]
+
+[tool.setuptools.data-files]
+"share/man/man1" = ["doc/mat2.1"]
 
 [tool.ruff]
 target-version = "py39"
