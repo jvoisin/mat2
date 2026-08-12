@@ -38,6 +38,7 @@ script-files = ["mat2"]
 
 [tool.setuptools.packages.find]
 exclude = ["tests*"]
+namespaces = false
 
 [tool.setuptools.data-files]
 "share/man/man1" = ["doc/mat2.1"]
