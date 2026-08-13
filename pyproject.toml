@@ -9,7 +9,7 @@ description = "mat2 is a metadata removal tool, supporting a wide range of commo
 readme = "README.md"
 license = "LGPL-3.0-or-later"
 license-files = ["LICENSE"]
-requires-python = ">=3.8"
+requires-python = ">=3.11"
 authors = [
         {name = "Julien (jvoisin) Voisin", email = "julien.voisin+mat2@dustri.org"},
 ]
