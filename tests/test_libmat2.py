@@ -354,6 +354,11 @@ class TestRevisionsCleaning(unittest.TestCase):
             self.assertNotIn(b'moveFrom', content)
             self.assertNotIn(b'moveTo', content)
             self.assertNotIn(b'Alice Reviewer', content)
+            # The moved text is kept, once, at the destination, and the run
+            # that followed the `w:moveTo` is still after it.
+            self.assertEqual(content.count(b'The budget figures are confidential.'), 1)
+            self.assertLess(content.index(b'The budget figures are confidential.'),
+                            content.index(b'Trailing text stays last.'))
             self.assertNotIn(b'move12345', content)
             # the moved text is part of the document, only the copy that the
             # move left behind at its source has to go

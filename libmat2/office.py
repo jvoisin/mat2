@@ -290,20 +290,19 @@ class MSOfficeParser(ZipParser):
         elements_ins = list()
         for tag in ('w:ins', 'w:moveTo'):
             for element in tree.iterfind('.//' + tag, namespace):
-                for position, item in enumerate(tree.iter()):  # pragma: no cover
-                    if item == element:
-                        for children in element.iterfind('./*'):
-                            elements_ins.append((element, position, children))
-                        break
+                elements_ins.append(element)
 
-        for (element, position, children) in elements_ins:
-            parent_map[element].insert(position, children)
-
-        # the list can sometimes contain duplicate elements, so don't remove
-        # until all children have been processed
-        for (element, position, children) in elements_ins:
-            if element in parent_map[element]:
-                parent_map[element].remove(element)
+        # Keep the children where the wrapper was. The index has to be the
+        # element's position among its own siblings, not its position in a
+        # walk of the whole tree, or the content lands at the end of the
+        # paragraph and the sentence comes out reordered.
+        for element in elements_ins:
+            parent = parent_map[element]
+            position = list(parent).index(element)
+            for offset, children in enumerate(list(element)):
+                parent.insert(position + offset, children)
+            if element in parent:
+                parent.remove(element)
 
         tree.write(full_path, xml_declaration=True, encoding='utf-8')
         return True
