@@ -268,28 +268,33 @@ class MSOfficeParser(ZipParser):
             logging.error("Unable to parse %s: %s", full_path, e)
             return False
 
-        # Revisions are either deletions (`w:del`) or
-        # insertions (`w:ins`)
-        del_presence = tree.find('.//w:del', namespace)
-        ins_presence = tree.find('.//w:ins', namespace)
-        if del_presence is None and ins_presence is None:
+        # Revisions are deletions (`w:del`), insertions (`w:ins`), or moves,
+        # which are a `w:moveFrom`/`w:moveTo` pair plus their range markers.
+        revisions =('w:del', 'w:ins', 'w:moveFrom', 'w:moveTo',
+                     'w:moveFromRangeStart', 'w:moveFromRangeEnd',
+                     'w:moveToRangeStart', 'w:moveToRangeEnd')
+        if all(tree.find('.//' + r, namespace) is None for r in revisions):
             return True  # No revisions are present
 
         parent_map = {c:p for p in tree.iter() for c in p}
 
         elements_del = list()
-        for element in tree.iterfind('.//w:del', namespace):
-            elements_del.append(element)
+        for tag in ('w:del', 'w:moveFrom', 'w:moveFromRangeStart',
+                    'w:moveFromRangeEnd', 'w:moveToRangeStart',
+                    'w:moveToRangeEnd'):
+            for element in tree.iterfind('.//' + tag, namespace):
+                elements_del.append(element)
         for element in elements_del:
             parent_map[element].remove(element)
 
         elements_ins = list()
-        for element in tree.iterfind('.//w:ins', namespace):
-            for position, item in enumerate(tree.iter()):  # pragma: no cover
-                if item == element:
-                    for children in element.iterfind('./*'):
-                        elements_ins.append((element, position, children))
-                    break
+        for tag in ('w:ins', 'w:moveTo'):
+            for element in tree.iterfind('.//' + tag, namespace):
+                for position, item in enumerate(tree.iter()):  # pragma: no cover
+                    if item == element:
+                        for children in element.iterfind('./*'):
+                            elements_ins.append((element, position, children))
+                        break
 
         for (element, position, children) in elements_ins:
             parent_map[element].insert(position, children)
