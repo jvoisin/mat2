@@ -337,6 +337,31 @@ class TestRevisionsCleaning(unittest.TestCase):
         os.remove('./tests/data/revision_clean.docx')
         os.remove('./tests/data/revision_clean.cleaned.docx')
 
+    def test_msoffice_move(self):
+        with zipfile.ZipFile('./tests/data/revision_move.docx') as zipin:
+            c = zipin.open('word/document.xml')
+            content = c.read()
+            r = b'<w:moveFrom w:id="31" w:author="Alice Reviewer" w:date="2026-01-02T10:00:00Z">'
+            self.assertIn(r, content)
+
+        shutil.copy('./tests/data/revision_move.docx', './tests/data/revision_move_clean.docx')
+        p = office.MSOfficeParser('./tests/data/revision_move_clean.docx')
+        self.assertTrue(p.remove_all())
+
+        with zipfile.ZipFile('./tests/data/revision_move_clean.cleaned.docx') as zipin:
+            c = zipin.open('word/document.xml')
+            content = c.read()
+            self.assertNotIn(b'moveFrom', content)
+            self.assertNotIn(b'moveTo', content)
+            self.assertNotIn(b'Alice Reviewer', content)
+            self.assertNotIn(b'move12345', content)
+            # the moved text is part of the document, only the copy that the
+            # move left behind at its source has to go
+            self.assertEqual(content.count(b'The budget figures are confidential.'), 1)
+
+        os.remove('./tests/data/revision_move_clean.docx')
+        os.remove('./tests/data/revision_move_clean.cleaned.docx')
+
 
 class TestAppendedTagsCleaning(unittest.TestCase):
     """ APEv2 and ID3v1 blocks are appended after the audio data, and aren't
