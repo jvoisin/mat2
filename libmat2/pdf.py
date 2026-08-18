@@ -31,24 +31,25 @@ class PDFParser(abstract.AbstractParser):
         self.__scale = 200 / 72.0  # how much precision do we want for the render
         try:  # Check now that the file is valid, to avoid surprises later
             document = Poppler.Document.new_from_file(self.uri, None)
-            self.pdf_version = self.__pdf_version_to_cairo(document.get_pdf_version())
+            major, minor = document.get_pdf_version()
+            self.pdf_version = self.__pdf_version_to_cairo(major, minor)
         except GLib.GError as e:  # Invalid PDF
             raise ValueError(e)
 
+    @staticmethod
     def __pdf_version_to_cairo(major: int, minor: int) -> cairo.PDFVersion:
         """
-            Convert a PDF version to the cairo.PDFVersion enum.
+            Convert a PDF version to the closest cairo.PDFVersion enum. cairo
+            can't produce anything newer than PDF 1.7 (eg. PDF 2.0), so those
+            are capped to the highest version it supports.
         """
-        if major == 1:
-            if minor == 4:
-                return cairo.PDFVersion(0)
-            elif minor == 5:
-                return cairo.PDFVersion(1)
-            elif minor == 6:
-                return cairo.PDFVersion(2)
-            elif minor == 7:
-                return cairo.PDFVersion(3)
-        return cairo.PDFVersion(0)
+        if major == 1 and minor == 5:
+            return cairo.PDFVersion.VERSION_1_5
+        elif major == 1 and minor == 6:
+            return cairo.PDFVersion.VERSION_1_6
+        elif (major, minor) >= (1, 7):
+            return cairo.PDFVersion.VERSION_1_7
+        return cairo.PDFVersion.VERSION_1_4
 
     def remove_all(self) -> bool:
         if self.lightweight_cleaning is True:
