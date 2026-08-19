@@ -69,7 +69,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
     def is_archive_valid(self):
         """Raise a ValueError is the current archive isn't a valid one."""
 
-    def _specific_cleanup(self, full_path: str) -> bool:
+    def _specific_cleanup(self, full_path: str, member_name: str = '') -> bool:
         """ This method can be used to apply specific treatment
         to files present in the archive."""
         # pylint: disable=unused-argument
@@ -230,7 +230,7 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
 
                 original_compression = self._get_member_compression(item)
 
-                if self._specific_cleanup(full_path) is False:
+                if self._specific_cleanup(full_path, member_name) is False:
                     logging.warning("Something went wrong during deep cleaning of %s in %s",
                                     member_name, self.filename)
                     abort = True

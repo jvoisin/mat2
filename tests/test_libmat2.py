@@ -1143,3 +1143,69 @@ class TextDocx(unittest.TestCase):
         os.remove('./tests/data/comment_clean.docx')
         os.remove('./tests/data/comment_clean.cleaned.docx')
 
+
+
+class TestDanglingRelationships(unittest.TestCase):
+    """A relationship whose target isn't in the package makes the whole
+    document unreadable, so cleaning must drop the relationship along with
+    the part it points to."""
+
+    @staticmethod
+    def __dangling_relationships(path):
+        import posixpath
+        ns = '{http://schemas.openxmlformats.org/package/2006/relationships}'
+        dangling = []
+        with zipfile.ZipFile(path) as zipin:
+            names = set(zipin.namelist())
+            for rels in (n for n in names if n.endswith('.rels')):
+                base = posixpath.dirname(posixpath.dirname(rels))
+                for rel in ET.fromstring(zipin.read(rels)).iter(ns + 'Relationship'):
+                    if rel.get('TargetMode') == 'External':
+                        continue
+                    target = rel.get('Target', '').split('#', 1)[0]
+                    if not target:  # a link to a bookmark, not to a part
+                        continue
+                    if target.startswith('/'):
+                        resolved = target[1:]
+                    else:
+                        resolved = posixpath.normpath(posixpath.join(base, target))
+                    if resolved not in names:
+                        dangling.append((rels, rel.get('Id'), target))
+        return dangling
+
+    def __clean(self, name):
+        shutil.copy('./tests/data/%s' % name, './tests/data/clean_%s' % name)
+        p = office.MSOfficeParser('./tests/data/clean_%s' % name)
+        self.assertTrue(p.remove_all())
+        return './tests/data/clean_%s' % name, p.output_filename
+
+    def test_docx(self):
+        # the fixture points at customXml with a `../` target and at
+        # docProps/custom.xml from the package-root _rels/.rels
+        self.assertEqual(self.__dangling_relationships('./tests/data/dangling_rels.docx'), [])
+
+        source, cleaned = self.__clean('dangling_rels.docx')
+        with zipfile.ZipFile(cleaned) as zipin:
+            names = zipin.namelist()
+        self.assertNotIn('customXml/item1.xml', names)
+        self.assertNotIn('docProps/custom.xml', names)
+        self.assertEqual(self.__dangling_relationships(cleaned), [])
+
+        os.remove(source)
+        os.remove(cleaned)
+
+    def test_xlsx(self):
+        self.assertEqual(self.__dangling_relationships('./tests/data/dangling_rels.xlsx'), [])
+
+        source, cleaned = self.__clean('dangling_rels.xlsx')
+        with zipfile.ZipFile(cleaned) as zipin:
+            names = zipin.namelist()
+            sheet = zipin.read('xl/worksheets/sheet1.xml')
+        self.assertNotIn('customXml/item1.xml', names)
+        self.assertNotIn('xl/printerSettings/printerSettings1.bin', names)
+        self.assertEqual(self.__dangling_relationships(cleaned), [])
+        # the sheet used to reference the printer settings by relationship id
+        self.assertNotIn(b'r:id', sheet)
+
+        os.remove(source)
+        os.remove(cleaned)
