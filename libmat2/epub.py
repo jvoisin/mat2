@@ -52,7 +52,7 @@ class EPUBParser(archive.ZipParser):
             except (TypeError, UnicodeDecodeError):
                 return {file_path: 'harmful content', }
 
-    def _specific_cleanup(self, full_path: str) -> bool:
+    def _specific_cleanup(self, full_path: str, member_name: str = '') -> bool:
         if full_path.endswith(('hmh.opf', 'content.opf')):
             return self.__handle_contentopf(full_path)
         elif full_path.endswith('OEBPS/toc.ncx'):

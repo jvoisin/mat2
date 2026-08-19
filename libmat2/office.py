@@ -4,6 +4,7 @@ import random
 import uuid
 import logging
 import os
+import posixpath
 import re
 import zipfile
 from typing import Any
@@ -97,6 +98,7 @@ class MSOfficeParser(ZipParser):
             'cNvPr': set(),
             'rid': set(),
             }
+        self.__removed_members: set[str] | None = None
 
         self.files_to_keep = set(map(re.compile, {  # type: ignore
             r'^\[Content_Types\]\.xml$',
@@ -340,17 +342,10 @@ class MSOfficeParser(ZipParser):
         tree.write(full_path, xml_declaration=True, encoding='utf-8')
         return True
 
-    def __remove_document_xml_rels_members(self, full_path: str) -> bool:
-        """ Remove the dangling references from the word/_rels/document.xml.rels file, since MS office doesn't like them.
-        """
-        try:
-            tree, namespace = _parse_xml(full_path)
-        except ET.ParseError as e:  # pragma: no cover
-            logging.error("Unable to parse %s: %s", full_path, e)
-            return False
-
-        if len(namespace.items()) != 1:  # pragma: no cover
-            logging.getLogger(__name__).debug("Got several namespaces for Types: %s", namespace.items())
+    def __get_removed_members(self) -> set[str]:
+        """ The set of members that `remove_all` will drop from the archive. """
+        if self.__removed_members is not None:
+            return self.__removed_members
 
         removed_fnames = set()
         with zipfile.ZipFile(self.filename) as zin:
@@ -362,10 +357,97 @@ class MSOfficeParser(ZipParser):
                             continue
                         removed_fnames.add(fname)
                         break
+        self.__removed_members = removed_fnames
+        return removed_fnames
+
+    def __dead_rel_ids(self, member_name: str) -> set[str]:
+        """ The relationship ids of `member_name` that point at a part
+        `remove_all` drops. """
+        rels_name = posixpath.join(posixpath.dirname(member_name), '_rels',
+                                   posixpath.basename(member_name) + '.rels')
+        removed_fnames = self.__get_removed_members()
+        base = posixpath.dirname(member_name)
+        dead = set()
+        with zipfile.ZipFile(self.filename) as zin:
+            if rels_name not in zin.namelist():
+                return dead
+            try:
+                root = ET.fromstring(zin.read(rels_name))
+            except ET.ParseError:  # pragma: no cover
+                return dead
+        for item in root:
+            if item.attrib.get('TargetMode') == 'External':
+                continue
+            target = item.attrib.get('Target', '').split('#', 1)[0]
+            if not target:
+                continue
+            if target.startswith('/'):
+                name = target[1:]
+            else:
+                name = posixpath.normpath(posixpath.join(base, target))
+            if name in removed_fnames:
+                dead.add(item.attrib['Id'])
+        return dead
+
+    def __remove_dead_rel_references(self, full_path: str, member_name: str) -> bool:
+        """ Drop the `r:id`/`r:embed`/… attributes pointing at relationships
+        that `__remove_rels_members` takes away, so that the part doesn't
+        reference a relationship that no longer exists. """
+        dead = self.__dead_rel_ids(member_name)
+        if not dead:
+            return True
+
+        try:
+            tree, _ = _parse_xml(full_path)
+        except ET.ParseError as e:  # pragma: no cover
+            logging.error("Unable to parse %s: %s", full_path, e)
+            return False
+
+        namespace = '{http://schemas.openxmlformats.org/officeDocument/2006/relationships}'
+        changed = False
+        for element in tree.iter():
+            for key in [k for k, v in element.attrib.items()
+                        if k.startswith(namespace) and v in dead]:
+                del element.attrib[key]
+                changed = True
+
+        if changed:
+            tree.write(full_path, xml_declaration=True, encoding='utf-8')
+        return True
+
+    def __remove_rels_members(self, full_path: str, member_name: str) -> bool:
+        """ Remove the dangling references from a `.rels` file, since MS Office
+        doesn't like them.
+
+        Relationship targets are resolved against the folder holding the
+        `_rels` directory, so `word/_rels/document.xml.rels` pointing at
+        `../customXml/item1.xml` refers to `customXml/item1.xml`.
+        """
+        try:
+            tree, namespace = _parse_xml(full_path)
+        except ET.ParseError as e:  # pragma: no cover
+            logging.error("Unable to parse %s: %s", full_path, e)
+            return False
+
+        if len(namespace.items()) != 1:  # pragma: no cover
+            logging.getLogger(__name__).debug("Got several namespaces for Types: %s", namespace.items())
+
+        removed_fnames = self.__get_removed_members()
+        # the base is `word` for `word/_rels/document.xml.rels`,
+        # and the package root for `_rels/.rels`
+        base = posixpath.dirname(posixpath.dirname(member_name))
 
         root = tree.getroot()
         for item in root.findall('{%s}Relationship' % namespace['']):
-            name = 'word/' + item.attrib['Target'] # add the word/ prefix to the path, since all document rels are in the word/ directory
+            if item.attrib.get('TargetMode') == 'External':
+                continue
+            target = item.attrib['Target'].split('#', 1)[0]
+            if not target:  # a link to a bookmark, not to a part
+                continue
+            if target.startswith('/'):  # already relative to the package root
+                name = target[1:]
+            else:
+                name = posixpath.normpath(posixpath.join(base, target))
             if name in removed_fnames:
                 root.remove(item)
 
@@ -385,16 +467,7 @@ class MSOfficeParser(ZipParser):
         if len(namespace.items()) != 1:  # pragma: no cover
             logging.getLogger(__name__).debug("Got several namespaces for Types: %s", namespace.items())
 
-        removed_fnames = set()
-        with zipfile.ZipFile(self.filename) as zin:
-            for fname in [item.filename for item in zin.infolist()]:
-                for file_to_omit in self.files_to_omit:
-                    if file_to_omit.search(fname):
-                        matches = map(lambda r: r.search(fname), self.files_to_keep)
-                        if any(matches):  # the file is in the allowlist
-                            continue
-                        removed_fnames.add(fname)
-                        break
+        removed_fnames = self.__get_removed_members()
 
         root = tree.getroot()
         for item in root.findall('{%s}Override' % namespace['']):
@@ -456,18 +529,23 @@ class MSOfficeParser(ZipParser):
         tree.write(full_path, xml_declaration=True, encoding='utf-8')
         return True
 
-    def _specific_cleanup(self, full_path: str) -> bool:
+    def _specific_cleanup(self, full_path: str, member_name: str = '') -> bool:
         # pylint: disable=too-many-return-statements,too-many-branches
         if os.stat(full_path).st_size == 0:  # Don't process empty files
             return True
 
-        if not full_path.endswith(('.xml', '.xml.rels')):
+        if not full_path.endswith(('.xml', '.rels')):
             return True
 
         if self.__randomize_creationId(full_path) is False:
             return False
 
         self.__collect_counters(full_path)
+
+        if not member_name.endswith('.rels'):
+            # the part might point at relationships that are about to go away
+            if self.__remove_dead_rel_references(full_path, member_name) is False:  # pragma: no cover
+                return False
 
         if full_path.endswith('/[Content_Types].xml'):
             # this file contains references to files that we might
@@ -481,10 +559,11 @@ class MSOfficeParser(ZipParser):
             # remove comment references and ranges
             if self.__remove_document_comment_meta(full_path) is False:
                 return False  # pragma: no cover
-        elif full_path.endswith('/word/_rels/document.xml.rels'):
-            # similar to the above, but for the document.xml.rels file
-            if self.__remove_document_xml_rels_members(full_path) is False:  # pragma: no cover
+        elif member_name.endswith('.rels'):
+            # similar to the above, but for the relationship files
+            if self.__remove_rels_members(full_path, member_name) is False:  # pragma: no cover
                 return False
+
         elif full_path.endswith('/docProps/app.xml'):
             # This file must be present and valid,
             # so we're removing as much as we can.
@@ -607,7 +686,7 @@ class LibreOfficeParser(ZipParser):
         tree.write(full_path, xml_declaration=True, encoding='utf-8')
         return True
 
-    def _specific_cleanup(self, full_path: str) -> bool:
+    def _specific_cleanup(self, full_path: str, member_name: str = '') -> bool:
         if os.stat(full_path).st_size == 0:  # Don't process empty files
             return True
 
