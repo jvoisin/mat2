@@ -98,7 +98,8 @@ class MSOfficeParser(ZipParser):
             'cNvPr': set(),
             'rid': set(),
             }
-        self.__removed_members: set[str] | None = None
+        self.__members_to_remove: set[str] | None = None
+        self.__rels_members: dict[str, bytes] | None = None
 
         self.files_to_keep = set(map(re.compile, {  # type: ignore
             r'^\[Content_Types\]\.xml$',
@@ -342,10 +343,10 @@ class MSOfficeParser(ZipParser):
         tree.write(full_path, xml_declaration=True, encoding='utf-8')
         return True
 
-    def __get_removed_members(self) -> set[str]:
+    def __get_members_to_remove(self) -> set[str]:
         """ The set of members that `remove_all` will drop from the archive. """
-        if self.__removed_members is not None:
-            return self.__removed_members
+        if self.__members_to_remove is not None:
+            return self.__members_to_remove
 
         removed_fnames = set()
         with zipfile.ZipFile(self.filename) as zin:
@@ -357,35 +358,58 @@ class MSOfficeParser(ZipParser):
                             continue
                         removed_fnames.add(fname)
                         break
-        self.__removed_members = removed_fnames
+        self.__members_to_remove = removed_fnames
         return removed_fnames
+
+    def __get_rels_members(self) -> dict[str, bytes]:
+        """ The content of every `.rels` member, read in a single pass over
+        the archive. """
+        if self.__rels_members is None:
+            with zipfile.ZipFile(self.filename) as zin:
+                self.__rels_members = {name: zin.read(name)
+                                       for name in zin.namelist()
+                                       if name.endswith('.rels')}
+        return self.__rels_members
+
+    @staticmethod
+    def __resolve_rel_target(base: str, target: str) -> str:
+        """ Resolve a relationship `Target` (`../customXml/item1.xml`,
+        `/word/styles.xml`, `media/image1.png`, `#_Toc42`, …) against `base`
+        into a zip member name. Returns an empty string when the target is
+        only a bookmark, not a part.
+
+        Zip member names use forward slashes on every platform, hence
+        posixpath rather than os.path.
+        """
+        target = target.partition('#')[0]  # `styles.xml#anchor` -> `styles.xml`
+        if not target:
+            return ''
+        if target.startswith('/'):  # already relative to the package root
+            return target.removeprefix('/')
+        return posixpath.normpath(posixpath.join(base, target))
 
     def __dead_rel_ids(self, member_name: str) -> set[str]:
         """ The relationship ids of `member_name` that point at a part
         `remove_all` drops. """
         rels_name = posixpath.join(posixpath.dirname(member_name), '_rels',
                                    posixpath.basename(member_name) + '.rels')
-        removed_fnames = self.__get_removed_members()
         base = posixpath.dirname(member_name)
-        dead = set()
-        with zipfile.ZipFile(self.filename) as zin:
-            if rels_name not in zin.namelist():
-                return dead
-            try:
-                root = ET.fromstring(zin.read(rels_name))
-            except ET.ParseError:  # pragma: no cover
-                return dead
+        dead: set[str] = set()
+        content = self.__get_rels_members().get(rels_name)
+        if content is None:
+            return dead
+        try:
+            root = ET.fromstring(content)
+        except ET.ParseError:  # pragma: no cover
+            return dead
+        members_to_remove = self.__get_members_to_remove()
         for item in root:
             if item.attrib.get('TargetMode') == 'External':
                 continue
-            target = item.attrib.get('Target', '').split('#', 1)[0]
-            if not target:
+            name = self.__resolve_rel_target(base, item.attrib.get('Target', ''))
+            if not name:
                 continue
-            if target.startswith('/'):
-                name = target[1:]
-            else:
-                name = posixpath.normpath(posixpath.join(base, target))
-            if name in removed_fnames:
+            if name in members_to_remove:
                 dead.add(item.attrib['Id'])
         return dead
 
@@ -432,7 +456,7 @@ class MSOfficeParser(ZipParser):
         if len(namespace.items()) != 1:  # pragma: no cover
             logging.getLogger(__name__).debug("Got several namespaces for Types: %s", namespace.items())
 
-        removed_fnames = self.__get_removed_members()
+        members_to_remove = self.__get_members_to_remove()
         # the base is `word` for `word/_rels/document.xml.rels`,
         # and the package root for `_rels/.rels`
         base = posixpath.dirname(posixpath.dirname(member_name))
@@ -441,14 +465,10 @@ class MSOfficeParser(ZipParser):
         for item in root.findall('{%s}Relationship' % namespace['']):
             if item.attrib.get('TargetMode') == 'External':
                 continue
-            target = item.attrib['Target'].split('#', 1)[0]
-            if not target:  # a link to a bookmark, not to a part
+            name = self.__resolve_rel_target(base, item.attrib['Target'])
+            if not name:  # a link to a bookmark, not to a part
                 continue
-            if target.startswith('/'):  # already relative to the package root
-                name = target[1:]
-            else:
-                name = posixpath.normpath(posixpath.join(base, target))
-            if name in removed_fnames:
+            if name in members_to_remove:
                 root.remove(item)
 
         tree.write(full_path, xml_declaration=True, encoding='utf-8')
@@ -467,12 +487,12 @@ class MSOfficeParser(ZipParser):
         if len(namespace.items()) != 1:  # pragma: no cover
             logging.getLogger(__name__).debug("Got several namespaces for Types: %s", namespace.items())
 
-        removed_fnames = self.__get_removed_members()
+        members_to_remove = self.__get_members_to_remove()
 
         root = tree.getroot()
         for item in root.findall('{%s}Override' % namespace['']):
             name = item.attrib['PartName'][1:]  # remove the leading '/'
-            if name in removed_fnames:
+            if name in members_to_remove:
                 root.remove(item)
 
         tree.write(full_path, xml_declaration=True, encoding='utf-8')
