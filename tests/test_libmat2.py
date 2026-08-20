@@ -8,6 +8,7 @@ import sys
 import tarfile
 import tempfile
 import zipfile
+import xml.etree.ElementTree as ET
 
 import mutagen
 import mutagen.apev2
@@ -776,14 +777,40 @@ class TestCleaning(unittest.TestCase):
 
         p = epub.EPUBParser('./tests/data/clean.cleaned.epub')
         meta = p.get_meta()
-        res = re.match(meta['OEBPS/content.opf']['metadata'], '^<dc:identifier>[0-9a-f-]+</dc:identifier><dc:title /><dc:language />$')
-        self.assertNotEqual(res, False)
+        self.assertIn('id="id"', meta['OEBPS/content.opf']['metadata'])
+        self.assertIn('urn:uuid:00000000-0000-0000-0000-000000000000',
+                  meta['OEBPS/content.opf']['metadata'])
+        self.assertIn('<dc:language>und</dc:language>',
+                  meta['OEBPS/content.opf']['metadata'])
+        self.assertIn('<dc:title>Untitled</dc:title>',
+                  meta['OEBPS/content.opf']['metadata'])
 
         self.assertTrue(p.remove_all())
+        p3 = epub.EPUBParser('./tests/data/clean.cleaned.cleaned.epub')
+        self.assertEqual(meta['OEBPS/content.opf']['metadata'],
+                 p3.get_meta()['OEBPS/content.opf']['metadata'])
 
         os.remove('./tests/data/clean.epub')
         os.remove('./tests/data/clean.cleaned.epub')
         os.remove('./tests/data/clean.cleaned.cleaned.epub')
+
+    def test_epub_preserves_unique_identifier_target(self):
+        opf = ('<package xmlns="http://www.idpf.org/2007/opf" '
+               'xmlns:dc="http://purl.org/dc/elements/1.1/" '
+               'unique-identifier="BookId"><metadata>'
+               '<dc:identifier id="BookId">secret</dc:identifier>'
+               '</metadata></package>')
+        parser = epub.EPUBParser('./tests/data/dirty.epub')
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.opf') as f:
+            f.write(opf)
+            f.flush()
+            self.assertTrue(parser._EPUBParser__handle_contentopf(f.name))
+            root = ET.parse(f.name).getroot()
+            identifier = root.find('{http://www.idpf.org/2007/opf}metadata/'
+                                  '{http://purl.org/dc/elements/1.1/}identifier')
+            self.assertEqual(root.attrib['unique-identifier'], 'BookId')
+            self.assertEqual(identifier.attrib['id'], 'BookId')
+            self.assertEqual(identifier.text, epub.EPUBParser.sanitized_identifier)
 
 
 class TestCleaningArchives(unittest.TestCase):

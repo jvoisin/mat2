@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import re
-import uuid
 import zipfile
 import xml.etree.ElementTree as ET  # type: ignore
 from typing import Any
@@ -13,6 +12,7 @@ from . import archive, office
 class EPUBParser(archive.ZipParser):
     mimetypes = {'application/epub+zip', }
     metadata_namespace = '{http://purl.org/dc/elements/1.1/}'
+    sanitized_identifier = 'urn:uuid:00000000-0000-0000-0000-000000000000'
 
     def __init__(self, filename):
         super().__init__(filename)
@@ -30,7 +30,6 @@ class EPUBParser(archive.ZipParser):
             'META-INF/calibre_bookmarks.txt',
             'OEBPS/package.opf',
              }))
-        self.uniqid = uuid.uuid4()
 
     def is_archive_valid(self):
         super().is_archive_valid()
@@ -99,20 +98,26 @@ class EPUBParser(archive.ZipParser):
             logging.error("Unable to parse %s in %s.", full_path, self.filename)
             return False
 
+        root = tree.getroot()
+        unique_identifier = root.attrib.get('unique-identifier', 'id') or 'id'
+        root.set('unique-identifier', unique_identifier)
+
         for item in tree.iterfind('.//', namespace):  # pragma: nocover
             if item.tag.strip().lower().endswith('metadata'):
                 item.clear()
 
-                # item with mandatory content
-                uniqid = ET.Element(self.metadata_namespace + 'identifier')
-                uniqid.text = str(self.uniqid)
-                uniqid.set('id', 'id')
-                item.append(uniqid)
+                identifier = ET.Element(self.metadata_namespace + 'identifier')
+                identifier.text = self.sanitized_identifier
+                identifier.set('id', unique_identifier)
+                item.append(identifier)
 
-                # items without mandatory content
-                for name in ['language', 'title']:
-                    uniqid = ET.Element(self.metadata_namespace + name)
-                    item.append(uniqid)
+                language = ET.Element(self.metadata_namespace + 'language')
+                language.text = 'und'
+                item.append(language)
+
+                title = ET.Element(self.metadata_namespace + 'title')
+                title.text = 'Untitled'
+                item.append(title)
                 break  # there is only a single <metadata> block
         tree.write(full_path, xml_declaration=True, encoding='utf-8')
         return True
