@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import re
 from typing import Any
 
 import cairo
@@ -187,12 +186,13 @@ class PPMParser(abstract.AbstractParser):
         return meta
 
     def remove_all(self) -> bool:
-        with open(self.filename) as fin:
-            with open(self.output_filename, 'w') as fout:
-                for line in fin:
-                    if not line.lstrip().startswith('#'):
-                        line = re.sub(r"\s+", "", line, flags=re.UNICODE)
-                        fout.write(line)
+        with open(self.filename, 'rb') as fin:
+            data = fin.read()
+        if data.startswith(b'P3'):
+            data = b''.join(line for line in data.splitlines(keepends=True)
+                            if not line.lstrip().startswith(b'#'))
+        with open(self.output_filename, 'wb') as fout:
+            fout.write(data)
         return True
 
 

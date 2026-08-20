@@ -142,6 +142,22 @@ class TestGetMeta(unittest.TestCase):
         self.assertEqual(meta['4'], '# And an other one')
         self.assertEqual(meta['6'], '# and a final one here')
 
+        self.assertTrue(p.remove_all())
+        with open(p.output_filename, 'rb') as f:
+            self.assertEqual(f.read(), b'P3\n3 2 1\n'
+                             b'1 0 1   0 1 0   0 0 1\n'
+                             b'1 1 0   1 0 1   1 0 0\n\n')
+        os.remove(p.output_filename)
+
+        with tempfile.NamedTemporaryFile(suffix='.ppm') as binary:
+            binary.write(b'P6\n1 1\n255\n\x00#\xff')
+            binary.flush()
+            p = images.PPMParser(binary.name)
+            self.assertTrue(p.remove_all())
+            with open(p.output_filename, 'rb') as f:
+                self.assertEqual(f.read(), b'P6\n1 1\n255\n\x00#\xff')
+            os.remove(p.output_filename)
+
     def test_tiff(self):
         p = images.TiffParser('./tests/data/dirty.tiff')
         meta = p.get_meta()
