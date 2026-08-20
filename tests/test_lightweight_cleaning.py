@@ -3,6 +3,8 @@
 import unittest
 import shutil
 import os
+import re
+import zlib
 
 from libmat2 import pdf, images, torrent
 
@@ -88,3 +90,33 @@ class TestLightWeightCleaning(unittest.TestCase):
 
         os.remove(target)
         os.remove(p1.output_filename)
+
+    def test_pdf_does_not_keep_creation_date(self):
+        for lightweight in (False, True):
+            target = './tests/data/clean.pdf'
+            shutil.copy('./tests/data/dirty.pdf', target)
+            parser = pdf.PDFParser(target)
+            parser.lightweight_cleaning = lightweight
+            self.assertTrue(parser.remove_all())
+
+            with open(parser.output_filename, 'rb') as f:
+                data = f.read()
+            streams = re.findall(rb'stream\r?\n(.*?)endstream', data,
+                                 flags=re.DOTALL)
+            decoded = b''.join(
+                zlib.decompress(stream.rstrip(b'\r\n'))
+                for stream in streams
+                if _is_zlib_stream(stream)
+            )
+            self.assertNotIn(b'/CreationDate (D:', decoded)
+
+            os.remove(target)
+            os.remove(parser.output_filename)
+
+
+def _is_zlib_stream(stream):
+    try:
+        zlib.decompress(stream.rstrip(b'\r\n'))
+    except zlib.error:
+        return False
+    return True

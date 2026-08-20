@@ -68,6 +68,8 @@ class PDFParser(abstract.AbstractParser):
 
         tmp_path = tempfile.mkstemp()[1]
         pdf_surface = cairo.PDFSurface(tmp_path, 10, 10)  # resized later anyway
+        pdf_surface.set_metadata(cairo.PDF_METADATA_CREATE_DATE, '')
+        pdf_surface.set_metadata(cairo.PDF_METADATA_CREATOR, '')
         pdf_surface.restrict_to_version(self.pdf_version)
         pdf_context = cairo.Context(pdf_surface)  # context draws on the surface
 
@@ -97,6 +99,8 @@ class PDFParser(abstract.AbstractParser):
 
         _, tmp_path = tempfile.mkstemp()
         pdf_surface = cairo.PDFSurface(tmp_path, 32, 32)  # resized later anyway
+        pdf_surface.set_metadata(cairo.PDF_METADATA_CREATE_DATE, '')
+        pdf_surface.set_metadata(cairo.PDF_METADATA_CREATOR, '')
         pdf_surface.restrict_to_version(self.pdf_version)
         pdf_context = cairo.Context(pdf_surface)
 
@@ -147,16 +151,6 @@ class PDFParser(abstract.AbstractParser):
         document.set_creator('')
         document.set_creation_date(-1)
         document.save('file://' + GLib.Uri.escape_string(os.path.abspath(out_file), '/', True))
-
-        # Cairo adds "/Producer" and "/CreationDate", and Poppler sometimes
-        # fails to remove them, we have to use this terrible regex.
-        # It should(tm) be alright though, because cairo's output format
-        # for metadata is fixed.
-        with open(out_file, 'rb') as f:
-            out = re.sub(rb'<<[\s\n]*/Producer.*?>>', b' << >>', f.read(),
-                         count=0, flags=re.DOTALL | re.IGNORECASE)
-        with open(out_file, 'wb') as f:
-            f.write(out)
 
         return True
 
