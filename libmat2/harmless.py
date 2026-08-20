@@ -6,7 +6,7 @@ from . import abstract
 
 class HarmlessParser(abstract.AbstractParser):
     """ This is the parser for filetypes that can not contain metadata. """
-    mimetypes = {'text/plain', 'image/x-ms-bmp', 'image/bmp'}
+    mimetypes = {'text/plain'}
 
     def get_meta(self) -> dict[str, str | dict]:
         return dict()

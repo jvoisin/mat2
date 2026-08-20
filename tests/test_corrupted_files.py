@@ -10,7 +10,7 @@ import zipfile
 import tarfile
 
 from libmat2 import pdf, images, audio, office, parser_factory, torrent
-from libmat2 import harmless, video, web, archive
+from libmat2 import video, web, archive
 
 # No need to logging messages, should something go wrong,
 # the testsuite _will_ fail.
@@ -165,9 +165,10 @@ class TestCorruptedFiles(unittest.TestCase):
         os.remove('./tests/data/clean.odg')
 
     def test_bmp(self):
-        shutil.copy('./tests/data/dirty.png', './tests/data/clean.bmp')
-        ret = harmless.HarmlessParser('./tests/data/clean.bmp')
-        self.assertIsNotNone(ret)
+        with open('./tests/data/clean.bmp', 'wb') as f:
+            f.write(b'not a bitmap')
+        with self.assertRaises(ValueError):
+            parser_factory.get_parser('./tests/data/clean.bmp')
         os.remove('./tests/data/clean.bmp')
 
     def test_docx(self):

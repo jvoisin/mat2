@@ -524,11 +524,6 @@ class TestCleaning(unittest.TestCase):
             'meta': {'Description': 'This is a comment, be careful!'},
             'expected_meta': {},
         },{
-            'name': 'bmp',
-            'parser': harmless.HarmlessParser,
-            'meta': {},
-            'expected_meta': {},
-        },{
             'name': 'torrent',
             'parser': torrent.TorrentParser,
             'meta': {'created by': b'mktorrent 1.0', 'creation date': 1522397702},
@@ -559,6 +554,11 @@ class TestCleaning(unittest.TestCase):
             'name': 'txt',
             'parser': harmless.HarmlessParser,
             'meta': {},
+            'expected_meta': {},
+        },{
+            'name': 'bmp',
+            'parser': images.BMPParser,
+            'meta': {'Comment': 'Created with GIMP'},
             'expected_meta': {},
         },{
             'name': 'gif',

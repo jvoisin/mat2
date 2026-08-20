@@ -104,6 +104,7 @@ class GdkPixbufAbstractParser(exiftool.ExiftoolParser):
         this has the side-effect of completely removing metadata.
     """
     _type = ''
+    _supports_lightweight_cleaning = True
 
     def __init__(self, filename):
         super().__init__(filename)
@@ -113,7 +114,7 @@ class GdkPixbufAbstractParser(exiftool.ExiftoolParser):
             raise ValueError(e)
 
     def remove_all(self) -> bool:
-        if self.lightweight_cleaning:
+        if self.lightweight_cleaning and self._supports_lightweight_cleaning:
             return self._lightweight_cleanup()
 
         _, extension = os.path.splitext(self.filename)
@@ -143,6 +144,22 @@ class JPGParser(GdkPixbufAbstractParser):
                       'ResolutionUnit', 'XResolution', 'YCbCrSubSampling',
                       'YResolution', 'Megapixels', 'ImageHeight', 'Orientation'}
 
+
+class BMPParser(GdkPixbufAbstractParser):
+    # ExifTool can read BMP metadata but cannot write cleaned BMP files.
+    _supports_lightweight_cleaning = False
+    mimetypes = {'image/bmp', 'image/x-ms-bmp'}
+    meta_allowlist = {'SourceFile', 'ExifToolVersion', 'FileName',
+                      'Directory', 'FileSize', 'FileModifyDate',
+                      'FileAccessDate', 'FileInodeChangeDate',
+                      'FilePermissions', 'FileType', 'FileTypeExtension',
+                      'MIMEType', 'BMPVersion', 'ImageWidth', 'ImageHeight',
+                      'ImageSize', 'Megapixels', 'BitsPerPixel', 'BitDepth',
+                      'Planes', 'Compression', 'ImageLength',
+                      'PixelsPerMeterX', 'PixelsPerMeterY', 'NumColors',
+                      'NumImportantColors', 'ColorSpace', 'RedMask',
+                      'GreenMask', 'BlueMask', 'AlphaMask', 'GammaRed',
+                      'GammaGreen', 'GammaBlue'}
 
 class TiffParser(GdkPixbufAbstractParser):
     _type = 'tiff'
