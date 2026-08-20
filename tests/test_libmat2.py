@@ -316,6 +316,28 @@ class TestRemovingThumbnails(unittest.TestCase):
 
 
 class TestRevisionsCleaning(unittest.TestCase):
+    def test_msoffice_revision_metadata_in_non_document_part(self):
+        with tempfile.NamedTemporaryFile(suffix='.xml') as xml_file:
+            xml_file.write(b'''<?xml version="1.0"?>
+                                <wx:footnotes xmlns:wx="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+                                    <wx:footnote wx:id="1">
+                                        <wx:p><wx:del wx:id="2" wx:author="Reviewer" wx:date="2026-01-01T00:00:00Z"><wx:r><wx:delText>secret</wx:delText></wx:r></wx:del>
+                                        <wx:ins wx:id="3" wx:author="Reviewer" wx:date="2026-01-01T00:00:00Z"><wx:r><wx:t>kept</wx:t></wx:r></wx:ins>
+                                        <wx:rPrChange wx:id="4" wx:author="Reviewer" wx:date="2026-01-01T00:00:00Z"><wx:rPr><wx:b/></wx:rPr></wx:rPrChange></wx:p>
+                                    </wx:footnote>
+                                </wx:footnotes>''')
+            xml_file.flush()
+
+            self.assertTrue(office.MSOfficeParser._MSOfficeParser__remove_revisions(
+                xml_file.name))
+
+            with open(xml_file.name, 'rb') as cleaned:
+                content = cleaned.read()
+            self.assertNotIn(b'secret', content)
+            self.assertIn(b'kept', content)
+            self.assertNotIn(b'Reviewer', content)
+            self.assertNotIn(b'rPrChange', content)
+
     def test_libreoffice(self):
         with zipfile.ZipFile('./tests/data/revision.odt') as zipin:
             c = zipin.open('content.xml')

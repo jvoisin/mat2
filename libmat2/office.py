@@ -266,34 +266,56 @@ class MSOfficeParser(ZipParser):
     @staticmethod
     def __remove_revisions(full_path: str) -> bool:
         try:
-            tree, namespace = _parse_xml(full_path)
+            tree, _namespace = _parse_xml(full_path)
         except ET.ParseError as e:  # pragma: no cover
             logging.error("Unable to parse %s: %s", full_path, e)
             return False
 
-        # Revisions are deletions (`w:del`), insertions (`w:ins`), or moves,
-        # which are a `w:moveFrom`/`w:moveTo` pair plus their range markers.
-        revisions =('w:del', 'w:ins', 'w:moveFrom', 'w:moveTo',
-                     'w:moveFromRangeStart', 'w:moveFromRangeEnd',
-                     'w:moveToRangeStart', 'w:moveToRangeEnd')
-        if all(tree.find('.//' + r, namespace) is None for r in revisions):
+        word_namespace = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+        revision_names = {
+            'del', 'ins', 'moveFrom', 'moveTo', 'moveFromRangeStart',
+            'moveFromRangeEnd', 'moveToRangeStart', 'moveToRangeEnd',
+            'cellIns', 'cellDel', 'rPrChange', 'pPrChange', 'sectPrChange',
+            'tblPrChange', 'trPrChange', 'tcPrChange', 'tblGridChange',
+            'numberingChange', 'customXmlInsRangeStart',
+            'customXmlInsRangeEnd', 'customXmlDelRangeStart',
+            'customXmlDelRangeEnd', 'customXmlMoveFromRangeStart',
+            'customXmlMoveFromRangeEnd', 'customXmlMoveToRangeStart',
+            'customXmlMoveToRangeEnd'
+        }
+        namespace_prefix = '{%s}' % word_namespace
+
+        def _tag_local_name(tag: str) -> str:
+            return tag.removeprefix(namespace_prefix)
+
+        elements = [element for element in tree.iter()
+                if element.tag.startswith(namespace_prefix) and
+                _tag_local_name(element.tag) in revision_names]
+        if not elements:
             return True  # No revisions are present
 
         parent_map = {c:p for p in tree.iter() for c in p}
 
-        elements_del = list()
-        for tag in ('w:del', 'w:moveFrom', 'w:moveFromRangeStart',
-                    'w:moveFromRangeEnd', 'w:moveToRangeStart',
-                    'w:moveToRangeEnd'):
-            for element in tree.iterfind('.//' + tag, namespace):
-                elements_del.append(element)
+        elements_del = [element for element in elements if
+                        _tag_local_name(element.tag) in {
+                            'del', 'moveFrom', 'moveFromRangeStart',
+                            'moveFromRangeEnd', 'moveToRangeStart',
+                            'moveToRangeEnd', 'cellDel', 'rPrChange',
+                            'pPrChange', 'sectPrChange', 'tblPrChange',
+                            'trPrChange', 'tcPrChange', 'tblGridChange',
+                            'numberingChange', 'customXmlInsRangeStart',
+                            'customXmlInsRangeEnd', 'customXmlDelRangeStart',
+                            'customXmlDelRangeEnd',
+                            'customXmlMoveFromRangeStart',
+                            'customXmlMoveFromRangeEnd',
+                            'customXmlMoveToRangeStart',
+                            'customXmlMoveToRangeEnd'}]
         for element in elements_del:
             parent_map[element].remove(element)
 
-        elements_ins = list()
-        for tag in ('w:ins', 'w:moveTo'):
-            for element in tree.iterfind('.//' + tag, namespace):
-                elements_ins.append(element)
+        elements_ins = [element for element in elements if
+                        _tag_local_name(element.tag) in
+                        {'ins', 'moveTo', 'cellIns'}]
 
         # Keep the children where the wrapper was. The index has to be the
         # element's position among its own siblings, not its position in a
@@ -306,6 +328,18 @@ class MSOfficeParser(ZipParser):
                 parent.insert(position + offset, children)
             if element in parent:
                 parent.remove(element)
+
+        # Track-change wrappers are removed above, but revision metadata can
+        # still remain on regular nodes as w:* attributes. Strip them to avoid
+        # leaking editor identity and revision timestamps.
+        revision_attributes = {'author', 'date', 'userId', 'initials', 'ed'}
+        for element in tree.iter():
+            for key in list(element.attrib):
+                if not key.startswith(namespace_prefix):
+                    continue
+                local_name = key.removeprefix(namespace_prefix)
+                if local_name in revision_attributes:
+                    del element.attrib[key]
 
         tree.write(full_path, xml_declaration=True, encoding='utf-8')
         return True
@@ -572,13 +606,14 @@ class MSOfficeParser(ZipParser):
             # remove, and MS Office doesn't like dangling references
             if self.__remove_content_type_members(full_path) is False:  # pragma: no cover
                 return False
-        elif full_path.endswith('/word/document.xml'):
-            # this file contains the revisions
+        elif member_name.startswith('word/') and member_name.endswith('.xml'):
+            # Revisions can occur in the document, notes, headers and footers.
             if self.__remove_revisions(full_path) is False:
                 return False  # pragma: no cover
-            # remove comment references and ranges
-            if self.__remove_document_comment_meta(full_path) is False:
-                return False  # pragma: no cover
+            if full_path.endswith('/word/document.xml'):
+                # remove comment references and ranges
+                if self.__remove_document_comment_meta(full_path) is False:
+                    return False  # pragma: no cover
         elif member_name.endswith('.rels'):
             # similar to the above, but for the relationship files
             if self.__remove_rels_members(full_path, member_name) is False:  # pragma: no cover
