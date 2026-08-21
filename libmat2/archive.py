@@ -142,37 +142,38 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
         with self.archive_class(self.filename) as zin:
             temp_folder = tempfile.mkdtemp()
 
-            for item in self._get_all_members(zin):
-                local_meta = self._get_member_meta(item)
-                member_name = self._get_member_name(item)
+            try:
+                for item in self._get_all_members(zin):
+                    local_meta = self._get_member_meta(item)
+                    member_name = self._get_member_name(item)
 
-                if self._is_dir(item):  # pragma: no cover
-                    continue  # don't keep empty folders
+                    if self._is_dir(item):  # pragma: no cover
+                        continue  # don't keep empty folders
 
-                full_path = os.path.join(temp_folder, member_name)
-                if not os.path.abspath(full_path).startswith(temp_folder):
-                    logging.error("%s contains a file (%s) pointing outside (%s) of its root.",
-                        self.filename, member_name, full_path)
-                    break
+                    full_path = os.path.join(temp_folder, member_name)
+                    if not os.path.abspath(full_path).startswith(temp_folder):
+                        logging.error("%s contains a file (%s) pointing outside (%s) of its root.",
+                            self.filename, member_name, full_path)
+                        break
 
-                try:
-                    zin.extract(member=item, path=temp_folder)
-                except OSError as e:
-                    logging.error("Unable to extraxt %s from %s: %s", item, self.filename, e)
+                    try:
+                        zin.extract(member=item, path=temp_folder)
+                    except OSError as e:
+                        logging.error("Unable to extraxt %s from %s: %s", item, self.filename, e)
 
-                os.chmod(full_path, stat.S_IRUSR)
+                    os.chmod(full_path, stat.S_IRUSR)
 
-                specific_meta = self._specific_get_meta(full_path, member_name)
-                local_meta = {**local_meta, **specific_meta}
+                    specific_meta = self._specific_get_meta(full_path, member_name)
+                    local_meta = {**local_meta, **specific_meta}
 
-                member_parser, _ = parser_factory.get_parser(full_path)  # type: ignore
-                if member_parser:
-                    local_meta = {**local_meta, **member_parser.get_meta()}
+                    member_parser, _ = parser_factory.get_parser(full_path)  # type: ignore
+                    if member_parser:
+                        local_meta = {**local_meta, **member_parser.get_meta()}
 
-                if local_meta:
-                    meta[member_name] = local_meta
-
-        shutil.rmtree(temp_folder)
+                    if local_meta:
+                        meta[member_name] = local_meta
+            finally:
+                shutil.rmtree(temp_folder)
         return meta
 
     def remove_all(self) -> bool:
@@ -184,96 +185,98 @@ class ArchiveBasedAbstractParser(abstract.AbstractParser):
             temp_folder = tempfile.mkdtemp()
             abort = False
 
-            # Sort the items to process, to reduce fingerprinting,
-            # and keep them in the `items` variable.
-            items: list[ArchiveMember] = list()
-            for item in sorted(self._get_all_members(zin), key=self._get_member_name):
-                # Some fileformats do require to have the `mimetype` file
-                # as the first file in the archive.
-                if self._get_member_name(item) == 'mimetype':
-                    items.insert(0, item)
-                else:
-                    items.append(item)
-
-            # Since files order is a fingerprint factor,
-            # we're iterating (and thus inserting) them in lexicographic order.
-            for item in items:
-                member_name = self._get_member_name(item)
-                if self._is_dir(item):
-                    continue  # don't keep empty folders
-
-                full_path = os.path.join(temp_folder, member_name)
-                if not os.path.abspath(full_path).startswith(temp_folder):
-                    logging.error("%s contains a file (%s) pointing outside (%s) of its root.",
-                            self.filename, member_name, full_path)
-                    abort = True
-                    break
-
-
-                if (zin is tarfile.TarFile) and sys.version_info < (3, 12):
-                    zin.extract(member=item, path=temp_folder, filter='data')
-                else:
-                    zin.extract(member=item, path=temp_folder)
-
-                try:
-                    original_permissions = os.stat(full_path).st_mode
-                except FileNotFoundError:
-                    logging.error("Something went wrong during processing of "
-                            "%s in %s, likely a path traversal attack.",
-                            member_name, self.filename)
-                    abort = True
-                    # we're breaking instead of continuing, because this exception
-                    # is raised in case of weird path-traversal-like atttacks.
-                    break
-
-                os.chmod(full_path, original_permissions | stat.S_IWUSR | stat.S_IRUSR)
-
-                original_compression = self._get_member_compression(item)
-
-                if self._specific_cleanup(full_path, member_name) is False:
-                    logging.warning("Something went wrong during deep cleaning of %s in %s",
-                                    member_name, self.filename)
-                    abort = True
-                    continue
-
-                if any(map(lambda r: r.search(member_name), self.files_to_keep)):
-                    # those files aren't supported, but we want to add them anyway
-                    pass
-                elif any(map(lambda r: r.search(member_name), self.files_to_omit)):
-                    continue
-                else:  # supported files that we want to first clean, then add
-                    member_parser, mtype = parser_factory.get_parser(full_path)  # type: ignore
-                    if not member_parser:
-                        if self.unknown_member_policy == UnknownMemberPolicy.OMIT:
-                            logging.warning("In file %s, omitting unknown element %s (format: %s)",
-                                            self.filename, member_name, mtype)
-                            continue
-                        elif self.unknown_member_policy == UnknownMemberPolicy.KEEP:
-                            logging.warning("In file %s, keeping unknown element %s (format: %s)",
-                                            self.filename, member_name, mtype)
-                        else:
-                            logging.error("In file %s, element %s's format (%s) "
-                                          "isn't supported",
-                                          self.filename, member_name, mtype)
-                            abort = True
-                            continue
+            try:
+                # Sort the items to process, to reduce fingerprinting,
+                # and keep them in the `items` variable.
+                items: list[ArchiveMember] = list()
+                for item in sorted(self._get_all_members(zin), key=self._get_member_name):
+                    # Some fileformats do require to have the `mimetype` file
+                    # as the first file in the archive.
+                    if self._get_member_name(item) == 'mimetype':
+                        items.insert(0, item)
                     else:
-                        if member_parser.remove_all() is False:
-                            logging.warning("In file %s, something went wrong \
-                                             with the cleaning of %s \
-                                             (format: %s)",
-                                            self.filename, member_name, mtype)
-                            abort = True
-                            continue
-                        os.rename(member_parser.output_filename, full_path)
+                        items.append(item)
 
-                zinfo = self.member_class(member_name)  # type: ignore
-                zinfo = self._set_member_permissions(zinfo, original_permissions)
-                zinfo = self._set_member_compression(zinfo, original_compression)
-                clean_zinfo = self._clean_member(zinfo)
-                self._add_file_to_archive(zout, clean_zinfo, full_path)
+                # Since files order is a fingerprint factor,
+                # we're iterating (and thus inserting) them in lexicographic order.
+                for item in items:
+                    member_name = self._get_member_name(item)
+                    if self._is_dir(item):
+                        continue  # don't keep empty folders
 
-        shutil.rmtree(temp_folder)
+                    full_path = os.path.join(temp_folder, member_name)
+                    if not os.path.abspath(full_path).startswith(temp_folder):
+                        logging.error("%s contains a file (%s) pointing outside (%s) of its root.",
+                                self.filename, member_name, full_path)
+                        abort = True
+                        break
+
+
+                    if (zin is tarfile.TarFile) and sys.version_info < (3, 12):
+                        zin.extract(member=item, path=temp_folder, filter='data')
+                    else:
+                        zin.extract(member=item, path=temp_folder)
+
+                    try:
+                        original_permissions = os.stat(full_path).st_mode
+                    except FileNotFoundError:
+                        logging.error("Something went wrong during processing of "
+                                "%s in %s, likely a path traversal attack.",
+                                member_name, self.filename)
+                        abort = True
+                        # we're breaking instead of continuing, because this exception
+                        # is raised in case of weird path-traversal-like atttacks.
+                        break
+
+                    os.chmod(full_path, original_permissions | stat.S_IWUSR | stat.S_IRUSR)
+
+                    original_compression = self._get_member_compression(item)
+
+                    if self._specific_cleanup(full_path, member_name) is False:
+                        logging.warning("Something went wrong during deep cleaning of %s in %s",
+                                        member_name, self.filename)
+                        abort = True
+                        continue
+
+                    if any(map(lambda r: r.search(member_name), self.files_to_keep)):
+                        # those files aren't supported, but we want to add them anyway
+                        pass
+                    elif any(map(lambda r: r.search(member_name), self.files_to_omit)):
+                        continue
+                    else:  # supported files that we want to first clean, then add
+                        member_parser, mtype = parser_factory.get_parser(full_path)  # type: ignore
+                        if not member_parser:
+                            if self.unknown_member_policy == UnknownMemberPolicy.OMIT:
+                                logging.warning("In file %s, omitting unknown element %s (format: %s)",
+                                                self.filename, member_name, mtype)
+                                continue
+                            elif self.unknown_member_policy == UnknownMemberPolicy.KEEP:
+                                logging.warning("In file %s, keeping unknown element %s (format: %s)",
+                                                self.filename, member_name, mtype)
+                            else:
+                                logging.error("In file %s, element %s's format (%s) "
+                                              "isn't supported",
+                                              self.filename, member_name, mtype)
+                                abort = True
+                                continue
+                        else:
+                            if member_parser.remove_all() is False:
+                                logging.warning("In file %s, something went wrong \
+                                                 with the cleaning of %s \
+                                                 (format: %s)",
+                                                self.filename, member_name, mtype)
+                                abort = True
+                                continue
+                            os.rename(member_parser.output_filename, full_path)
+
+                    zinfo = self.member_class(member_name)  # type: ignore
+                    zinfo = self._set_member_permissions(zinfo, original_permissions)
+                    zinfo = self._set_member_compression(zinfo, original_compression)
+                    clean_zinfo = self._clean_member(zinfo)
+                    self._add_file_to_archive(zout, clean_zinfo, full_path)
+            finally:
+                shutil.rmtree(temp_folder)
+
         if abort:
             os.remove(self.output_filename)
             return False

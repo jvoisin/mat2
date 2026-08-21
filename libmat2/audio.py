@@ -40,13 +40,14 @@ class MutagenParser(abstract.AbstractParser):
 
     def remove_all(self) -> bool:
         shutil.copy(self.filename, self.output_filename)
-        f = mutagen.File(self.output_filename)
         try:
+            f = mutagen.File(self.output_filename)
             f.delete()
             f.save()
-        except mutagen.MutagenError as e:
+            self._remove_appended_tags()
+        except (mutagen.MutagenError, ValueError) as e:
+            os.remove(self.output_filename)
             raise ValueError(e)
-        self._remove_appended_tags()
         return True
 
 
@@ -77,11 +78,15 @@ class FLACParser(MutagenParser):
 
     def remove_all(self) -> bool:
         shutil.copy(self.filename, self.output_filename)
-        f = mutagen.File(self.output_filename)
-        f.clear_pictures()
-        f.delete()
-        f.save(deleteid3=True)
-        self._remove_appended_tags()
+        try:
+            f = mutagen.File(self.output_filename)
+            f.clear_pictures()
+            f.delete()
+            f.save(deleteid3=True)
+            self._remove_appended_tags()
+        except (mutagen.MutagenError, ValueError) as e:
+            os.remove(self.output_filename)
+            raise ValueError(e)
         return True
 
     def get_meta(self) -> dict[str, str | dict]:
