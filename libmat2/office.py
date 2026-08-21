@@ -31,6 +31,30 @@ def _parse_xml(full_path: str) -> tuple[ET.ElementTree, dict[str, str]]:
     return ET.parse(full_path), namespace_map
 
 
+# The OpenDocument spec fixes these namespace URIs, so matching an element by
+# its `{uri}local` tag stays independent of the document's namespace prefixes
+# while, unlike matching on the local name alone, not colliding with same-named
+# elements from other namespaces (e.g. MathML's `annotation` in an embedded
+# formula object).
+_ODF_OFFICE_NS = 'urn:oasis:names:tc:opendocument:xmlns:office:1.0'
+_ODF_TEXT_NS = 'urn:oasis:names:tc:opendocument:xmlns:text:1.0'
+_ODF_TABLE_NS = 'urn:oasis:names:tc:opendocument:xmlns:table:1.0'
+
+
+def _remove_element_keeping_tail(parent: ET.Element, element: ET.Element) -> None:
+    """ Remove `element` from `parent`, grafting its tail text onto the previous
+    sibling (or the parent's own text when it's the first child), so that the
+    document text surrounding an inline marker survives its removal. """
+    index = list(parent).index(element)
+    if element.tail:
+        if index == 0:
+            parent.text = (parent.text or '') + element.tail
+        else:
+            previous = parent[index - 1]
+            previous.tail = (previous.tail or '') + element.tail
+    parent.remove(element)
+
+
 def _sort_xml_attributes(full_path: str) -> bool:
     """ Sort xml attributes lexicographically,
     because it's possible to fingerprint producers (MS Office, Libreoffice, …)
@@ -712,7 +736,6 @@ class LibreOfficeParser(ZipParser):
             r'^(?:Object\s\d+/)?content\.xml$',
             r'^manifest\.rdf$',
             r'^mimetype$',
-            r'^settings\.xml$',
             r'^(?:Object\s\d+/)?styles\.xml$',
         }))
         self.files_to_omit = set(map(re.compile, {  # type: ignore
@@ -721,22 +744,72 @@ class LibreOfficeParser(ZipParser):
             r'^layout-cache$',
             r'^Configurations2/',
             r'^Thumbnails/',
+            # settings.xml holds window geometry, the last cursor position,
+            # printer and database names, and a per-release set of config keys
+            # that fingerprints the producing application; ODF makes it optional.
+            r'^settings\.xml$',
         }))
 
     @staticmethod
     def __remove_revisions(full_path: str) -> bool:
         try:
-            tree, namespace = _parse_xml(full_path)
+            tree, _namespace = _parse_xml(full_path)
         except ET.ParseError as e:
             logging.error("Unable to parse %s: %s", full_path, e)
             return False
 
-        if 'office' not in namespace:  # no revisions in the current file
-            return True
+        root = tree.getroot()
+        parent_map = {c: p for p in root.iter() for c in p}
 
-        for text in tree.getroot().iterfind('.//office:text', namespace):
-            for changes in text.iterfind('.//text:tracked-changes', namespace):
-                text.remove(changes)
+        # Tracked changes live under `office:text` (text documents) as
+        # `text:tracked-changes` and under `office:spreadsheet` as
+        # `table:tracked-changes`; either way the container carries the deleted
+        # content and its authorship. The in-body `change`/`change-start`/
+        # `change-end` markers and any stray `office:change-info` reference
+        # change ids that no longer exist once the container is gone.
+        revision_tags = {
+            '{%s}tracked-changes' % _ODF_TEXT_NS,
+            '{%s}tracked-changes' % _ODF_TABLE_NS,
+            '{%s}change-info' % _ODF_OFFICE_NS,
+            '{%s}change' % _ODF_TEXT_NS,
+            '{%s}change-start' % _ODF_TEXT_NS,
+            '{%s}change-end' % _ODF_TEXT_NS,
+        }
+        # The inline `change`/`change-start`/`change-end` markers carry the
+        # inserted and surrounding document text in their tail, which
+        # `_remove_element_keeping_tail` preserves.
+        for element in [e for e in root.iter() if e.tag in revision_tags]:
+            parent = parent_map.get(element)
+            if parent is not None:
+                _remove_element_keeping_tail(parent, element)
+
+        tree.write(full_path, xml_declaration=True, encoding='utf-8')
+        return True
+
+    @staticmethod
+    def __remove_annotations(full_path: str) -> bool:
+        try:
+            tree, _namespace = _parse_xml(full_path)
+        except ET.ParseError as e:
+            logging.error("Unable to parse %s: %s", full_path, e)
+            return False
+
+        root = tree.getroot()
+        parent_map = {c: p for p in root.iter() for c in p}
+
+        # Comments are stored inline as an `office:annotation` (holding the
+        # author, date, initials and the comment body) paired with an
+        # `office:annotation-end` marker. Drop both entirely, like the MS
+        # Office parser does; the commented-on document text lives in their
+        # tail and is preserved by `_remove_element_keeping_tail`.
+        annotation_tags = {
+            '{%s}annotation' % _ODF_OFFICE_NS,
+            '{%s}annotation-end' % _ODF_OFFICE_NS,
+        }
+        for element in [e for e in root.iter() if e.tag in annotation_tags]:
+            parent = parent_map.get(element)
+            if parent is not None:
+                _remove_element_keeping_tail(parent, element)
 
         tree.write(full_path, xml_declaration=True, encoding='utf-8')
         return True
@@ -746,8 +819,13 @@ class LibreOfficeParser(ZipParser):
             return True
 
         if os.path.basename(full_path).endswith('.xml'):
-            if os.path.basename(full_path) == 'content.xml':
+            # Tracked changes live in the body (`content.xml`, including an
+            # embedded `Object N/content.xml`); comments can additionally live
+            # in headers and footers, which are stored in `styles.xml`.
+            if os.path.basename(full_path) in ('content.xml', 'styles.xml'):
                 if self.__remove_revisions(full_path) is False:
+                    return False
+                if self.__remove_annotations(full_path) is False:
                     return False
 
             try:

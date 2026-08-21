@@ -349,12 +349,119 @@ class TestRevisionsCleaning(unittest.TestCase):
         self.assertTrue(p.remove_all())
 
         with zipfile.ZipFile('./tests/data/clean.cleaned.odt') as zipin:
+            self.assertNotIn('settings.xml', zipin.namelist())
             c = zipin.open('content.xml')
             r = c.read()
             self.assertNotIn(b'tracked-changes', r)
+            self.assertNotIn(b'change-info', r)
+            self.assertNotIn(b'Unknown Author', r)
+            self.assertNotIn(b'change-start', r)
+            self.assertNotIn(b'change-end', r)
 
         os.remove('./tests/data/clean.odt')
         os.remove('./tests/data/clean.cleaned.odt')
+
+    def test_libreoffice_spreadsheet_revisions(self):
+        with tempfile.NamedTemporaryFile(suffix='.xml') as xml_file:
+            xml_file.write(b'''<?xml version="1.0"?>
+                                <office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+                                    <office:body><office:spreadsheet>
+                                        <table:tracked-changes><table:cell-content-change table:id="ct1">
+                                            <office:change-info><dc:creator>Reviewer</dc:creator><dc:date>2026-01-01T00:00:00</dc:date></office:change-info>
+                                            <table:previous><table:change-track-table-cell><text:p>secret</text:p></table:change-track-table-cell></table:previous>
+                                        </table:cell-content-change></table:tracked-changes>
+                                        <table:table table:name="Sheet1"><table:table-row><table:table-cell><text:p>kept</text:p></table:table-cell></table:table-row></table:table>
+                                    </office:spreadsheet></office:body>
+                                </office:document-content>''')
+            xml_file.flush()
+
+            self.assertTrue(office.LibreOfficeParser._LibreOfficeParser__remove_revisions(
+                xml_file.name))
+
+            with open(xml_file.name, 'rb') as cleaned:
+                content = cleaned.read()
+            self.assertNotIn(b'tracked-changes', content)
+            self.assertNotIn(b'Reviewer', content)
+            self.assertNotIn(b'secret', content)
+            self.assertIn(b'kept', content)
+
+    def test_libreoffice_revisions_keep_inserted_text(self):
+        with tempfile.NamedTemporaryFile(suffix='.xml') as xml_file:
+            xml_file.write(b'''<?xml version="1.0"?>
+                                <office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+                                    <office:body><office:text>
+                                        <text:tracked-changes><text:changed-region text:id="ct1"><text:insertion>
+                                            <office:change-info><dc:creator>Reviewer</dc:creator><dc:date>2026-01-01T00:00:00</dc:date></office:change-info>
+                                        </text:insertion></text:changed-region></text:tracked-changes>
+                                        <text:p>Before <text:change-start text:change-id="ct1"/>inserted words<text:change-end text:change-id="ct1"/> after</text:p>
+                                    </office:text></office:body>
+                                </office:document-content>''')
+            xml_file.flush()
+
+            self.assertTrue(office.LibreOfficeParser._LibreOfficeParser__remove_revisions(
+                xml_file.name))
+
+            with open(xml_file.name, 'rb') as cleaned:
+                content = cleaned.read()
+            self.assertNotIn(b'tracked-changes', content)
+            self.assertNotIn(b'change-start', content)
+            self.assertNotIn(b'change-end', content)
+            self.assertNotIn(b'Reviewer', content)
+            # the inserted text and the text around the markers is document
+            # content, and must survive the removal of the inline markers
+            self.assertIn(b'Before', content)
+            self.assertIn(b'inserted words', content)
+            self.assertIn(b'after', content)
+
+    def test_libreoffice_annotations(self):
+        with tempfile.NamedTemporaryFile(suffix='.xml') as xml_file:
+            xml_file.write(b'''<?xml version="1.0"?>
+                                <office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:loext="urn:oasis:names:tc:openoffice:xmlns:loext:1.0">
+                                    <office:body><office:text><text:p>
+                                        <office:annotation office:name="a1"><dc:creator>Reviewer</dc:creator><dc:date>2026-01-01T00:00:00</dc:date><meta:date-string>January 1, 2026</meta:date-string><loext:sender-initials>RV</loext:sender-initials><text:p>comment body</text:p></office:annotation>
+                                        <office:annotation-end office:name="a1"/>visible</text:p></office:text></office:body>
+                                </office:document-content>''')
+            xml_file.flush()
+
+            self.assertTrue(office.LibreOfficeParser._LibreOfficeParser__remove_annotations(
+                xml_file.name))
+
+            with open(xml_file.name, 'rb') as cleaned:
+                content = cleaned.read()
+            self.assertNotIn(b'Reviewer', content)
+            self.assertNotIn(b'January 1, 2026', content)
+            # ODF 1.2 Extended, the common LibreOffice format, stores comment
+            # initials as `loext:sender-initials`; they must be gone too
+            self.assertNotIn(b'sender-initials', content)
+            self.assertNotIn(b'RV', content)
+            # the whole comment is dropped, along with its paired end marker
+            self.assertNotIn(b'comment body', content)
+            self.assertNotIn(b'annotation', content)
+            # but the commented-on document text must be preserved
+            self.assertIn(b'visible', content)
+
+    def test_libreoffice_annotations_keep_mathml(self):
+        # An embedded formula object is stored as `Object N/content.xml`, so it
+        # goes through the same cleanup; MathML's `annotation` holds the formula
+        # source and must not be mistaken for an ODF comment `office:annotation`.
+        with tempfile.NamedTemporaryFile(suffix='.xml') as xml_file:
+            xml_file.write(b'''<?xml version="1.0"?>
+                                <math xmlns="http://www.w3.org/1998/Math/MathML">
+                                    <semantics>
+                                        <mrow><msup><mi>x</mi><mn>2</mn></msup></mrow>
+                                        <annotation encoding="StarMath 5.0">x^2</annotation>
+                                    </semantics>
+                                </math>''')
+            xml_file.flush()
+
+            self.assertTrue(office.LibreOfficeParser._LibreOfficeParser__remove_annotations(
+                xml_file.name))
+
+            with open(xml_file.name, 'rb') as cleaned:
+                content = cleaned.read()
+            self.assertIn(b'annotation', content)
+            self.assertIn(b'x^2', content)
+            self.assertIn(b'msup', content)
 
     def test_msoffice(self):
         with zipfile.ZipFile('./tests/data/revision.docx') as zipin:
