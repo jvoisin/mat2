@@ -77,6 +77,18 @@ class DTBNCXParser(AbstractHTMLParser):
     tags_required_blocklist = frozenset({'title', 'doctitle', 'meta'})
 
 
+# Void elements don't need a closing tag (https://html.spec.whatwg.org/#void-elements):
+# a real-world, non-XHTML document writes `<meta charset="utf-8">`, not
+# `<meta charset="utf-8" />`. `handle_starttag` pushes every opening tag on
+# the validation queue expecting a matching `handle_endtag`, so a bare one of
+# these left mat2 unable to process such a common, valid document at all: the
+# closing tag of an ancestor (eg. `</head>`) would be compared against the
+# unclosed `meta`/`br`/… still sitting on top of the queue, and raise.
+_VOID_ELEMENTS = frozenset({'area', 'base', 'br', 'col', 'embed', 'hr', 'img',
+                            'input', 'link', 'meta', 'param', 'source',
+                            'track', 'wbr'})
+
+
 class _HTMLParser(parser.HTMLParser):
     """Python doesn't have a validating html parser in its stdlib, so
     we're using an internal queue to track all the opening/closing tags,
@@ -138,10 +150,29 @@ class _HTMLParser(parser.HTMLParser):
         previous_tag = self.__validation_queue.pop()
         previous_tag = previous_tag[1:-1]  # remove < and >
         previous_tag = previous_tag.split(' ')[0]  # remove attributes
+
         if tag != previous_tag.lower():
+            if previous_tag.lower() in _VOID_ELEMENTS:
+                # A void element (eg. a bare `<meta charset="utf-8">`) never
+                # gets its own closing tag in real-world HTML, so close it
+                # here instead of raising on the closing tag of one of its
+                # ancestors. It can still be closed explicitly, like above,
+                # for the (unusual, but tolerated) documents that do so.
+                self.__close_tag(previous_tag)
+                self.handle_endtag(tag)
+                return
             raise ValueError("The closing tag %s doesn't match the previous "
                              "tag %s in %s" %
                              (tag, previous_tag, self.filename))
+
+        self.__close_tag(previous_tag)
+
+    def __close_tag(self, previous_tag: str) -> None:
+        """ Apply the bookkeeping triggered by a closing tag, given
+        `previous_tag` (in its original case, as written on the matching
+        opening tag): either a real one, or a void element's implicit one.
+        """
+        tag = previous_tag.lower()
 
         if tag in self.tag_required_blocklist:
             self.__in_dangerous_but_required_tag -= 1

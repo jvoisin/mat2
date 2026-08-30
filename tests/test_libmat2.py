@@ -995,6 +995,19 @@ class TestCleaning(unittest.TestCase):
         os.remove('./tests/data/clean.html')
         os.remove('./tests/data/clean.cleaned.html')
 
+        # `<meta charset="utf-8">` without a self-closing slash is how every
+        # non-XHTML HTML5 document spells it; it must not blow up mat2, nor
+        # make it silently drop everything coming after it.
+        with open('./tests/data/clean.html', 'w') as f:
+            f.write('<html><head><meta charset="utf-8"></head>'
+                    '<body>secret content</body></html>')
+        p = web.HTMLParser('./tests/data/clean.html')
+        self.assertTrue(p.remove_all())
+        with open('./tests/data/clean.cleaned.html', 'r') as f:
+            self.assertEqual(f.read(), '<html><head></head><body>secret content</body></html>')
+        os.remove('./tests/data/clean.html')
+        os.remove('./tests/data/clean.cleaned.html')
+
     def test_epub(self):
         shutil.copy('./tests/data/dirty.epub', './tests/data/clean.epub')
         p = epub.EPUBParser('./tests/data/clean.epub')
