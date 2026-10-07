@@ -77,6 +77,18 @@ def check_dependencies() -> dict[str, dict[str, bool]]:
         except ImportError:  # pragma: no cover
             ret[key]['found'] = False
 
+    import gi
+    ret['Cairo from PyGobject'] = {
+            'found': True,
+            'required': True
+    }
+    try:
+        gi.require_foreign("cairo")
+    except ImportError:
+        ret['Cairo from PyGobject'] = {
+                'found': False,
+        }
+
     for k, v in CMD_DEPENDENCIES.items():
         ret[k] = {
             'found': True,
