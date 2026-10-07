@@ -14,6 +14,7 @@ import io
 import cairo
 import gi
 gi.require_version('Poppler', '0.18')
+gi.require_foreign('cairo')
 from gi.repository import Poppler, GLib
 
 from . import abstract
