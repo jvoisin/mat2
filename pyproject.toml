@@ -7,8 +7,6 @@ name = "mat2"
 version = "0.15.0"
 description = "mat2 is a metadata removal tool, supporting a wide range of commonly used file formats, written in python3: at its core, it's a library, used by an eponymous command-line interface, as well as several file manager extensions."
 readme = "README.md"
-license = "LGPL-3.0-or-later"
-license-files = ["LICENSE"]
 requires-python = ">=3.11"
 authors = [
         {name = "Julien (jvoisin) Voisin", email = "julien.voisin+mat2@dustri.org"},
@@ -27,6 +25,9 @@ classifiers = [
         "Topic :: File Formats",
         "Intended Audience :: End Users/Desktop",
 ]
+# This file doesn't contain the license, as the fields are currently
+# a mess: https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license-and-license-files
+# We should add them once the dust settled.
 
 [project.urls]
 Repository = "https://github.com/jvoisin/mat2"
