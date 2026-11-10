@@ -3,6 +3,7 @@ import os
 import shutil
 import stat
 import subprocess
+import tempfile
 import unittest
 import glob
 
@@ -70,6 +71,19 @@ class TestReturnValue(unittest.TestCase):
     def test_zero(self):
         ret = subprocess.call(mat2_binary, stdout=subprocess.DEVNULL)
         self.assertEqual(0, ret)
+
+    def test_unreadable_file_message(self):
+        with tempfile.NamedTemporaryFile(delete=False) as f:
+            fname = f.name
+        try:
+            os.chmod(fname, 0)
+            proc = subprocess.Popen(mat2_binary + ['--show', fname],
+                                    stdout=subprocess.PIPE)
+            stdout, _ = proc.communicate()
+            self.assertIn(b'is not readable.', stdout)
+        finally:
+            os.chmod(fname, 0o600)
+            os.remove(fname)
 
         ret = subprocess.call(mat2_binary + ['--show', 'mat2'], stdout=subprocess.DEVNULL)
         self.assertEqual(0, ret)
