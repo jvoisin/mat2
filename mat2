@@ -42,10 +42,10 @@ def __check_file(filename: str, mode: int = os.R_OK) -> bool:
     elif not os.access(filename, mode):
         mode_str: list[str] = list()
         if mode & os.R_OK:
-            mode_str += 'readable'
+            mode_str.append('readable')
         if mode & os.W_OK:
-            mode_str += 'writeable'
-        __print_without_chars("[-] %s is not %s." % (filename, 'nor '.join(mode_str)))
+            mode_str.append('writeable')
+        __print_without_chars("[-] %s is not %s." % (filename, ' nor '.join(mode_str)))
         return False
     return True
 
