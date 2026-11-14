@@ -871,6 +871,7 @@ class TestCleaning(unittest.TestCase):
             },
             'extra_expected_meta': {
                 'VideoFullRangeFlag': 0,
+                'TimeScale': 720000,
              }
         },{
             'name': 'wmv',
